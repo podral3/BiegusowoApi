@@ -1,6 +1,9 @@
 var builder = DistributedApplication.CreateBuilder(args);
 
+var databaseContextPath = Path.GetFullPath(Path.Combine(AppContext.BaseDirectory, "../../../../Database")); //bruh 
+
 var postgres = builder.AddPostgres("postgres")
+    .WithDockerfile(databaseContextPath)
     .WithDataVolume()
     .WithPgAdmin(pgadmin => pgadmin.WithHostPort(2137));
 
