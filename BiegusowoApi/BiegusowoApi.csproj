@@ -10,14 +10,11 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.7" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.4" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Abstractions" Version="10.0.4" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Analyzers" Version="10.0.4" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.23.0" />
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\BiegusowoApi.Data\BiegusowoApi.Data.csproj" />
     <ProjectReference Include="..\BiegusowoApi.ServiceDefaults\BiegusowoApi.ServiceDefaults.csproj" />
   </ItemGroup>
 

@@ -1,3 +1,5 @@
+using BiegusowoApi.Helpers.Composition;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddServiceDefaults();
@@ -7,6 +9,7 @@ builder.AddServiceDefaults();
 builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
+builder.Services.AddDatabaseContext(builder.Configuration);
 
 var app = builder.Build();
 

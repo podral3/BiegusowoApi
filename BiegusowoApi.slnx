@@ -3,6 +3,7 @@
     <File Path=".editorconfig" />
   </Folder>
   <Project Path="BiegusowoApi.AppHost/BiegusowoApi.AppHost.csproj" />
+  <Project Path="BiegusowoApi.Data/BiegusowoApi.Data.csproj" Id="3aac1209-fe5f-4473-97e6-49bcfabc015b" />
   <Project Path="BiegusowoApi.ServiceDefaults/BiegusowoApi.ServiceDefaults.csproj" />
   <Project Path="BiegusowoApi/BiegusowoApi.csproj" />
 </Solution>
