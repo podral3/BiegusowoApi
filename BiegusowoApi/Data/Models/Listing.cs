@@ -1,0 +1,28 @@
+﻿using BiegusowoApi.Data.Types;
+
+namespace BiegusowoApi.Data.Models;
+
+public class Listing
+{
+    public Guid Id { get; set; }
+    
+    public Guid UserId { get; set; }
+    public User User { get; set; } = null!;
+
+    public int SpeciesId { get; set; }
+    public Species Species { get; set; } = null!;
+
+    public int BreedId { get; set; }
+    public Breed Breed { get; set; } = null!;
+
+    public string Title { get; set; }
+    public string Description { get; set; }
+    public ListingType ListingType { get; set; }   
+    public ListingStatus ListingStatus { get; set; }
+    public string BreedNote { get; set; }
+    public double Price { get; set; }
+    public bool PriceNegotiable { get; set; } = false;
+
+    
+
+}

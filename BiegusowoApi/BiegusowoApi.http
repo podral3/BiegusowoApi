@@ -1,0 +1,6 @@
+@BiegusowoApi_HostAddress = http://localhost:5158
+
+GET {{BiegusowoApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

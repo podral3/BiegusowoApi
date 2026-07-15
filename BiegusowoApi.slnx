@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+  </Folder>
+  <Project Path="BiegusowoApi.AppHost/BiegusowoApi.AppHost.csproj" />
+  <Project Path="BiegusowoApi.ServiceDefaults/BiegusowoApi.ServiceDefaults.csproj" />
+  <Project Path="BiegusowoApi/BiegusowoApi.csproj" />
+</Solution>
