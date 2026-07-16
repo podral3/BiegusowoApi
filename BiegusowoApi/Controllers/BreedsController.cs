@@ -23,7 +23,7 @@ public class BreedsController(ApplicationDbContext dbContext) : ControllerBase
 
     [HttpPost]
     [Authorize(Roles = "Admin")]
-    public async Task<ActionResult<BreedDto>> CreateBreed([FromBody] int speciesId, [FromBody] string name)
+    public async Task<ActionResult<BreedDto>> AddBreed([FromBody] int speciesId, [FromBody] string name)
     {
         var breed = new Breed
         {

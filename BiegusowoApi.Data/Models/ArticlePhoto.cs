@@ -10,7 +10,7 @@ public class ArticlePhoto
     public int ArticleId { get; set; }
     public Article Article { get; set; } = null!;
     
-    public string StorageKey { get; set; }
-    public short Order { get; set; } = 0;
+    public string FileName { get; set; }
+    public short Order { get; set; }
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
 }

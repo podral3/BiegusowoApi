@@ -3,9 +3,7 @@
 public record ListingMapIcon(
     string Id,
     string Title,
-    string Description,
+    int breedId,
     double Price,
-    bool PriceNegotiable,
-    string CityName,
     double Latitude,
     double Longitude);
