@@ -1,5 +1,6 @@
 ﻿using BiegusowoApi.Domain.Dtos.Listing;
 using BiegusowoApi.Helpers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BiegusowoApi.Controllers;
@@ -23,19 +24,21 @@ public class ListingsController : ControllerBase
         throw new NotImplementedException();
     }
 
-    [HttpGet("{id:string}")]
+    [HttpGet("{id}")]
     public ActionResult<ListingDto> GetListing([FromRoute] string id)
     {
         throw new NotImplementedException();
     }
 
-    [HttpPatch("{id:string}")]
+    [Authorize]
+    [HttpPatch("{id}")]
     public ActionResult<ListingDto> PatchListing([FromRoute] string id, [FromBody] UpdateListingRequest request)
     {
         throw new NotImplementedException();
     }
 
-    [HttpDelete("{id:string}")]
+    [Authorize]
+    [HttpDelete("{id}")]
     public ActionResult DeleteListing([FromRoute] string id)
     {
         throw new NotImplementedException();

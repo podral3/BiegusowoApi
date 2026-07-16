@@ -13,7 +13,7 @@ public class ImagesController : ControllerBase
         throw new NotImplementedException();
     }
 
-    [HttpPost("confirm/{tableName:string}/{id:string}")]
+    [HttpPost("confirm/{tableName}/{id}")]
     public async Task<IActionResult> ConfirmUpload([FromRoute] string tableName, [FromRoute] string id)
     {
         throw new NotImplementedException();

@@ -1,6 +1,6 @@
 ﻿using BiegusowoApi.Data.Models;
 
-namespace BiegusowoApi.Domain.Dtos;
+namespace BiegusowoApi.Domain.Dtos.Misc;
 
 public record SpeciesDto(
     int Id,
