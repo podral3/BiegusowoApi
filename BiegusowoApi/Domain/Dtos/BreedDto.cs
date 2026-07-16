@@ -2,10 +2,14 @@
 
 namespace BiegusowoApi.Domain.Dtos;
 
-public class BreedDto(Breed breed)
+public record BreedDto(
+    int Id,
+    int SpeciesId,
+    string Name,
+    string Slug)
 {
-    public int Id { get; set; } = breed.Id;
-    public int SpeciesId { get; set; } = breed.SpeciesId;
-    public string Name { get; set; } = breed.Name;
-    public string Slug { get; set; } = breed.Slug;
+    public BreedDto(Breed breed)
+        : this(breed.Id, breed.SpeciesId, breed.Name, breed.Slug)
+    {
+    }
 }

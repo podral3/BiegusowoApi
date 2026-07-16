@@ -1,4 +1,5 @@
 ﻿using BiegusowoApi.Data.Types;
+using NetTopologySuite.Geometries;
 
 namespace BiegusowoApi.Data.Models;
 
@@ -23,6 +24,14 @@ public class Listing
     public double Price { get; set; }
     public bool PriceNegotiable { get; set; } = false;
 
-    
+    public DateTimeOffset CreatedAt { get; set; }
+    public DateTimeOffset? UpdatedAt { get; set; }
+    public DateTimeOffset? DeletedAt { get; set; }
+    public string? RemovedReason { get; set; }
+
+    public int VoivodeshipId { get; set; }
+    public string CityName { get; set; }
+
+    public Point Location { get; set; }
 
 }

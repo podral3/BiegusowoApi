@@ -10,8 +10,8 @@
         public string Title { get; set; }
         public string slug { get; set; }
         public string Excerpt { get; set; }
-        public string cover_url { get; set; }
-        public string body_html { get; set; }
+        public string CoverURL { get; set; }
+        public string BodyHTML { get; set; }
         public string MetaTitle { get; set; }
         public string MetaDescription { get; set; }
         public string OgImageUrl { get; set; }

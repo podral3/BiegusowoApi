@@ -2,9 +2,13 @@
 
 namespace BiegusowoApi.Domain.Dtos;
 
-public class SpeciesDto(Species species)
+public record SpeciesDto(
+    int Id,
+    string Name,
+    string Slug)
 {
-    public int Id { get; set; } = species.Id;
-    public string Name { get; set; } = species.Name;
-    public string Slug { get; set; } = species.Slug;
+    public SpeciesDto(Species species)
+        : this(species.Id, species.Name, species.Slug)
+    {
+    }
 }
