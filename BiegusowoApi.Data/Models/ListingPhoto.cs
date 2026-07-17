@@ -9,8 +9,8 @@
 
         public string FileName { get; set; }
         public int SortOrder { get; set; }
-        public bool IsCover { get; set; }
         public string Bucket { get; set; }
+        public int FileSizeBytes { get; set; }
         public string StorageProvider { get; set; } 
         public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
 

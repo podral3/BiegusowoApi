@@ -8,5 +8,5 @@ RUN apt-get update && apt-get install -y curl ca-certificates gnupg \
     && apt-get purge -y curl gnupg \
     && rm -rf /var/lib/apt/lists/*
 	
-COPY init-extensions.sh /docker-entrypoint-initdb.d/
-RUN chmod +x /docker-entrypoint-initdb.d/init-extensions.sh
+COPY 01-init-extensions.sh /docker-entrypoint-initdb.d/01-init-extensions.sh
+RUN chmod +x /docker-entrypoint-initdb.d/01-init-extensions.sh

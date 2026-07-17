@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Text.Json;
 using Microsoft.EntityFrameworkCore.Migrations;
+using NetTopologySuite.Geometries;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
@@ -8,11 +8,14 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BiegusowoApi.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InitialMigrate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.AlterDatabase()
+                .Annotation("Npgsql:PostgresExtension:postgis", ",,");
+
             migrationBuilder.CreateTable(
                 name: "FileDeletionOutboxes",
                 columns: table => new
@@ -24,7 +27,7 @@ namespace BiegusowoApi.Data.Migrations
                     RetryCount = table.Column<int>(type: "integer", nullable: false),
                     LastError = table.Column<string>(type: "text", nullable: false),
                     StorageProvider = table.Column<string>(type: "text", nullable: false),
-                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
                     LastRetryAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
@@ -90,18 +93,15 @@ namespace BiegusowoApi.Data.Migrations
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     IdentityId = table.Column<string>(type: "text", nullable: false),
                     DisplayName = table.Column<string>(type: "text", nullable: false),
+                    Bio = table.Column<string>(type: "text", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "text", nullable: true),
                     AvatarUrl = table.Column<string>(type: "text", nullable: false),
-                    Role = table.Column<string>(type: "text", nullable: false),
+                    BackgroundImageUlr = table.Column<string>(type: "text", nullable: false),
                     City = table.Column<string>(type: "text", nullable: false),
                     VoivodeshipId = table.Column<int>(type: "integer", nullable: false),
-                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
                     UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
-                    DeletedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
-                    BackgroundImageUlr = table.Column<string>(type: "text", nullable: false),
-                    Bio = table.Column<string>(type: "text", nullable: false),
-                    PhoneNumber = table.Column<string>(type: "text", nullable: false),
-                    Avatar = table.Column<JsonDocument>(type: "jsonb", nullable: false),
-                    BackgroundImage = table.Column<JsonDocument>(type: "jsonb", nullable: false)
+                    DeletedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -125,14 +125,15 @@ namespace BiegusowoApi.Data.Migrations
                     Title = table.Column<string>(type: "text", nullable: false),
                     slug = table.Column<string>(type: "text", nullable: false),
                     Excerpt = table.Column<string>(type: "text", nullable: false),
-                    cover_url = table.Column<string>(type: "text", nullable: false),
-                    body_html = table.Column<string>(type: "text", nullable: false),
+                    CoverURL = table.Column<string>(type: "text", nullable: false),
+                    BodyHTML = table.Column<string>(type: "text", nullable: false),
                     MetaTitle = table.Column<string>(type: "text", nullable: false),
                     MetaDescription = table.Column<string>(type: "text", nullable: false),
                     OgImageUrl = table.Column<string>(type: "text", nullable: false),
                     Status = table.Column<string>(type: "text", nullable: false),
                     ReadingTimeMinutes = table.Column<int>(type: "integer", nullable: false),
-                    PublishedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
+                    PublishedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()")
                 },
                 constraints: table =>
                 {
@@ -157,9 +158,16 @@ namespace BiegusowoApi.Data.Migrations
                     Description = table.Column<string>(type: "text", nullable: false),
                     ListingType = table.Column<int>(type: "integer", nullable: false),
                     ListingStatus = table.Column<int>(type: "integer", nullable: false),
-                    BreedNote = table.Column<string>(type: "text", nullable: false),
+                    BreedNote = table.Column<string>(type: "text", nullable: true),
                     Price = table.Column<double>(type: "double precision", nullable: false),
-                    PriceNegotiable = table.Column<bool>(type: "boolean", nullable: false)
+                    PriceNegotiable = table.Column<bool>(type: "boolean", nullable: false),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    RemovedReason = table.Column<string>(type: "text", nullable: true),
+                    VoivodeshipId = table.Column<int>(type: "integer", nullable: false),
+                    CityName = table.Column<string>(type: "text", nullable: false),
+                    Location = table.Column<Point>(type: "geometry", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -182,6 +190,12 @@ namespace BiegusowoApi.Data.Migrations
                         principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Listings_Voivodeships_VoivodeshipId",
+                        column: x => x.VoivodeshipId,
+                        principalTable: "Voivodeships",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -191,9 +205,9 @@ namespace BiegusowoApi.Data.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     ArticleId = table.Column<int>(type: "integer", nullable: false),
-                    StorageKey = table.Column<string>(type: "text", nullable: false),
+                    FileName = table.Column<string>(type: "text", nullable: false),
                     Order = table.Column<short>(type: "smallint", nullable: false),
-                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
+                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()")
                 },
                 constraints: table =>
                 {
@@ -215,7 +229,7 @@ namespace BiegusowoApi.Data.Migrations
                     BuyerId = table.Column<Guid>(type: "uuid", nullable: false),
                     SellerId = table.Column<Guid>(type: "uuid", nullable: false),
                     LastMessageAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
+                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()")
                 },
                 constraints: table =>
                 {
@@ -246,12 +260,12 @@ namespace BiegusowoApi.Data.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     ListingId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Url = table.Column<string>(type: "text", nullable: false),
+                    FileName = table.Column<string>(type: "text", nullable: false),
                     SortOrder = table.Column<int>(type: "integer", nullable: false),
-                    IsCover = table.Column<bool>(type: "boolean", nullable: false),
                     Bucket = table.Column<string>(type: "text", nullable: false),
+                    FileSizeBytes = table.Column<int>(type: "integer", nullable: false),
                     StorageProvider = table.Column<string>(type: "text", nullable: false),
-                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
+                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()")
                 },
                 constraints: table =>
                 {
@@ -273,7 +287,7 @@ namespace BiegusowoApi.Data.Migrations
                     SenderId = table.Column<Guid>(type: "uuid", nullable: false),
                     Body = table.Column<string>(type: "text", nullable: false),
                     MessageStatus = table.Column<int>(type: "integer", nullable: false),
-                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
+                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()")
                 },
                 constraints: table =>
                 {
@@ -341,6 +355,11 @@ namespace BiegusowoApi.Data.Migrations
                 name: "IX_Listings_UserId",
                 table: "Listings",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Listings_VoivodeshipId",
+                table: "Listings",
+                column: "VoivodeshipId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Messages_ConversationId",

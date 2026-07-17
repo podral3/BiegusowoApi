@@ -22,6 +22,7 @@ builder.AddProject<Projects.BiegusowoApi>("biegusowoapi")
     .WithReference(appDb)
     .WithReference(keycloak)
     .WaitFor(appDb)
-    .WaitFor(keycloak);
+    .WaitFor(keycloak)
+    .WithEnvironment("DOTNET_WATCH", "1");
 
 builder.Build().Run();

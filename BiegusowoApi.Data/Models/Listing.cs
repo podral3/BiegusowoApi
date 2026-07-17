@@ -20,7 +20,7 @@ public class Listing
     public string Description { get; set; }
     public ListingType ListingType { get; set; }   
     public ListingStatus ListingStatus { get; set; }
-    public string BreedNote { get; set; }
+    public string? BreedNote { get; set; }
     public double Price { get; set; }
     public bool PriceNegotiable { get; set; } = false;
 
@@ -30,6 +30,7 @@ public class Listing
     public string? RemovedReason { get; set; }
 
     public int VoivodeshipId { get; set; }
+    public Voivodeship Voivodeship { get; set; } = null!;
     public string CityName { get; set; }
 
     public Point Location { get; set; }

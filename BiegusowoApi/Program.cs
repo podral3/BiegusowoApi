@@ -1,3 +1,5 @@
+using BiegusowoApi.Data;
+using BiegusowoApi.Data.Seeding;
 using BiegusowoApi.Helpers.Composition;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,6 +18,13 @@ app.MapDefaultEndpoints();
 
 if (app.Environment.IsDevelopment())
 {
+    using var scope = app.Services.CreateScope();
+    var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    if (!dbContext.Species.Any())
+    {
+        await new EntityRelationOrchestrator(dbContext).Orchestrate();
+    }
+        
     app.MapOpenApi();
     app.UseScalar();
 }

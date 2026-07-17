@@ -1,0 +1,51 @@
+﻿using BiegusowoApi.Data.Models;
+using BiegusowoApi.Data.Types;
+using Bogus;
+using NetTopologySuite;
+using NetTopologySuite.Geometries;
+namespace BiegusowoApi.Data.Seeding.Seeders;
+
+internal static class ListingSeeder
+{
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="count"></param>
+    /// <param name="SpeciesBreedsRanges">Dict where each key is a species ID and the value is a tuple of (minBreedId, maxBreedId)</param>
+    /// <returns></returns>
+    public static List<Listing> Generate(int count, List<Breed> breeds, List<User> users, List<Voivodeship> voivodeships)
+    {
+        var geometryFactory = NtsGeometryServices.Instance.CreateGeometryFactory(srid: 4326);
+        Breed temporaryBreed = null!;
+
+        var listingFaker = new Bogus.Faker<Listing>()
+            .UseSeed(42)
+            .RuleFor(l => l.Title, f => f.Lorem.Sentence())
+            .RuleFor(l => l.Description, f => f.Lorem.Paragraph())
+            .RuleFor(l => l.ListingType, f => f.PickRandom<ListingType>())
+            .RuleFor(l => l.ListingStatus, f => f.PickRandom<ListingStatus>())
+            .RuleFor(l => l.UserId, f => f.PickRandom(users).Id)
+            .RuleFor(l => l.BreedId, f =>
+            {
+                temporaryBreed = f.PickRandom(breeds); //First we pick a random breed, then we use its ID for the BreedId property and its SpeciesId for the SpeciesId property
+                return temporaryBreed.Id;
+            })
+            .RuleFor(l => l.SpeciesId, f => temporaryBreed.SpeciesId)
+            .RuleFor(l => l.BreedNote, f => f.Lorem.Sentence().OrNull(f, 0.3f))
+            .RuleFor(l => l.Price, f => f.Random.Double(10, 200))
+            .RuleFor(l => l.PriceNegotiable, f => f.Random.Bool(0.5f))
+            .RuleFor(l => l.UpdatedAt, f => f.Date.RecentOffset(30).ToUniversalTime().OrNull(f, 0.4f))
+            .RuleFor(l => l.DeletedAt, f => f.Date.RecentOffset(30).ToUniversalTime().OrNull(f, 0.2f))
+            .RuleFor(l => l.CityName, f => f.Address.City())
+            .RuleFor(l => l.VoivodeshipId, f => f.PickRandom(voivodeships).Id)
+            .RuleFor(l => l.Location, f =>
+            {
+                // Lat/Lon w przybliżonych granicach Polski
+                var lat = f.Random.Double(49.0, 54.8);   // Y
+                var lon = f.Random.Double(14.1, 24.2);   // X
+
+                return geometryFactory.CreatePoint(new Coordinate(lon, lat));
+            }); 
+        return listingFaker.Generate(count);
+    }
+}
