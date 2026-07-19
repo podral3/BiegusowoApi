@@ -30,6 +30,10 @@ public class BaseTests : IClassFixture<WebApplicationFactoryFixture>
     protected IQueryable<T> GetQueryable<T>() where T : class => _dbContext.Set<T>().AsNoTracking();
     protected async Task<HttpResponseMessage> PostAsJsonAsync<T>(string url, T data, CancellationToken cancellationToken)
         => await _client.PostAsJsonAsync(url, data, cancellationToken);
+
+    protected async Task<HttpResponseMessage> PostAsJsonAsync<T>(HttpClient client, string url,  T data, CancellationToken cancellationToken)
+        => await client.PostAsJsonAsync(url, data, cancellationToken);
+
     protected async Task AddAsync<TEntity>(TEntity entity)
         where TEntity : class
     {

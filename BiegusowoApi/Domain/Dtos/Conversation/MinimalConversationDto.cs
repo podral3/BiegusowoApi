@@ -6,4 +6,6 @@ public record MinimalConversationDto(
     string OtherPersonName,
     string ListingId,
     string ListingTitle,
-    bool AreYouSeller);
+    bool AreYouSeller,
+    string LastMessagePreview,
+    DateTimeOffset LastMessageAt);

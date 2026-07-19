@@ -246,6 +246,7 @@ public class ListingsControllerTests(WebApplicationFactoryFixture factory) : Bas
 
         // Act
         var response = await PostAsJsonAsync(
+            client,
             "/api/listings",
             request,
             CancellationToken);
@@ -284,6 +285,7 @@ public class ListingsControllerTests(WebApplicationFactoryFixture factory) : Bas
 
         // Act
         var response = await PostAsJsonAsync(
+            client,
             "/api/listings",
             request,
             CancellationToken);
@@ -330,6 +332,7 @@ public class ListingsControllerTests(WebApplicationFactoryFixture factory) : Bas
 
         // Act
         var response = await PostAsJsonAsync(
+            client,
             "/api/listings",
             request,
             CancellationToken);
@@ -363,6 +366,7 @@ public class ListingsControllerTests(WebApplicationFactoryFixture factory) : Bas
 
         // Act
         var response = await PostAsJsonAsync(
+            client,
             "/api/listings",
             request,
             CancellationToken);

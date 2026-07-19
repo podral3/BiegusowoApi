@@ -15,21 +15,27 @@ public class ConversationsController(ApplicationDbContext dbContext) : Controlle
 
     [HttpGet]
     [Authorize]
-    public async Task<ActionResult<PaginatedList<MinimalConversationDto>>> GetConversations()
+    [EndpointDescription("Get a paginated list of user conversations. Does not include messages.")]
+    public async Task<ActionResult<PaginatedList<MinimalConversationDto>>> GetConversations(
+        [FromQuery] int page = 1,
+        [FromQuery] int pageSize = 10)
     {
-        throw new NotImplementedException();
+        return Ok();
     }
 
-    [HttpGet]
+    [HttpGet("{conversationId}")]
     [Authorize]
-    public async Task<ActionResult<ConversationDto>> GetConversation(string id)
+    public async Task<ActionResult<ConversationDto>> GetMessages(
+        [FromRoute] string conversationId,
+        [FromQuery] int skip = 0,
+        [FromQuery] int pageSize = 10)
     {
         throw new NotImplementedException();
     }
 
     [HttpPost]
     [Authorize]
-    public async Task<ActionResult<ConversationDto>> GetOrCreateConversation([FromBody] ConversationRequest request)
+    public async Task<ActionResult<ConversationDto>> CreateConversation([FromBody] ConversationRequest request)
     {
         throw new NotImplementedException();
     }

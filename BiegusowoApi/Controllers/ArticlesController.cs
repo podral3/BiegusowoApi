@@ -18,8 +18,8 @@ public class ArticlesController(ApplicationDbContext dbContext) : ControllerBase
         throw new NotImplementedException();
     }
 
-    [HttpGet("{slug}")]
-    public async Task<ActionResult<ArticleDto>> GetArticle([FromRoute] string slug)
+    [HttpGet("{id}")]
+    public async Task<ActionResult<ArticleDto>> GetArticle([FromRoute] string id)
     {
         throw new NotImplementedException();
     }
