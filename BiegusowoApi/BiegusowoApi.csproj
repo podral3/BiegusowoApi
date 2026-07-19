@@ -22,4 +22,9 @@
     <ProjectReference Include="..\BiegusowoApi.ServiceDefaults\BiegusowoApi.ServiceDefaults.csproj" />
   </ItemGroup>
 
+<ItemGroup>
+	<InternalsVisibleTo Include="Biegusowo.Tests" />
+</ItemGroup>
+
+
 </Project>

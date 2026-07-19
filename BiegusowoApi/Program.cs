@@ -20,10 +20,10 @@ if (app.Environment.IsDevelopment())
 {
     using var scope = app.Services.CreateScope();
     var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    if (!dbContext.Species.Any())
-    {
-        await new EntityRelationOrchestrator(dbContext).Orchestrate();
-    }
+    //if (!dbContext.Species.Any())
+    //{
+    //    await new DataSeeder(dbContext).Seed();
+    //}
         
     app.MapOpenApi();
     app.UseScalar();
@@ -36,3 +36,7 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+
+//for testing purposes
+public partial class Program { }

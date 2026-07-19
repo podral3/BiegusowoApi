@@ -4,10 +4,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BiegusowoApi.Data.Seeding;
 
-public class EntityRelationOrchestrator(ApplicationDbContext dbContext)
+public class DataSeeder(ApplicationDbContext dbContext)
 {
     private readonly ApplicationDbContext _dbContext = dbContext;
-    public async Task Orchestrate()
+    public async Task Seed()
     {
         await _dbContext.Database.MigrateAsync();
 
