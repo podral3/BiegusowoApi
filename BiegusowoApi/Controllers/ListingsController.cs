@@ -31,15 +31,22 @@ public class ListingsController : ControllerBase
     }
 
     [Authorize]
+    [HttpPost]
+    public async Task<ActionResult<ListingDto>> CreateListing([FromBody] CreateListingRequest request)
+    {
+        throw new NotImplementedException();    
+    }
+
+    [Authorize]
     [HttpPatch("{id}")]
-    public ActionResult<ListingDto> PatchListing([FromRoute] string id, [FromBody] UpdateListingRequest request)
+    public async Task<ActionResult<ListingDto>> PatchListing([FromRoute] string id, [FromBody] UpdateListingRequest request)
     {
         throw new NotImplementedException();
     }
 
     [Authorize]
     [HttpDelete("{id}")]
-    public ActionResult DeleteListing([FromRoute] string id)
+    public async Task<ActionResult> DeleteListing([FromRoute] string id)
     {
         throw new NotImplementedException();
     }

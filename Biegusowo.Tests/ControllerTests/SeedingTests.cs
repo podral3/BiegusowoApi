@@ -4,7 +4,7 @@ using BiegusowoApi.Data.Seeding;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Biegusowo.Tests;
+namespace Biegusowo.Tests.ControllerTests;
 
 public class SeedingTests(WebApplicationFactoryFixture factory) 
     : IClassFixture<WebApplicationFactoryFixture>

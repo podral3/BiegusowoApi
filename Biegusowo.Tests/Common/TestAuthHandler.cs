@@ -11,37 +11,30 @@ namespace Biegusowo.Tests.Common;
 
 public class TestAuthContext
 {
-    public int UserId { get; set; }
+    public string UserId { get; set; }
     public string? Email { get; set; }
     public List<string> Roles { get; set; } = new();
 }
 
-public class TestAuthHandler : AuthenticationHandler<AuthenticationSchemeOptions>
+public class TestAuthHandler(
+    IOptionsMonitor<AuthenticationSchemeOptions> options,
+    ILoggerFactory logger,
+    UrlEncoder encoder,
+    TestAuthContext context)
+    : AuthenticationHandler<AuthenticationSchemeOptions>(options, logger, encoder)
 {
-    private readonly TestAuthContext _context;
-
-    public TestAuthHandler(
-        IOptionsMonitor<AuthenticationSchemeOptions> options,
-        ILoggerFactory logger,
-        UrlEncoder encoder,
-        TestAuthContext context)
-        : base(options, logger, encoder)
-    {
-        _context = context;
-    }
-
     protected override Task<AuthenticateResult> HandleAuthenticateAsync()
     {
         var claims = new List<Claim>
         {
-            new Claim(ClaimTypes.NameIdentifier, _context.UserId.ToString()),
-            new Claim("sub", _context.UserId.ToString()),
+            new Claim(ClaimTypes.NameIdentifier, context.UserId.ToString()),
+            new Claim("sub", context.UserId.ToString()),
         };
 
-        if (_context.Email is not null)
-            claims.Add(new Claim(ClaimTypes.Email, _context.Email));
+        if (context.Email is not null)
+            claims.Add(new Claim(ClaimTypes.Email, context.Email));
 
-        claims.AddRange(_context.Roles.Select(r => new Claim(ClaimTypes.Role, r)));
+        claims.AddRange(context.Roles.Select(r => new Claim(ClaimTypes.Role, r)));
 
         var identity = new ClaimsIdentity(claims, authenticationType: "Test");
         var principal = new ClaimsPrincipal(identity);

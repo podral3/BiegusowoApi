@@ -16,6 +16,7 @@ namespace Biegusowo.Tests.Common;
 public class WebApplicationFactoryFixture : WebApplicationFactory<Program>, IAsyncLifetime
 {
     private readonly PostgreSqlContainer _postgreSqlContainer;
+    private IServiceScopeFactory _scopeFactory;
 
     public WebApplicationFactoryFixture()
     {
@@ -44,8 +45,8 @@ public class WebApplicationFactoryFixture : WebApplicationFactory<Program>, IAsy
             services.AddScoped<DataSeeder>();
         });
     }
-
-    public HttpClient CreateAuthenticatedClient(int userId, params string[] roles)
+    public IServiceScope CreateScope() => _scopeFactory.CreateScope();
+    public HttpClient CreateAuthenticatedClient(string userId, params string[] roles)
     {
         return WithWebHostBuilder(builder =>
         {
@@ -68,7 +69,7 @@ public class WebApplicationFactoryFixture : WebApplicationFactory<Program>, IAsy
         }).CreateClient();
     }
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
         await _postgreSqlContainer.StartAsync();
         Console.WriteLine(_postgreSqlContainer.GetConnectionString());
@@ -83,11 +84,12 @@ public class WebApplicationFactoryFixture : WebApplicationFactory<Program>, IAsy
         var seeder = scope.ServiceProvider.GetRequiredService<DataSeeder>();
         await seeder.Seed();
 
+        _scopeFactory = this.Services.GetRequiredService<IServiceScopeFactory>();
     }
 
-    async Task IAsyncLifetime.DisposeAsync()
+    public override async ValueTask DisposeAsync()
     {
         await _postgreSqlContainer.StopAsync();
-        await _postgreSqlContainer.DisposeAsync();
+        GC.SuppressFinalize(this);
     }
 }
