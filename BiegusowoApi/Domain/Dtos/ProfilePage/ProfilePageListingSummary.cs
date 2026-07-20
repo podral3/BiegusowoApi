@@ -1,7 +1,7 @@
-﻿namespace BiegusowoApi.Domain.ProfilePage;
+﻿namespace BiegusowoApi.Domain.Dtos.ProfilePage;
 
 public record ProfilePageListingSummary(
-    string Id,
+    Guid Id,
     string Slug,
     string Title,
     decimal Price,

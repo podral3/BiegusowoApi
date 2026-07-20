@@ -3,7 +3,7 @@
 public record MinimalArticleDto(
     string Title,
     string AuthorName,
-    string ConverUrl,
-    int ReadingTimeMinuts,
+    string CoverUrl,
+    int ReadingTimeMinutes,
     DateTimeOffset PublishedAt,
     string Slug);

@@ -1,10 +1,10 @@
 ﻿namespace BiegusowoApi.Domain.Dtos.Conversation;
 
 public record MinimalConversationDto(
-    string Id,
-    string OtherPersonId,
+    Guid Id,
+    Guid OtherPersonId,
     string OtherPersonName,
-    string ListingId,
+    Guid ListingId,
     string ListingTitle,
     bool AreYouSeller,
     string LastMessagePreview,

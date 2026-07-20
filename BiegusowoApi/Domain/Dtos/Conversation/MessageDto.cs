@@ -1,7 +1,7 @@
 ﻿namespace BiegusowoApi.Domain.Dtos.Conversation;
 
 public record MessageDto(
-    string ConversationId,
-    string SenderId,
+    Guid ConversationId,
+    Guid SenderId,
     string Message,
     DateTimeOffset SentAt);

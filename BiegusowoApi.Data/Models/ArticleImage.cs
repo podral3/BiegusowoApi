@@ -2,7 +2,7 @@
 
 namespace BiegusowoApi.Data.Models;
 
-public class ArticlePhoto
+public class ArticleImage
 {
     public int Id { get; set; }
 

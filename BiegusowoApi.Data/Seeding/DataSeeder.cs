@@ -24,7 +24,7 @@ public class DataSeeder(ApplicationDbContext dbContext)
             await _dbContext.Listings.AddRangeAsync(listings);
             await _dbContext.SaveChangesAsync();
 
-            List<ListingPhoto> listingPhotos = ListingPhotoSeeder.Generate(listings, 10);
+            List<ListingImage> listingPhotos = ListingPhotoSeeder.Generate(listings, 10);
             await _dbContext.ListingPhotos.AddRangeAsync(listingPhotos);
             await _dbContext.SaveChangesAsync();
 

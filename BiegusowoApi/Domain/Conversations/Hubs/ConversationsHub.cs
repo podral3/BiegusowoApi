@@ -17,7 +17,7 @@ public class ConversationsHub(IConversationService conversationService) : Hub
         List<MinimalConversationDto> conversations = paginatedList.Items;
         foreach (var conversation in conversations)
         {
-            await Groups.AddToGroupAsync(Context.ConnectionId, conversation.Id);
+            await Groups.AddToGroupAsync(Context.ConnectionId, conversation.Id.ToString());
         }
         await base.OnConnectedAsync();
     }

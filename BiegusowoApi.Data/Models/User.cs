@@ -9,8 +9,13 @@ public class User
     public string DisplayName { get; set; }
     public string? Bio { get; set; }
     public string? PhoneNumber { get; set; }
-    public string AvatarUrl { get; set; }
-    public string BackgroundImageUlr { get; set; }
+
+    public Guid? AvatarImageId { get; set; }
+    public UserImage AvatarImage { get; set; } = null!;
+
+    public Guid? BackgroundImageId { get; set; }
+    public UserImage BackgroundImage { get; set; } = null!;
+
     public string City { get; set; }
 
     public int VoivodeshipId { get; set; }

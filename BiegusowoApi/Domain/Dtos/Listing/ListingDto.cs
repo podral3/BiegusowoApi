@@ -3,8 +3,8 @@
 namespace BiegusowoApi.Domain.Dtos.Listing;
 
 public record ListingDto(
-    string Id,
-    string UserId,
+    Guid Id,
+    Guid UserId,
     string UserName,
     string Title,
     string Description,

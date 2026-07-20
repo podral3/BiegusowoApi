@@ -1,9 +1,9 @@
 ﻿namespace BiegusowoApi.Domain.Dtos.Listing;
 
 public record ListingMapIcon(
-    string Id,
+    Guid Id,
     string Title,
-    int breedId,
+    int BreedId,
     double Price,
     double Latitude,
     double Longitude);

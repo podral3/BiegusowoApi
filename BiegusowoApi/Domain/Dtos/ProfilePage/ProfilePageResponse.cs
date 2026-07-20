@@ -1,6 +1,6 @@
 ﻿using BiegusowoApi.Domain.Dtos.User;
 
-namespace BiegusowoApi.Domain.ProfilePage;
+namespace BiegusowoApi.Domain.Dtos.ProfilePage;
 
 public record ProfilePageResponse(
     UserDto User,

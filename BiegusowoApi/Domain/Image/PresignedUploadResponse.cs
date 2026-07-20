@@ -7,6 +7,7 @@ public record PresignedUploadResponse(
 public record FileUploadResponse(
     string Key,
     string PresignedUrl,
+    string ImageId,
     Dictionary<string, string> Metadata
     );
 

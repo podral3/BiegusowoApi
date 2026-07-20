@@ -1,6 +1,6 @@
 ﻿namespace BiegusowoApi.Domain.Conversations;
 
-public record ConversationRequest(string ListingId,
+public record ConversationRequest(Guid ListingId,
     string FirstMessage,
     DateTimeOffset SentAt);
 

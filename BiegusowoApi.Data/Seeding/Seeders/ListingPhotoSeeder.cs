@@ -8,9 +8,9 @@ namespace BiegusowoApi.Data.Seeding.Seeders;
 
 internal static class ListingPhotoSeeder
 {
-    public static List<ListingPhoto> Generate(List<Listing> listings, int maxPhotosPerListing)
+    public static List<ListingImage> Generate(List<Listing> listings, int maxPhotosPerListing)
     {
-        var listingPhotos = new List<ListingPhoto>();
+        var listingPhotos = new List<ListingImage>();
         foreach (var listing in listings)
         { 
         int listingPhotoCount = new Random(42).Next(maxPhotosPerListing);
@@ -18,7 +18,7 @@ internal static class ListingPhotoSeeder
 
             for (int i = 0; i < listingPhotoCount; i++)
             {
-                var photo = new ListingPhoto
+                var photo = new ListingImage
                 {
                     Id = Guid.NewGuid(),
                     ListingId = listing.Id,
@@ -26,7 +26,6 @@ internal static class ListingPhotoSeeder
                     SortOrder = i,
                     Bucket = "public",
                     FileSizeBytes = new Random().Next(100_000, 5_000_000), // Random file size between 100KB and 5MB
-                    StorageProvider = "Local",
                     CreatedAt = DateTimeOffset.UtcNow
                 };
                 listingPhotos.Add(photo);
