@@ -9,6 +9,8 @@ public class DataSeeder(ApplicationDbContext dbContext)
     private readonly ApplicationDbContext _dbContext = dbContext;
     public async Task Seed()
     {
+        //await _dbContext.Database.MigrateAsync();
+
         await using var transaction = await _dbContext.Database.BeginTransactionAsync();
         try
         {

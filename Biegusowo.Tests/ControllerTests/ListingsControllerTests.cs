@@ -258,47 +258,11 @@ public class ListingsControllerTests(WebApplicationFactoryFixture factory) : Bas
             cancellationToken: CancellationToken);
 
         await Verify(listing);
-    }
 
-    [Fact]
-    public async Task CreateListing_PersistsListing()
-    {
-        // Arrange
-        var client = _factory.CreateAuthenticatedClient(FirstUserId);
+        Listing? entity = await GetQueryable<Listing>()
+            .FirstOrDefaultAsync(x => x.Id == listing!.Id, CancellationToken);
 
-        var request = new CreateListingRequest(
-            "Integration Test Listing",
-            "Description",
-            99,
-            false,
-            1,
-            10,
-            "",
-            8,
-            1,
-            1,
-            "Warsaw",
-            21.0,
-            52.0,
-            []
-        );
-
-        // Act
-        var response = await PostAsJsonAsync(
-            client,
-            "/api/listings",
-            request,
-            CancellationToken);
-
-        response.Should().Be201Created();
-
-        var listing = await response.Content.ReadFromJsonAsync<ListingDto>(
-            cancellationToken: CancellationToken);
-
-        // Assert
-        var entity = await GetQueryable<Listing>()
-            .FirstOrDefaultAsync(x => x.Id.ToString() == listing!.Id, CancellationToken);
-
+        entity.Should().NotBeNull();
         entity.Title.Should().Be(request.Title);
         entity.Description.Should().Be(request.Description);
         entity.Price.Should().Be(request.Price);

@@ -71,15 +71,13 @@ public class WebApplicationFactoryFixture : WebApplicationFactory<Program>, IAsy
 
     public async ValueTask InitializeAsync()
     {
-        await _postgreSqlContainer.StartAsync();
-        Console.WriteLine(_postgreSqlContainer.GetConnectionString());
-        
+        await _postgreSqlContainer.StartAsync();        
 
         // Migrate
         using var scope = Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         await db.Database.MigrateAsync();
-        Console.WriteLine(db.Database.GetConnectionString());
+
         // Seed
         var seeder = scope.ServiceProvider.GetRequiredService<DataSeeder>();
         await seeder.Seed();
