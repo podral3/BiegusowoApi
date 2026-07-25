@@ -2,13 +2,9 @@
 {
     public class Article
     {
-        public int Id { get; set; }
-        
-        public int AuthorId { get; set; }
-        public User Author { get; set; } = null!;
-        
+        public Guid Id { get; set; }
         public string Title { get; set; }
-        public string slug { get; set; }
+        public string Slug { get; set; }
         public string Excerpt { get; set; }
         public string CoverURL { get; set; }
         public string BodyHTML { get; set; }
@@ -18,7 +14,8 @@
         public string Status { get; set; }
         public int ReadingTimeMinutes { get; set; }
         public DateTimeOffset PublishedAt { get; set; }
-        public DateTimeOffset CreatedAt { get; } = DateTimeOffset.UtcNow;
-        public DateTimeOffset UpdatedAt { get; }
+        public DateTimeOffset CreatedAt { get; set; }
+        public DateTimeOffset? UpdatedAt { get; set; }
+        public DateTimeOffset? DeletedAt { get; set; }
     }
 }

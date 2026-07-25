@@ -13,8 +13,8 @@ public class ListingsController : ControllerBase
 {
     [HttpGet]
     [EndpointDescription("Get a paginated list of listings with optional filters and sorting.")]
-    [ProducesResponseType(typeof(PaginatedList<ListingDto>), StatusCodes.Status200OK)]
-    public ActionResult<PaginatedList<ListingDto>> GetListings(
+    [ProducesResponseType(typeof(CursorPaginatedList<ListingDto>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<CursorPaginatedList<ListingDto>>> GetListings(
         [FromQuery] string? search,
         [FromQuery] string? city,
         [FromQuery] string? sort,
@@ -22,7 +22,8 @@ public class ListingsController : ControllerBase
         [FromQuery] int? breedId,
         [FromQuery] int? priceMin,
         [FromQuery] int? priceMax,
-        [FromQuery] int page = 1,
+        [FromQuery] string? beforeCursorValue, 
+        [FromQuery] Guid? beforeListingId,    
         [FromQuery] int pageSize = 20)
     {
         throw new NotImplementedException();

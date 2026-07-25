@@ -17,11 +17,14 @@ internal static class ListingSeeder
     {
         var geometryFactory = NtsGeometryServices.Instance.CreateGeometryFactory(srid: 4326);
         Breed temporaryBreed = null!;
+        int idCounter = 1;
+
 
         var listingFaker = new Bogus.Faker<Listing>()
             .UseSeed(42)
-            .RuleFor(l => l.Title, f => f.Lorem.Sentence())
-            .RuleFor(l => l.Description, f => f.Lorem.Paragraph())
+            .RuleFor(l => l.Id, f => DataSeeder.SeedGuid(idCounter++))
+            .RuleFor(l => l.Title, f => f.Lorem.Sentence(2, 1))
+            .RuleFor(l => l.Description, f => f.Lorem.Sentence(3, 5))
             .RuleFor(l => l.ListingType, f => f.PickRandom<ListingType>())
             .RuleFor(l => l.ListingStatus, f => f.PickRandom<ListingStatus>())
             .RuleFor(l => l.UserId, f => f.PickRandom(users).Id)
@@ -31,11 +34,26 @@ internal static class ListingSeeder
                 return temporaryBreed.Id;
             })
             .RuleFor(l => l.SpeciesId, f => temporaryBreed.SpeciesId)
-            .RuleFor(l => l.BreedNote, f => f.Lorem.Sentence().OrNull(f, 0.3f))
-            .RuleFor(l => l.Price, f => f.Random.Double(10, 200))
+            .RuleFor(l => l.BreedNote, f => f.Lorem.Sentence(3).OrNull(f, 0.3f))
+            .RuleFor(l => l.Price, f => Math.Round(f.Random.Double(10, 200),2))
             .RuleFor(l => l.PriceNegotiable, f => f.Random.Bool(0.5f))
-            .RuleFor(l => l.UpdatedAt, f => f.Date.RecentOffset(30).ToUniversalTime().OrNull(f, 0.4f))
-            .RuleFor(l => l.DeletedAt, f => f.Date.RecentOffset(30).ToUniversalTime().OrNull(f, 0.2f))
+            .RuleFor(l => l.CreatedAt, f => f.Date.RecentOffset(30).ToUniversalTime())
+            .RuleFor(l => l.CreatedAt, f => f.Date.RecentOffset(30).ToUniversalTime())
+            .RuleFor(l => l.UpdatedAt, (f, l) =>
+            {
+                if (f.Random.Float() < 0.4f)
+                    return null;
+
+                return l.CreatedAt.AddMinutes(f.Random.Int(1, 60));
+            })
+            .RuleFor(l => l.DeletedAt, (f, l) =>
+            {
+                if (f.Random.Float() < 0.2f)
+                    return null;
+
+                var baseTime = l.UpdatedAt ?? l.CreatedAt;
+                return baseTime.AddMinutes(f.Random.Int(1, 120));
+            })
             .RuleFor(l => l.CityName, f => f.Address.City())
             .RuleFor(l => l.VoivodeshipId, f => f.PickRandom(voivodeships).Id)
             .RuleFor(l => l.Location, f =>
@@ -45,7 +63,7 @@ internal static class ListingSeeder
                 var lon = f.Random.Double(14.1, 24.2);   // X
 
                 return geometryFactory.CreatePoint(new Coordinate(lon, lat));
-            }); 
+            });
         return listingFaker.Generate(count);
     }
 }

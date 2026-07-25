@@ -1,4 +1,5 @@
 ﻿using BiegusowoApi.Data.Models;
+using BiegusowoApi.Data.Types;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -11,6 +12,8 @@ internal static class MessageSeeder
     {
         var messages = new List<Message>();
         var random = new Random(42);
+        int idCounter = 1;
+
         foreach (var conversation in conversations)
         {
             int messageCount = random.Next(1, maxMessagesPerConversation + 1);
@@ -18,18 +21,22 @@ internal static class MessageSeeder
 
             for (int i = 0; i < messageCount; i++)
             {
-                // Simulate realistic reply gaps (e.g., between 5 minutes and 4 hours)
                 int minutesToAdd = random.Next(5, 240);
                 currentTimestamp = currentTimestamp.AddMinutes(minutesToAdd);
 
                 var message = new Message
                 {
+                    Id = DataSeeder.SeedGuid(idCounter++),
                     Conversation = conversation,
                     SenderId = random.Next(2) == 0 ? conversation.BuyerId : conversation.SellerId,
                     Body = $"Message {i + 1} in conversation {conversation.Id}",
-                    CreatedAt = currentTimestamp
+                    CreatedAt = currentTimestamp,
+                    MessageStatus = MessageStatus.Read
                 };
-                if ( i == 0 ) message.Sender = conversation.Buyer;
+                if (i == messageCount - 1)
+                {
+                    message.MessageStatus = random.Next(2) == 0 ? MessageStatus.Read : MessageStatus.Unread;
+                }
 
                 messages.Add(message);
             }

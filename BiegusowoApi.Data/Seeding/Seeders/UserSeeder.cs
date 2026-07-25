@@ -1,6 +1,7 @@
 ﻿using BiegusowoApi.Data.Models;
 using Bogus;
 using Bogus.Extensions;
+using System.Diagnostics.Metrics;
 
 namespace BiegusowoApi.Data.Seeding.Seeders;
 
@@ -8,8 +9,10 @@ internal static class UserSeeder
 {
     public static List<User> Generate(int count, List<Voivodeship> voivodeships)
     {
+        int idCounter = 1;
         var userFaker = new Faker<User>()
             .UseSeed(42)
+            .RuleFor(l => l.Id, f => DataSeeder.SeedGuid(idCounter++))
             .RuleFor(u => u.IdentityId, f => f.Random.Guid().ToString())
             .RuleFor(u => u.DisplayName, f => f.Internet.UserName())
             .RuleFor(u => u.Bio, f => f.Lorem.Paragraph().OrNull(f, 0.2f))

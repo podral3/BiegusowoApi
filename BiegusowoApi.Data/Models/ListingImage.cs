@@ -11,7 +11,8 @@
         public int SortOrder { get; set; }
         public string Bucket { get; set; }
         public int FileSizeBytes { get; set; }
-        public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+        public DateTimeOffset CreatedAt { get; set; } 
+        public DateTimeOffset? DeletedAt { get; set; }
 
     }
 }

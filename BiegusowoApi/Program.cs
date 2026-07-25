@@ -20,11 +20,11 @@ if (app.Environment.IsDevelopment())
 {
     using var scope = app.Services.CreateScope();
     var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    //if (!dbContext.Species.Any())
-    //{
-    //    await new DataSeeder(dbContext).Seed();
-    //}
-        
+    if (!dbContext.Species.Any())
+    {
+        await new DataSeeder(dbContext).Seed();
+    }
+
     app.MapOpenApi();
     app.UseScalar();
 }

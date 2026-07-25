@@ -17,6 +17,31 @@ namespace BiegusowoApi.Data.Migrations
                 .Annotation("Npgsql:PostgresExtension:postgis", ",,");
 
             migrationBuilder.CreateTable(
+                name: "Articles",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Title = table.Column<string>(type: "text", nullable: false),
+                    Slug = table.Column<string>(type: "text", nullable: false),
+                    Excerpt = table.Column<string>(type: "text", nullable: false),
+                    CoverURL = table.Column<string>(type: "text", nullable: false),
+                    BodyHTML = table.Column<string>(type: "text", nullable: false),
+                    MetaTitle = table.Column<string>(type: "text", nullable: false),
+                    MetaDescription = table.Column<string>(type: "text", nullable: false),
+                    OgImageUrl = table.Column<string>(type: "text", nullable: false),
+                    Status = table.Column<string>(type: "text", nullable: false),
+                    ReadingTimeMinutes = table.Column<int>(type: "integer", nullable: false),
+                    PublishedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
+                    UpdatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Articles", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "FileDeletionOutboxes",
                 columns: table => new
                 {
@@ -52,6 +77,23 @@ namespace BiegusowoApi.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "UserImages",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    FileName = table.Column<string>(type: "text", nullable: false),
+                    Bucket = table.Column<string>(type: "text", nullable: false),
+                    FileSizeBytes = table.Column<int>(type: "integer", nullable: false),
+                    Type = table.Column<int>(type: "integer", nullable: false),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserImages", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Voivodeships",
                 columns: table => new
                 {
@@ -62,6 +104,28 @@ namespace BiegusowoApi.Data.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Voivodeships", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ArticleImages",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    ArticleId = table.Column<Guid>(type: "uuid", nullable: false),
+                    FileName = table.Column<string>(type: "text", nullable: false),
+                    Order = table.Column<short>(type: "smallint", nullable: false),
+                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ArticleImages", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ArticleImages_Articles_ArticleId",
+                        column: x => x.ArticleId,
+                        principalTable: "Articles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -95,8 +159,8 @@ namespace BiegusowoApi.Data.Migrations
                     DisplayName = table.Column<string>(type: "text", nullable: false),
                     Bio = table.Column<string>(type: "text", nullable: true),
                     PhoneNumber = table.Column<string>(type: "text", nullable: true),
-                    AvatarUrl = table.Column<string>(type: "text", nullable: false),
-                    BackgroundImageUlr = table.Column<string>(type: "text", nullable: false),
+                    AvatarImageId = table.Column<Guid>(type: "uuid", nullable: true),
+                    BackgroundImageId = table.Column<Guid>(type: "uuid", nullable: true),
                     City = table.Column<string>(type: "text", nullable: false),
                     VoivodeshipId = table.Column<int>(type: "integer", nullable: false),
                     CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
@@ -107,41 +171,19 @@ namespace BiegusowoApi.Data.Migrations
                 {
                     table.PrimaryKey("PK_Users", x => x.Id);
                     table.ForeignKey(
+                        name: "FK_Users_UserImages_AvatarImageId",
+                        column: x => x.AvatarImageId,
+                        principalTable: "UserImages",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Users_UserImages_BackgroundImageId",
+                        column: x => x.BackgroundImageId,
+                        principalTable: "UserImages",
+                        principalColumn: "Id");
+                    table.ForeignKey(
                         name: "FK_Users_Voivodeships_VoivodeshipId",
                         column: x => x.VoivodeshipId,
                         principalTable: "Voivodeships",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Articles",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    AuthorId = table.Column<int>(type: "integer", nullable: false),
-                    AuthorId1 = table.Column<Guid>(type: "uuid", nullable: false),
-                    Title = table.Column<string>(type: "text", nullable: false),
-                    slug = table.Column<string>(type: "text", nullable: false),
-                    Excerpt = table.Column<string>(type: "text", nullable: false),
-                    CoverURL = table.Column<string>(type: "text", nullable: false),
-                    BodyHTML = table.Column<string>(type: "text", nullable: false),
-                    MetaTitle = table.Column<string>(type: "text", nullable: false),
-                    MetaDescription = table.Column<string>(type: "text", nullable: false),
-                    OgImageUrl = table.Column<string>(type: "text", nullable: false),
-                    Status = table.Column<string>(type: "text", nullable: false),
-                    ReadingTimeMinutes = table.Column<int>(type: "integer", nullable: false),
-                    PublishedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
-                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Articles", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Articles_Users_AuthorId1",
-                        column: x => x.AuthorId1,
-                        principalTable: "Users",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -199,28 +241,6 @@ namespace BiegusowoApi.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ArticlePhotos",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    ArticleId = table.Column<int>(type: "integer", nullable: false),
-                    FileName = table.Column<string>(type: "text", nullable: false),
-                    Order = table.Column<short>(type: "smallint", nullable: false),
-                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_ArticlePhotos", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_ArticlePhotos_Articles_ArticleId",
-                        column: x => x.ArticleId,
-                        principalTable: "Articles",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Conversations",
                 columns: table => new
                 {
@@ -228,7 +248,6 @@ namespace BiegusowoApi.Data.Migrations
                     ListingId = table.Column<Guid>(type: "uuid", nullable: false),
                     BuyerId = table.Column<Guid>(type: "uuid", nullable: false),
                     SellerId = table.Column<Guid>(type: "uuid", nullable: false),
-                    LastMessageAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()")
                 },
                 constraints: table =>
@@ -264,8 +283,8 @@ namespace BiegusowoApi.Data.Migrations
                     SortOrder = table.Column<int>(type: "integer", nullable: false),
                     Bucket = table.Column<string>(type: "text", nullable: false),
                     FileSizeBytes = table.Column<int>(type: "integer", nullable: false),
-                    StorageProvider = table.Column<string>(type: "text", nullable: false),
-                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()")
+                    CreatedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false, defaultValueSql: "now()"),
+                    DeletedAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -307,14 +326,9 @@ namespace BiegusowoApi.Data.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_ArticlePhotos_ArticleId",
-                table: "ArticlePhotos",
+                name: "IX_ArticleImages_ArticleId",
+                table: "ArticleImages",
                 column: "ArticleId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Articles_AuthorId1",
-                table: "Articles",
-                column: "AuthorId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Breeds_SpeciesId",
@@ -372,6 +386,16 @@ namespace BiegusowoApi.Data.Migrations
                 column: "SenderId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Users_AvatarImageId",
+                table: "Users",
+                column: "AvatarImageId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_BackgroundImageId",
+                table: "Users",
+                column: "BackgroundImageId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Users_VoivodeshipId",
                 table: "Users",
                 column: "VoivodeshipId");
@@ -381,7 +405,7 @@ namespace BiegusowoApi.Data.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "ArticlePhotos");
+                name: "ArticleImages");
 
             migrationBuilder.DropTable(
                 name: "FileDeletionOutboxes");
@@ -409,6 +433,9 @@ namespace BiegusowoApi.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "Species");
+
+            migrationBuilder.DropTable(
+                name: "UserImages");
 
             migrationBuilder.DropTable(
                 name: "Voivodeships");

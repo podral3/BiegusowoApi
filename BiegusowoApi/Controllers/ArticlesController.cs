@@ -15,13 +15,33 @@ public class ArticlesController(ApplicationDbContext dbContext) : ControllerBase
     private readonly ApplicationDbContext _dbContext = dbContext;
 
     [HttpGet]
-    [EndpointDescription("Get a paginated list of miminal article data to display.")]
-    [ProducesResponseType(typeof(PaginatedList<MinimalArticleDto>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<PaginatedList<MinimalArticleDto>>> GetArticles(
-        [FromQuery] int page = 1,
+    [EndpointDescription("Get a paginated list of minimal article data to display.")]
+    [ProducesResponseType(typeof(CursorPaginatedList<MinimalArticleDto>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<CursorPaginatedList<MinimalArticleDto>>> GetArticles(
+        [FromQuery] DateTimeOffset? beforePublishedAt,
+        [FromQuery] Guid? beforeArticleId,
         [FromQuery] int pageSize = 10)
     {
-        throw new NotImplementedException();
+        var query = _dbContext.Articles.AsQueryable();
+
+        if (beforePublishedAt.HasValue && beforeArticleId.HasValue)
+        {
+            query = query.Where(a =>
+                a.PublishedAt < beforePublishedAt.Value ||
+                (a.PublishedAt == beforePublishedAt.Value && a.Id.CompareTo(beforeArticleId.Value) < 0));
+        }
+
+        var articles = await query
+            .OrderByDescending(a => a.PublishedAt)
+            .ThenByDescending(a => a.Id)
+            .Take(pageSize + 1)
+            .Select(a => new MinimalArticleDto(a.Title, "John Doe", a.CoverURL, a.ReadingTimeMinutes, a.PublishedAt, a.Slug))
+            .ToListAsync();
+
+        bool hasNextPage = articles.Count > pageSize;
+        if (hasNextPage) articles.RemoveAt(articles.Count - 1);
+
+        return Ok(new CursorPaginatedList<MinimalArticleDto>(articles, hasNextPage));
     }
 
     [HttpGet("{id:guid}")]

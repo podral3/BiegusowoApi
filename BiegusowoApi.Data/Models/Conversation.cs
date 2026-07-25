@@ -12,8 +12,6 @@
 
         public Guid SellerId { get; set; }
         public User Seller { get; set; } = null!; 
-
-        public DateTimeOffset LastMessageAt { get; set; }
         public DateTimeOffset CreatedAt { get; set; }
     }
 }

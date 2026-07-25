@@ -15,7 +15,7 @@ public class BaseTests : IClassFixture<WebApplicationFactoryFixture>
     protected readonly IServiceScope _serviceScope;
     private readonly ApplicationDbContext _dbContext;
 
-    protected readonly string FirstUserId = "019f71d5-2ed0-710a-afe7-6b90b1aa8505";
+    protected readonly string FirstUserId = "00000000-0000-0000-0000-000000000001";
 
     public BaseTests(WebApplicationFactoryFixture factory)
     {

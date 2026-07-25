@@ -6,7 +6,7 @@ namespace BiegusowoApi.Data
     public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : DbContext(options)
     {
         public DbSet<Article> Articles { get; set; }
-        public DbSet<ArticleImage> ArticlePhotos { get; set; }
+        public DbSet<ArticleImage> ArticleImages { get; set; }
         public DbSet<Breed> Breeds { get; set; }
         public DbSet<Conversation> Conversations { get; set; }
         public DbSet<FileDeletionOutbox> FileDeletionOutboxes { get; set; }
@@ -15,19 +15,21 @@ namespace BiegusowoApi.Data
         public DbSet<Message> Messages { get; set; }
         public DbSet<Species> Species { get; set; }
         public DbSet<User> Users { get; set; }
+        public DbSet<UserImage> UserImages { get; set; }
         public DbSet<Voivodeship> Voivodeships { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<Article>().Property(x => x.CreatedAt).HasColumnType("timestamp with time zone").HasDefaultValueSql("now()");
-            modelBuilder.Entity<ArticleImage>().Property(x => x.CreatedAt).HasColumnType("timestamp with time zone").HasDefaultValueSql("now()");
-            modelBuilder.Entity<Conversation>().Property(x => x.CreatedAt).HasColumnType("timestamp with time zone").HasDefaultValueSql("now()");
-            modelBuilder.Entity<FileDeletionOutbox>().Property(x => x.CreatedAt).HasColumnType("timestamp with time zone").HasDefaultValueSql("now()");
-            modelBuilder.Entity<Listing>().Property(x => x.CreatedAt).HasColumnType("timestamp with time zone").HasDefaultValueSql("now()");
-            modelBuilder.Entity<ListingImage>().Property(x => x.CreatedAt).HasColumnType("timestamp with time zone").HasDefaultValueSql("now()");
-            modelBuilder.Entity<Message>().Property(x => x.CreatedAt).HasColumnType("timestamp with time zone").HasDefaultValueSql("now()");
-            modelBuilder.Entity<User>().Property(x => x.CreatedAt).HasColumnType("timestamp with time zone").HasDefaultValueSql("now()");
+            // Set default value for CreatedAt property to current timestamp for all entities that have it via reflection
+            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+            {
+                var prop = entityType.FindProperty("CreatedAt");
+                if (prop != null && prop.ClrType == typeof(DateTimeOffset))
+                {
+                    prop.SetDefaultValueSql("now()");
+                }
+            }
         }
     }
 }

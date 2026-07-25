@@ -4,13 +4,14 @@ namespace BiegusowoApi.Data.Models;
 
 public class ArticleImage
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
 
     [ForeignKey(nameof(Article))]
-    public int ArticleId { get; set; }
+    public Guid ArticleId { get; set; }
     public Article Article { get; set; } = null!;
     
     public string FileName { get; set; }
     public short Order { get; set; }
     public DateTimeOffset CreatedAt { get; set; } = DateTimeOffset.UtcNow;
+    public DateTimeOffset? DeletedAt { get; set; }
 }

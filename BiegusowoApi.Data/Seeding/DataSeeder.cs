@@ -9,14 +9,17 @@ public class DataSeeder(ApplicationDbContext dbContext)
     private readonly ApplicationDbContext _dbContext = dbContext;
     public async Task Seed()
     {
-        await _dbContext.Database.MigrateAsync();
-
         await using var transaction = await _dbContext.Database.BeginTransactionAsync();
         try
         {
             await InlineDataSeeder.Seed(_dbContext);
 
             List<User> users = UserSeeder.Generate(100, InlineDataSeeder.Voivodeships);
+
+            List<UserImage> userImages = UserImageSeeder.Generate(users); // stamps AvatarImageId/BackgroundImageId onto users
+            await _dbContext.UserImages.AddRangeAsync(userImages);
+            await _dbContext.SaveChangesAsync();
+
             await _dbContext.Users.AddRangeAsync(users);
             await _dbContext.SaveChangesAsync();
 
@@ -36,6 +39,14 @@ public class DataSeeder(ApplicationDbContext dbContext)
             await _dbContext.Messages.AddRangeAsync(messages);
             await _dbContext.SaveChangesAsync();
 
+            List<Article> articles = ArticleSeeder.Generate(10);
+            await _dbContext.Articles.AddRangeAsync(articles);
+            await _dbContext.SaveChangesAsync();
+
+            List<ArticleImage> articleImages = ArticleImageSeeder.Generate(articles, 5);
+            await _dbContext.ArticleImages.AddRangeAsync(articleImages);
+            await _dbContext.SaveChangesAsync();
+
             await transaction.CommitAsync();
         }
         catch
@@ -44,4 +55,6 @@ public class DataSeeder(ApplicationDbContext dbContext)
             throw;
         }
     }
+    public static Guid SeedGuid(int number) =>
+    new($"00000000-0000-0000-0000-{number:D12}");
 }

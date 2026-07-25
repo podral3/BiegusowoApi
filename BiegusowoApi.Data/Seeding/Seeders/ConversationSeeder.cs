@@ -1,7 +1,4 @@
 ﻿using BiegusowoApi.Data.Models;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace BiegusowoApi.Data.Seeding.Seeders;
 
@@ -11,9 +8,11 @@ internal static class ConversationSeeder
     {
         var conversations = new List<Conversation>();
         var random = new Random(42);
+        int idCounter = 1;
+
         foreach (var listing in listings)
         {
-            if (random.Next(100) < 30) continue; // 30% chance to skip creating conversations for this listing
+            if (random.Next(100) < 30) continue;
 
             int conversationCount = random.Next(maxConversationsPerListing + 1);
             for (int i = 0; i < conversationCount; i++)
@@ -27,10 +26,11 @@ internal static class ConversationSeeder
                 }
                 var conversation = new Conversation
                 {
+                    Id = DataSeeder.SeedGuid(idCounter++),
                     Listing = listing,
                     Buyer = buyer,
                     Seller = seller,
-                    CreatedAt = DateTimeOffset.UtcNow.AddDays(-random.Next(60)) // Random creation time within the last 60 days
+                    CreatedAt = DateTimeOffset.UtcNow.AddDays(-random.Next(10))
                 };
                 conversations.Add(conversation);
             }

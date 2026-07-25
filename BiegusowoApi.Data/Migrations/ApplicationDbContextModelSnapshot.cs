@@ -26,16 +26,8 @@ namespace BiegusowoApi.Data.Migrations
 
             modelBuilder.Entity("BiegusowoApi.Data.Models.Article", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AuthorId")
-                        .HasColumnType("integer");
-
-                    b.Property<Guid>("AuthorId1")
                         .HasColumnType("uuid");
 
                     b.Property<string>("BodyHTML")
@@ -50,6 +42,9 @@ namespace BiegusowoApi.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("now()");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Excerpt")
                         .IsRequired()
@@ -73,6 +68,10 @@ namespace BiegusowoApi.Data.Migrations
                     b.Property<int>("ReadingTimeMinutes")
                         .HasColumnType("integer");
 
+                    b.Property<string>("Slug")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("Status")
                         .IsRequired()
                         .HasColumnType("text");
@@ -81,32 +80,30 @@ namespace BiegusowoApi.Data.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("slug")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<DateTimeOffset?>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("AuthorId1");
 
                     b.ToTable("Articles");
                 });
 
-            modelBuilder.Entity("BiegusowoApi.Data.Models.ArticlePhoto", b =>
+            modelBuilder.Entity("BiegusowoApi.Data.Models.ArticleImage", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
+                        .HasColumnType("uuid");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("ArticleId")
-                        .HasColumnType("integer");
+                    b.Property<Guid>("ArticleId")
+                        .HasColumnType("uuid");
 
                     b.Property<DateTimeOffset>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("now()");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("FileName")
                         .IsRequired()
@@ -119,7 +116,7 @@ namespace BiegusowoApi.Data.Migrations
 
                     b.HasIndex("ArticleId");
 
-                    b.ToTable("ArticlePhotos");
+                    b.ToTable("ArticleImages");
                 });
 
             modelBuilder.Entity("BiegusowoApi.Data.Models.Breed", b =>
@@ -164,9 +161,6 @@ namespace BiegusowoApi.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("now()");
-
-                    b.Property<DateTimeOffset>("LastMessageAt")
-                        .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("ListingId")
                         .HasColumnType("uuid");
@@ -303,7 +297,7 @@ namespace BiegusowoApi.Data.Migrations
                     b.ToTable("Listings");
                 });
 
-            modelBuilder.Entity("BiegusowoApi.Data.Models.ListingPhoto", b =>
+            modelBuilder.Entity("BiegusowoApi.Data.Models.ListingImage", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -318,6 +312,9 @@ namespace BiegusowoApi.Data.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("now()");
 
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.Property<string>("FileName")
                         .IsRequired()
                         .HasColumnType("text");
@@ -330,10 +327,6 @@ namespace BiegusowoApi.Data.Migrations
 
                     b.Property<int>("SortOrder")
                         .HasColumnType("integer");
-
-                    b.Property<string>("StorageProvider")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.HasKey("Id");
 
@@ -408,13 +401,11 @@ namespace BiegusowoApi.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<string>("AvatarUrl")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<Guid?>("AvatarImageId")
+                        .HasColumnType("uuid");
 
-                    b.Property<string>("BackgroundImageUlr")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<Guid?>("BackgroundImageId")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("Bio")
                         .HasColumnType("text");
@@ -450,9 +441,46 @@ namespace BiegusowoApi.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("AvatarImageId");
+
+                    b.HasIndex("BackgroundImageId");
+
                     b.HasIndex("VoivodeshipId");
 
                     b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("BiegusowoApi.Data.Models.UserImage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Bucket")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("timestamp with time zone")
+                        .HasDefaultValueSql("now()");
+
+                    b.Property<DateTimeOffset?>("DeletedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("FileName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("FileSizeBytes")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("UserImages");
                 });
 
             modelBuilder.Entity("BiegusowoApi.Data.Models.Voivodeship", b =>
@@ -472,18 +500,7 @@ namespace BiegusowoApi.Data.Migrations
                     b.ToTable("Voivodeships");
                 });
 
-            modelBuilder.Entity("BiegusowoApi.Data.Models.Article", b =>
-                {
-                    b.HasOne("BiegusowoApi.Data.Models.User", "Author")
-                        .WithMany()
-                        .HasForeignKey("AuthorId1")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Author");
-                });
-
-            modelBuilder.Entity("BiegusowoApi.Data.Models.ArticlePhoto", b =>
+            modelBuilder.Entity("BiegusowoApi.Data.Models.ArticleImage", b =>
                 {
                     b.HasOne("BiegusowoApi.Data.Models.Article", "Article")
                         .WithMany()
@@ -567,7 +584,7 @@ namespace BiegusowoApi.Data.Migrations
                     b.Navigation("Voivodeship");
                 });
 
-            modelBuilder.Entity("BiegusowoApi.Data.Models.ListingPhoto", b =>
+            modelBuilder.Entity("BiegusowoApi.Data.Models.ListingImage", b =>
                 {
                     b.HasOne("BiegusowoApi.Data.Models.Listing", "Listing")
                         .WithMany()
@@ -599,11 +616,23 @@ namespace BiegusowoApi.Data.Migrations
 
             modelBuilder.Entity("BiegusowoApi.Data.Models.User", b =>
                 {
+                    b.HasOne("BiegusowoApi.Data.Models.UserImage", "AvatarImage")
+                        .WithMany()
+                        .HasForeignKey("AvatarImageId");
+
+                    b.HasOne("BiegusowoApi.Data.Models.UserImage", "BackgroundImage")
+                        .WithMany()
+                        .HasForeignKey("BackgroundImageId");
+
                     b.HasOne("BiegusowoApi.Data.Models.Voivodeship", "Voivodeship")
                         .WithMany()
                         .HasForeignKey("VoivodeshipId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("AvatarImage");
+
+                    b.Navigation("BackgroundImage");
 
                     b.Navigation("Voivodeship");
                 });

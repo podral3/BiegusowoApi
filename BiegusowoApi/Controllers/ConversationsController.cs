@@ -16,9 +16,8 @@ public class ConversationsController(ApplicationDbContext dbContext) : Controlle
 
     [HttpGet]
     [Authorize]
-    [EndpointDescription("Get a paginated list of user conversations. Does not include messages.")]
-    [ProducesResponseType(typeof(PaginatedList<MinimalConversationDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<PaginatedList<MinimalConversationDto>>> GetConversations(
+        [FromQuery] DateTimeOffset? beforeLastMessageAt,
         [FromQuery] Guid? beforeConversationId,
         [FromQuery] int pageSize = 10)
     {
@@ -27,12 +26,10 @@ public class ConversationsController(ApplicationDbContext dbContext) : Controlle
 
     [HttpGet("{conversationId:guid}")]
     [Authorize]
-    [EndpointDescription("Get messages for a specific conversation.")]
-    [ProducesResponseType(typeof(ConversationDto), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ConversationDto>> GetMessages(
         [FromRoute] Guid conversationId,
-        [FromQuery] Guid? beforeMessageId,
+        [FromQuery] DateTimeOffset? beforeCreatedAt,
+        [FromQuery] Guid? beforeMessageId, 
         [FromQuery] int pageSize = 10)
     {
         throw new NotImplementedException();
