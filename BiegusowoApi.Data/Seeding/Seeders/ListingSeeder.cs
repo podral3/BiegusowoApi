@@ -3,6 +3,8 @@ using BiegusowoApi.Data.Types;
 using Bogus;
 using NetTopologySuite;
 using NetTopologySuite.Geometries;
+using System.Text.Json;
+using static System.Reflection.Metadata.BlobBuilder;
 namespace BiegusowoApi.Data.Seeding.Seeders;
 
 internal static class ListingSeeder
@@ -13,12 +15,12 @@ internal static class ListingSeeder
     /// <param name="count"></param>
     /// <param name="SpeciesBreedsRanges">Dict where each key is a species ID and the value is a tuple of (minBreedId, maxBreedId)</param>
     /// <returns></returns>
-    public static List<Listing> Generate(int count, List<Breed> breeds, List<User> users, List<Voivodeship> voivodeships)
+    public static (List<Listing> Listings, List<Blob> Blobs) Generate(int count, List<Breed> breeds, List<User> users, List<Voivodeship> voivodeships)
     {
         var geometryFactory = NtsGeometryServices.Instance.CreateGeometryFactory(srid: 4326);
         Breed temporaryBreed = null!;
         int idCounter = 1;
-
+        var blobs = new List<Blob>();
 
         var listingFaker = new Bogus.Faker<Listing>()
             .UseSeed(42)
@@ -63,7 +65,19 @@ internal static class ListingSeeder
                 var lon = f.Random.Double(14.1, 24.2);   // X
 
                 return geometryFactory.CreatePoint(new Coordinate(lon, lat));
+            })
+            .RuleFor(l => l.Images, f =>
+            {
+                int imageCount = f.Random.Int(2, 5);
+                var imgBlobs = BlobSeeder.Generate(imageCount, "listing");
+                blobs.AddRange(imgBlobs);
+
+                var dict = imgBlobs
+                    .Select((b, i) => new { Order = (i).ToString(), b.FileName })
+                    .ToDictionary(x => x.Order, x => x.FileName);
+
+                return JsonSerializer.SerializeToDocument(dict);
             });
-        return listingFaker.Generate(count);
+        return (listingFaker.Generate(count), blobs);
     }
 }

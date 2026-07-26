@@ -7,30 +7,25 @@ namespace BiegusowoApi.Data.Seeding;
 public class DataSeeder(ApplicationDbContext dbContext)
 {
     private readonly ApplicationDbContext _dbContext = dbContext;
+
     public async Task Seed()
     {
-        //await _dbContext.Database.MigrateAsync();
-
         await using var transaction = await _dbContext.Database.BeginTransactionAsync();
         try
         {
             await InlineDataSeeder.Seed(_dbContext);
 
-            List<User> users = UserSeeder.Generate(100, InlineDataSeeder.Voivodeships);
+            var allBlobs = new List<Blob>();
 
-            List<UserImage> userImages = UserImageSeeder.Generate(users); // stamps AvatarImageId/BackgroundImageId onto users
-            await _dbContext.UserImages.AddRangeAsync(userImages);
-            await _dbContext.SaveChangesAsync();
-
+            var (users, userBlobs) = UserSeeder.Generate(100, InlineDataSeeder.Voivodeships);
+            allBlobs.AddRange(userBlobs);
             await _dbContext.Users.AddRangeAsync(users);
             await _dbContext.SaveChangesAsync();
 
-            List<Listing> listings = ListingSeeder.Generate(100, InlineDataSeeder.Breeds, users, InlineDataSeeder.Voivodeships);
+            var (listings, listingBlobs) = ListingSeeder.Generate(
+                100, InlineDataSeeder.Breeds, users, InlineDataSeeder.Voivodeships);
+            allBlobs.AddRange(listingBlobs);
             await _dbContext.Listings.AddRangeAsync(listings);
-            await _dbContext.SaveChangesAsync();
-
-            List<ListingImage> listingPhotos = ListingPhotoSeeder.Generate(listings, 10);
-            await _dbContext.ListingPhotos.AddRangeAsync(listingPhotos);
             await _dbContext.SaveChangesAsync();
 
             List<Conversation> conversations = ConversationSeeder.Generate(listings, users, 5);
@@ -41,12 +36,12 @@ public class DataSeeder(ApplicationDbContext dbContext)
             await _dbContext.Messages.AddRangeAsync(messages);
             await _dbContext.SaveChangesAsync();
 
-            List<Article> articles = ArticleSeeder.Generate(10);
+            var (articles, articleBlobs) = ArticleSeeder.Generate(10);
+            allBlobs.AddRange(articleBlobs);
             await _dbContext.Articles.AddRangeAsync(articles);
             await _dbContext.SaveChangesAsync();
 
-            List<ArticleImage> articleImages = ArticleImageSeeder.Generate(articles, 5);
-            await _dbContext.ArticleImages.AddRangeAsync(articleImages);
+            await _dbContext.Blobs.AddRangeAsync(allBlobs);
             await _dbContext.SaveChangesAsync();
 
             await transaction.CommitAsync();
@@ -57,6 +52,7 @@ public class DataSeeder(ApplicationDbContext dbContext)
             throw;
         }
     }
+
     public static Guid SeedGuid(int number) =>
-    new($"00000000-0000-0000-0000-{number:D12}");
+        new($"00000000-0000-0000-0000-{number:D12}");
 }

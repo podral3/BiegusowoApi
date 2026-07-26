@@ -3,7 +3,6 @@ using Amazon.S3.Model;
 using BiegusowoApi.Options;
 using Microsoft.Extensions.Options;
 using System.Net;
-using System.Runtime;
 using static BiegusowoApi.Domain.FileStorage.IFileStorageProvider;
 
 namespace BiegusowoApi.Domain.FileStorage;

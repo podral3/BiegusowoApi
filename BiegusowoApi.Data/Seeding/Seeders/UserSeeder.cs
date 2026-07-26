@@ -2,14 +2,16 @@
 using Bogus;
 using Bogus.Extensions;
 using System.Diagnostics.Metrics;
+using static System.Reflection.Metadata.BlobBuilder;
 
 namespace BiegusowoApi.Data.Seeding.Seeders;
 
 internal static class UserSeeder
 {
-    public static List<User> Generate(int count, List<Voivodeship> voivodeships)
+    public static (List<User> Users, List<Blob> Blobs) Generate(int count, List<Voivodeship> voivodeships)
     {
         int idCounter = 1;
+        var blobs = new List<Blob>();
         var userFaker = new Faker<User>()
             .UseSeed(42)
             .RuleFor(l => l.Id, f => DataSeeder.SeedGuid(idCounter++))
@@ -18,8 +20,21 @@ internal static class UserSeeder
             .RuleFor(u => u.Bio, f => f.Lorem.Paragraph().OrNull(f, 0.2f))
             .RuleFor(u => u.PhoneNumber, f => f.Phone.PhoneNumber().OrNull(f, 0.2f))
             .RuleFor(u => u.City, f => f.Address.City())
-            .RuleFor(u => u.VoivodeshipId, f => f.PickRandom(voivodeships).Id);
+            .RuleFor(u => u.VoivodeshipId, f => f.PickRandom(voivodeships).Id)
+            .RuleFor(u => u.AvatarFileName, f =>
+            {
+                var blob = BlobSeeder.Generate(1, "avatar")[0];
+                blobs.Add(blob);
+                return blob.FileName;
+            })
+            .RuleFor(u => u.BackgroundFileName, f =>
+            {
+                var blob = BlobSeeder.Generate(1, "background")[0];
+                blobs.Add(blob);
+                return blob.FileName;
+            });
 
-        return userFaker.Generate(count);
+        var users = userFaker.Generate(count);
+        return (users, blobs);
     }
 }

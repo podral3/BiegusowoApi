@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Text;
 using static BiegusowoApi.Domain.FileStorage.IFileStorageProvider;
 
-namespace Biegusowo.Tests.Fakes;
+namespace Biegusowo.Tests.Common.Fakes;
 
 /// <summary>
 /// In-memory fake of IStorageProvider for unit testing ImageService without

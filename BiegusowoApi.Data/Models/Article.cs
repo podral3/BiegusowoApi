@@ -1,4 +1,6 @@
-﻿namespace BiegusowoApi.Data.Models
+﻿using System.Text.Json;
+
+namespace BiegusowoApi.Data.Models
 {
     public class Article
     {
@@ -13,6 +15,7 @@
         public string OgImageUrl { get; set; }
         public string Status { get; set; }
         public int ReadingTimeMinutes { get; set; }
+        public JsonDocument Images { get; set; }
         public DateTimeOffset PublishedAt { get; set; }
         public DateTimeOffset CreatedAt { get; set; }
         public DateTimeOffset? UpdatedAt { get; set; }

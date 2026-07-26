@@ -1,5 +1,6 @@
 ﻿using BiegusowoApi.Data.Types;
 using NetTopologySuite.Geometries;
+using System.Text.Json;
 
 namespace BiegusowoApi.Data.Models;
 
@@ -23,7 +24,7 @@ public class Listing
     public string? BreedNote { get; set; }
     public double Price { get; set; }
     public bool PriceNegotiable { get; set; } = false;
-
+    public JsonDocument Images { get; set; }
     public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset? UpdatedAt { get; set; }
     public DateTimeOffset? DeletedAt { get; set; }
