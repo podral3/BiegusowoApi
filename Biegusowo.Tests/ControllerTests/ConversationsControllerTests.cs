@@ -30,6 +30,27 @@ public class ConversationsControllerTests(WebApplicationFactoryFixture factory)
     }
 
     [Fact]
+    public async Task GetConversations_SecondPage_DoesNotRepeatFirstPageItems()
+    {
+        var client = _factory.CreateAuthenticatedClient(FirstUserId);
+
+        var firstResponse = await client.GetAsync("/api/conversations?pageSize=5", CancellationToken);
+        var firstPage = await firstResponse.Content.ReadFromJsonAsync<PaginatedList<MinimalConversationDto>>(CancellationToken);
+
+        var last = firstPage!.Items.Last();
+
+        var secondResponse = await client.GetAsync(
+            $"/api/conversations?pageSize=5&beforeLastMessageAt={Uri.EscapeDataString(last.LastMessageAt.ToString("O"))}&beforeConversationId={last.Id}",
+            CancellationToken);
+
+        secondResponse.Should().Be200Ok();
+
+        var secondPage = await secondResponse.Content.ReadFromJsonAsync<PaginatedList<MinimalConversationDto>>(CancellationToken);
+
+        await Verify(secondPage);
+    }
+
+    [Fact]
     public async Task GetMessagesReturnsMessages()
     {
         // Arrange

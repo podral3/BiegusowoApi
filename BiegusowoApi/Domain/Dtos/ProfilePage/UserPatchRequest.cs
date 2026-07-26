@@ -2,7 +2,7 @@
 
 public record UserPatchRequest(
     string DisplayName,
-    decimal Bio,
+    string Bio,
     string PhoneNumber,
     string City,
     string VoivodeshipId)

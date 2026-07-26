@@ -1,6 +1,8 @@
 using BiegusowoApi.Data;
+using BiegusowoApi.Data.Seeding;
 using BiegusowoApi.Domain.Blobs;
 using BiegusowoApi.Domain.Blobs.Service;
+using BiegusowoApi.Domain.FileStorage;
 using BiegusowoApi.Helpers.Composition;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,6 +14,7 @@ builder.Services.AddDatabaseContext(builder.Configuration);
 builder.Services.AddKeycloakAuthentication(builder.Configuration, builder.Environment);
 builder.Services.AddOpenApiServices();
 
+builder.Services.AddScoped<IFileStorageProvider, S3StorageProvider>();
 builder.Services.AddScoped<IBlobService, BlobService>();
 builder.Services.Configure<FileStorageOptions>(
     builder.Configuration.GetSection("FileStorage"));

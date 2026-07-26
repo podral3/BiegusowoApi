@@ -1,6 +1,7 @@
 ﻿using BiegusowoApi.Domain.Blobs;
 using BiegusowoApi.Domain.Dtos.Listing;
 using BiegusowoApi.Helpers;
+using BiegusowoApi.Helpers.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
@@ -35,6 +36,7 @@ public class ListingsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public ActionResult<ListingDto> GetListing([FromRoute] Guid id)
     {
+        Guid userId = User.GetUserId();
         throw new NotImplementedException();
     }
 
@@ -99,7 +101,7 @@ public class ListingsController : ControllerBase
     [EndpointDescription("Delete an image associated with a specific listing.")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> DeleteImage(
+    public async Task<IActionResult> DeleteImages(
         [FromRoute] Guid id,
         [FromBody] List<string> imageIds)
     {

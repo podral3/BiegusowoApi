@@ -9,7 +9,8 @@ using System.Net.Http.Json;
 
 namespace Biegusowo.Tests.ControllerTests;
 
-public class ListingsControllerTests(WebApplicationFactoryFixture factory) : BaseTests(factory)
+public class ListingsControllerTests(WebApplicationFactoryFixture factory) 
+    : BaseTests(factory)
 {
     // ─── GetListings ─────────────────────────────────────────────────────────────
 
@@ -187,7 +188,7 @@ public class ListingsControllerTests(WebApplicationFactoryFixture factory) : Bas
         // Arrange
         var client = _factory.CreateAuthenticatedClient(FirstUserId);
 
-        const string listingId = "019f71d5-31a7-7fb7-8508-381e3881c3d9";
+        const string listingId = "00000000-0000-0000-0000-000000000001";
 
         // Act
         var response = await client.GetAsync(
@@ -343,8 +344,8 @@ public class ListingsControllerTests(WebApplicationFactoryFixture factory) : Bas
     public async Task DeleteListing_ReturnsOk()
     {
         // Arrange
-        var client = _factory.CreateAuthenticatedClient(userId: "019f71d5-2ed0-710a-afe7-6b90b1aa8505");
-        string listingId = "019f71d5-31a7-7fb7-8508-381e3881c3d9";
+        var client = _factory.CreateAuthenticatedClient("00000000-0000-0000-0000-000000000089");
+        string listingId = "00000000-0000-0000-0000-000000000006";
         // Act
         var response = await client.DeleteAsync($"/api/listings/{listingId}",
             CancellationToken);
@@ -356,13 +357,26 @@ public class ListingsControllerTests(WebApplicationFactoryFixture factory) : Bas
     public async Task DeleteNonExistentListing_ReturnsNotFound()
     {
         // Arrange
-        var client = _factory.CreateAuthenticatedClient(userId: "019f71d5-2ed0-710a-afe7-6b90b1aa8505");
+        var client = _factory.CreateAuthenticatedClient(FirstUserId);
         string listingId = "non-existend-id";
         // Act
         var response = await client.DeleteAsync($"/api/listings/{listingId}",
             CancellationToken);
 
         response.Should().Be404NotFound();
+    }
+
+    [Fact] 
+    public async Task DeleteNotOwnedListing_ReturnsForbid()
+    {
+        // Arrange
+        var client = _factory.CreateAuthenticatedClient(FirstUserId);
+        string listingId = "00000000-0000-0000-0000-000000000094";
+        // Act
+        var response = await client.DeleteAsync($"/api/listings/{listingId}",
+            CancellationToken);
+
+        response.Should().Be403Forbidden();
     }
 
 }

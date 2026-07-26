@@ -1,4 +1,6 @@
-﻿using BiegusowoApi.Data;
+﻿using BiegusowoApi.Auth.CurrentUser;
+using BiegusowoApi.Data;
+using BiegusowoApi.Data.Models;
 using BiegusowoApi.Domain.Blobs;
 using BiegusowoApi.Domain.Blobs.Service;
 using BiegusowoApi.Domain.Dtos.ProfilePage;
@@ -14,16 +16,18 @@ namespace BiegusowoApi.Controllers;
 [ApiController]
 public class UsersController(
     ApplicationDbContext dbContext,
+    ICurrentUserService currentUserService,
     IBlobService blobService) : ControllerBase
 {
     private readonly ApplicationDbContext _dbContext = dbContext;
+    private readonly ICurrentUserService _currentUserService = currentUserService;
     private readonly IBlobService _blobService = blobService;
 
     [HttpGet("{id:guid}")]
     [EndpointDescription("Get the profile of a specific user by their ID.")]
     [ProducesResponseType(typeof(ProfilePageResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public Task<ActionResult<ProfilePageResponse>> GetProfile(Guid id)
+    public async Task<ActionResult<ProfilePageResponse>> GetProfile(Guid id)
     {
         throw new NotImplementedException();
     }
@@ -32,7 +36,7 @@ public class UsersController(
     [HttpGet("me")]
     [EndpointDescription("Get the profile of the currently authenticated user.")]
     [ProducesResponseType(typeof(ProfilePageResponse), StatusCodes.Status200OK)]
-    public Task<ActionResult<ProfilePageResponse>> GetMyProfile() 
+    public async Task<ActionResult<ProfilePageResponse>> GetMyProfile() 
     {
         throw new NotImplementedException();
     }
