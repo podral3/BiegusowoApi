@@ -11,7 +11,7 @@ public class Blob
     public string FileName { get; set; }
     public string ContentType { get; set; }
     public string Bucket { get; set; }
-    public bool Uploaded { get; set; }
+    public bool Uploaded { get; set; } = false;
     public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset? DeletedAt { get; set; }
 }

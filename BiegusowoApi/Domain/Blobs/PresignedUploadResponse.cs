@@ -1,12 +1,11 @@
-﻿namespace BiegusowoApi.Domain.Image;
+﻿namespace BiegusowoApi.Domain.Blobs;
 
 public record PresignedUploadResponse(
     List<FileUploadResponse> Files
     );
 
 public record FileUploadResponse(
-    string Key,
     string PresignedUrl,
-    Guid ImageId
+    Guid BlobId
     );
 

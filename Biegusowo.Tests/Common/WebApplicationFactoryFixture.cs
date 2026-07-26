@@ -1,5 +1,7 @@
-﻿using BiegusowoApi.Data;
+﻿using Biegusowo.Tests.Common.Fakes;
+using BiegusowoApi.Data;
 using BiegusowoApi.Data.Seeding;
+using BiegusowoApi.Domain.FileStorage;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -41,6 +43,15 @@ public class WebApplicationFactoryFixture : WebApplicationFactory<Program>, IAsy
                 {
                     x.UseNetTopologySuite();
                 }));
+
+            var fileStorageDescriptor = services.SingleOrDefault(
+                d => d.ServiceType == typeof(IFileStorageProvider));
+            if (fileStorageDescriptor != null)
+                services.Remove(fileStorageDescriptor);
+            services.AddScoped<FakeStorageProvider>();
+
+            services.AddScoped<IFileStorageProvider>(sp =>
+                sp.GetRequiredService<FakeStorageProvider>());
 
             services.AddScoped<DataSeeder>();
         });

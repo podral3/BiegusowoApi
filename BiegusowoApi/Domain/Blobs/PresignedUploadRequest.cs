@@ -1,4 +1,4 @@
-﻿namespace BiegusowoApi.Domain.Image;
+﻿namespace BiegusowoApi.Domain.Blobs;
 
 public record PresignedUploadRequest(
     List<PresignedUploadFile> Files
@@ -7,5 +7,7 @@ public record PresignedUploadRequest(
 public record PresignedUploadFile(
     string FileName,
     string ContentType,
-    int FileSize
+    int FileSizeBytes,
+    int FileWidth,
+    int FileHeight
     );

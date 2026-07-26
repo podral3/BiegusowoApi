@@ -53,7 +53,7 @@ public class FakeStorageProvider : IFileStorageProvider
     /// Test helper: pretend a client successfully PUT this file to the presigned
     /// URL, so a subsequent ConfirmUploadsAsync call finds it via GetObjectInfoAsync.
     /// </summary>
-    public void SimulateUpload(string objectKey, long sizeBytes, string contentType = "image/jpeg")
+    public void SimulateUpload(string objectKey, long sizeBytes, string contentType = "image/webp")
     {
         _objects[objectKey] = new StorageObjectInfo(sizeBytes, contentType, DateTimeOffset.UtcNow);
     }
