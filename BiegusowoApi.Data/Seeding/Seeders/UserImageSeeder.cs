@@ -17,7 +17,6 @@ internal static class UserImageSeeder
             {
                 Id = DataSeeder.SeedGuid(idCounter++),
                 FileName = $"avatar_{avatarSlug(user)}.webp",
-                Bucket = "public",
                 FileSizeBytes = random.Next(50_000, 2_000_000),
                 Type = UserImageType.Avatar,
                 CreatedAt = DateTimeOffset.UtcNow
@@ -29,7 +28,6 @@ internal static class UserImageSeeder
             {
                 Id = DataSeeder.SeedGuid(idCounter++),
                 FileName = $"background_{avatarSlug(user)}.webp",
-                Bucket = "public",
                 FileSizeBytes = random.Next(100_000, 5_000_000),
                 Type = UserImageType.Background,
                 CreatedAt = DateTimeOffset.UtcNow

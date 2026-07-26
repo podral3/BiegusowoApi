@@ -26,7 +26,6 @@ internal static class ListingPhotoSeeder
                     ListingId = listing.Id,
                     FileName = $"photo_{i + 1}.webp",
                     SortOrder = i,
-                    Bucket = "public",
                     FileSizeBytes = random.Next(100_000, 5_000_000),
                     CreatedAt = DateTimeOffset.UtcNow
                 };

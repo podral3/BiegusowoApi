@@ -1,4 +1,5 @@
 ﻿using BiegusowoApi.Data.Models;
+using BiegusowoApi.Data.Types;
 using Microsoft.EntityFrameworkCore;
 
 namespace BiegusowoApi.Data
@@ -20,6 +21,11 @@ namespace BiegusowoApi.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            modelBuilder.HasPostgresEnum<ImageType>();
+            modelBuilder.HasPostgresEnum<ListingStatus>();
+            modelBuilder.HasPostgresEnum<ListingType>();
+            modelBuilder.HasPostgresEnum<MessageStatus>();
+            modelBuilder.HasPostgresEnum<UserImageType>();
 
             // Set default value for CreatedAt property to current timestamp for all entities that have it via reflection
             foreach (var entityType in modelBuilder.Model.GetEntityTypes())
