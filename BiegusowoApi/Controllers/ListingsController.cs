@@ -13,8 +13,8 @@ public class ListingsController : ControllerBase
 {
     [HttpGet]
     [EndpointDescription("Get a paginated list of listings with optional filters and sorting.")]
-    [ProducesResponseType(typeof(CursorPaginatedList<ListingDto>), StatusCodes.Status200OK)]
-    public async Task<ActionResult<CursorPaginatedList<ListingDto>>> GetListings(
+    [ProducesResponseType(typeof(CursorPaginatedList<MinimalListingDto>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<CursorPaginatedList<MinimalListingDto>>> GetListings(
         [FromQuery] string? search,
         [FromQuery] string? city,
         [FromQuery] string? sort,
