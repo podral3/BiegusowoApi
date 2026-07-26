@@ -8,7 +8,7 @@ namespace BiegusowoApi.Data.Models;
 public class Blob
 {
     public Guid Id { get; set; }
-    public string FileName { get; set; }
+    public string StorageKey { get; set; }
     public string ContentType { get; set; }
     public string Bucket { get; set; }
     public bool Uploaded { get; set; } = false;

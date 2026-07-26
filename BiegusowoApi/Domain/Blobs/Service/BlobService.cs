@@ -20,7 +20,7 @@ public class BlobService(
     {
         List<Blob> blobs = [.. request.Select(file => new Blob
         {
-            FileName = file.Key,
+            StorageKey = file.Key,
             ContentType = file.ContentType,
             Bucket = _options.Bucket,
         })];
@@ -49,14 +49,14 @@ public class BlobService(
                 results.Add(new FileUploadResult(null, null, Error: "Blob not found"));
                 continue;   
             }
-            StorageObjectInfo? info =await _fileStorageProvider.GetObjectInfoAsync(blob.FileName, ct);
+            StorageObjectInfo? info =await _fileStorageProvider.GetObjectInfoAsync(blob.StorageKey, ct);
             if (info == null)
             {
-                results.Add(new FileUploadResult(blob.FileName, null, Error: "File not found in storage"));
+                results.Add(new FileUploadResult(blob.StorageKey, null, Error: "File not found in storage"));
                 continue;
             }
             blob.Uploaded = true;
-            results.Add(new FileUploadResult(blob.FileName, kvp.Key, null));
+            results.Add(new FileUploadResult(blob.StorageKey, kvp.Key, null));
         }
         await _dbContext.SaveChangesAsync(ct);
         return new ConfirmUploadResult(results);

@@ -16,7 +16,7 @@ internal class BlobSeeder
             blobs.Add(new Blob
             {
                 Id = DataSeeder.SeedGuid(number),
-                FileName = $"{prefix}_image{number}.webp",
+                StorageKey = $"{prefix}/image{number}.webp",
                 ContentType = "image/webp",
                 Bucket = "public",
                 Uploaded = true,

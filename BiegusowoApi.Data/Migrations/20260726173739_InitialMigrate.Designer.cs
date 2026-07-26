@@ -14,7 +14,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BiegusowoApi.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260726135128_InitialMigrate")]
+    [Migration("20260726173739_InitialMigrate")]
     partial class InitialMigrate
     {
         /// <inheritdoc />
@@ -122,7 +122,7 @@ namespace BiegusowoApi.Data.Migrations
                     b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("FileName")
+                    b.Property<string>("StorageKey")
                         .IsRequired()
                         .HasColumnType("text");
 

@@ -52,7 +52,7 @@ namespace BiegusowoApi.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    FileName = table.Column<string>(type: "text", nullable: false),
+                    StorageKey = table.Column<string>(type: "text", nullable: false),
                     ContentType = table.Column<string>(type: "text", nullable: false),
                     Bucket = table.Column<string>(type: "text", nullable: false),
                     Uploaded = table.Column<bool>(type: "boolean", nullable: false),

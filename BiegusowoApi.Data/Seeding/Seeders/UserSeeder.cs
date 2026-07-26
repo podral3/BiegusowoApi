@@ -25,13 +25,13 @@ internal static class UserSeeder
             {
                 var blob = BlobSeeder.Generate(1, "avatar")[0];
                 blobs.Add(blob);
-                return blob.FileName;
+                return blob.StorageKey;
             })
             .RuleFor(u => u.BackgroundFileName, f =>
             {
                 var blob = BlobSeeder.Generate(1, "background")[0];
                 blobs.Add(blob);
-                return blob.FileName;
+                return blob.StorageKey;
             });
 
         var users = userFaker.Generate(count);

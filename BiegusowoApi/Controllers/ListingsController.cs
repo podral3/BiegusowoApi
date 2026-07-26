@@ -1,5 +1,5 @@
-﻿using BiegusowoApi.Domain.Dtos.Listing;
-using BiegusowoApi.Domain.Image;
+﻿using BiegusowoApi.Domain.Blobs;
+using BiegusowoApi.Domain.Dtos.Listing;
 using BiegusowoApi.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;

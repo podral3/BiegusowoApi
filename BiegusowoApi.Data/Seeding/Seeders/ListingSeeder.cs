@@ -73,8 +73,8 @@ internal static class ListingSeeder
                 blobs.AddRange(imgBlobs);
 
                 var dict = imgBlobs
-                    .Select((b, i) => new { Order = (i).ToString(), b.FileName })
-                    .ToDictionary(x => x.Order, x => x.FileName);
+                    .Select((b, i) => new { Order = (i).ToString(), b.StorageKey })
+                    .ToDictionary(x => x.Order, x => x.StorageKey);
 
                 return JsonSerializer.SerializeToDocument(dict);
             });

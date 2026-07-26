@@ -1,6 +1,6 @@
 ﻿using BiegusowoApi.Data;
+using BiegusowoApi.Domain.Blobs;
 using BiegusowoApi.Domain.Dtos.Article;
-using BiegusowoApi.Domain.Image;
 using BiegusowoApi.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

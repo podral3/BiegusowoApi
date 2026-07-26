@@ -119,7 +119,7 @@ namespace BiegusowoApi.Data.Migrations
                     b.Property<DateTimeOffset?>("DeletedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("FileName")
+                    b.Property<string>("StorageKey")
                         .IsRequired()
                         .HasColumnType("text");
 
