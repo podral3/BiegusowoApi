@@ -4,6 +4,7 @@ using BiegusowoApi.Domain.Blobs;
 using BiegusowoApi.Domain.Blobs.Service;
 using BiegusowoApi.Domain.Conversations;
 using BiegusowoApi.Domain.FileStorage;
+using BiegusowoApi.Domain.Profile;
 using BiegusowoApi.Helpers.Composition;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,6 +22,7 @@ builder.Services.Configure<FileStorageOptions>(
     builder.Configuration.GetSection("FileStorage"));
 
 builder.Services.AddScoped<IConversationService, ConversationService>();
+builder.Services.AddScoped<IProfileService, ProfileService>();
 var app = builder.Build();
 
 app.MapDefaultEndpoints();

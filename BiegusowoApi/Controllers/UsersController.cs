@@ -1,9 +1,10 @@
-﻿using BiegusowoApi.Data;
-using BiegusowoApi.Domain.Blobs;
+﻿using BiegusowoApi.Domain.Blobs;
 using BiegusowoApi.Domain.Blobs.Service;
 using BiegusowoApi.Domain.Dtos.ProfilePage;
+using BiegusowoApi.Domain.Profile;
+using BiegusowoApi.Helpers.Claims;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.JsonPatch;
+using Microsoft.AspNetCore.JsonPatch.SystemTextJson;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BiegusowoApi.Controllers;
@@ -11,10 +12,10 @@ namespace BiegusowoApi.Controllers;
 [Route("api/[controller]")]
 [ApiController]
 public class UsersController(
-    ApplicationDbContext dbContext,
+    IProfileService profileService,
     IBlobService blobService) : ControllerBase
 {
-    private readonly ApplicationDbContext _dbContext = dbContext;
+    private readonly IProfileService _profileService = profileService;
     private readonly IBlobService _blobService = blobService;
 
     [HttpGet("{id:guid}")]
@@ -23,7 +24,8 @@ public class UsersController(
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ProfilePageResponse>> GetProfile(Guid id)
     {
-        throw new NotImplementedException();
+        var result = await _profileService.GetProfileAsync(id);
+        return result is null ? NotFound() : Ok(result);
     }
 
     [Authorize]
@@ -32,7 +34,9 @@ public class UsersController(
     [ProducesResponseType(typeof(ProfilePageResponse), StatusCodes.Status200OK)]
     public async Task<ActionResult<ProfilePageResponse>> GetMyProfile() 
     {
-        throw new NotImplementedException();
+        var userId = User.GetUserId();
+        var result = await _profileService.GetMyProfileAsync(userId);
+        return result is null ? NotFound() : Ok(result);
     }
 
     [Authorize]
@@ -40,10 +44,24 @@ public class UsersController(
     [EndpointDescription("Update the profile information of the currently authenticated user.")]
     [ProducesResponseType(typeof(ProfilePageResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    public Task<ActionResult<ProfilePageResponse>> UpdateUserInfo(
+    public async Task<ActionResult<ProfilePageResponse>> UpdateUserInfo(
         [FromBody] JsonPatchDocument<UserPatchRequest> request)
     {
-        throw new NotImplementedException();
+        var userId = User.GetUserId();
+
+        try
+        {
+            var result = await _profileService.UpdateMyProfileAsync(userId, request);
+            return result is null ? NotFound() : Ok(result);
+        }
+        catch (Microsoft.AspNetCore.JsonPatch.Exceptions.JsonPatchException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
  
     [HttpPost("me/avatar/presigned")]

@@ -1,0 +1,13 @@
+﻿{
+  User: {
+    Username: Kaia.Schneider14,
+    Description: Dolor fuga fugit. Est nostrum est qui. Id sint ab.,
+    Slug: Kaia.Schneider14,
+    DisplayName: Kaia.Schneider14,
+    City: Ankundingtown,
+    JoinDate: DateTimeOffset_1
+  },
+  AvatarUrl: avatar/image3.webp,
+  BackgroundImageUrl: background/image4.webp,
+  HasMoreListings: false
+}

@@ -1,10 +1,8 @@
 ﻿using AwesomeAssertions;
 using Biegusowo.Tests.Common;
 using BiegusowoApi.Domain.Dtos.ProfilePage;
-using Docker.DotNet.Models;
 using Microsoft.AspNetCore.JsonPatch;
-using System;
-using System.Collections.Generic;
+using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text;
 
@@ -58,16 +56,25 @@ public class UserControllerTests(WebApplicationFactoryFixture factory)
     [Fact]
     public async Task UpdateUserInfo_ReturnsOk()
     {
-        // Arrange
+        //Arrange
         var client = _factory.CreateAuthenticatedClient(FirstUserId);
-        var patchDoc = new JsonPatchDocument<UserPatchRequest>();
-        patchDoc.Replace(u => u.DisplayName, "Updated Display Name");
-        patchDoc.Replace(u => u.Bio, "Updated Bio");
-        patchDoc.Replace(u => u.PhoneNumber, "123456789");
+        var ops = new[]
+        {
+            new { op = "replace", path = "/DisplayName", value = "Updated Display Name" },
+            new { op = "replace", path = "/Bio", value = "Updated Bio" },
+            new { op = "replace", path = "/PhoneNumber", value = "123456789" }
+        };
+
+        var json = System.Text.Json.JsonSerializer.Serialize(ops);
+
+        var content = new StringContent(json, Encoding.UTF8);
+        content.Headers.ContentType = new MediaTypeHeaderValue("application/json-patch+json");
         // Act
-        var response = await client.PatchAsJsonAsync("/api/users/me", patchDoc, CancellationToken);
+        var response = await client.PatchAsync("/api/users/me", content, CancellationToken);
+
         // Assert
         response.Should().Be200Ok();
+
         var result = await response.Content.ReadFromJsonAsync<ProfilePageResponse>(CancellationToken);
         await Verify(result);
     }
@@ -76,7 +83,7 @@ public class UserControllerTests(WebApplicationFactoryFixture factory)
     public async Task UpdateUserInfo_InvalidPhoneNumber_ReturnsBadRequest()
     {
         // Arrange
-        var client = _factory.CreateAuthenticatedClient(FirstUserId);
+        var client = _factory.CreateAuthenticatedClient("00000000-0000-0000-0000-0000000051");
         var patchDoc = new JsonPatchDocument<UserPatchRequest>();
         patchDoc.Replace(u => u.PhoneNumber, "InvalidPhoneNumber");
         // Act

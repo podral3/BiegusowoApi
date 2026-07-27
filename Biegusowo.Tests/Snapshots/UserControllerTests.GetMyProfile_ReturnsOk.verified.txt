@@ -1,0 +1,12 @@
+﻿{
+  User: {
+    Username: Marcel52,
+    Slug: Marcel52,
+    DisplayName: Marcel52,
+    City: New Reginald,
+    JoinDate: DateTimeOffset_1
+  },
+  AvatarUrl: avatar/image1.webp,
+  BackgroundImageUrl: background/image2.webp,
+  HasMoreListings: false
+}
