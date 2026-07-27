@@ -6,6 +6,5 @@ public record ConversationDto(
     Guid Id,
     Guid ListingId,
     string ListingTitle,
-    ConversationParticipantDto Buyer,
-    ConversationParticipantDto Seller,
+    ConversationParticipantDto Receipient,
     CursorPaginatedList<MessageDto> Messages);

@@ -36,8 +36,9 @@ public class ConversationsController(IConversationService conversationService) :
         [FromQuery] Guid? beforeMessageId,
         [FromQuery] int pageSize = 10)
     {
-        var result = await _conversationService.GetConversationAsync(IdentityId, conversationId, beforeCreatedAt, beforeMessageId, pageSize);
-        return result is null ? NotFound() : Ok(result);
+        Result<ConversationDto?> result = await _conversationService
+            .GetConversationAsync(IdentityId, conversationId, beforeCreatedAt, beforeMessageId, pageSize);
+        return result.ToActionResult(this);
     }
 
     [HttpPost]
@@ -47,7 +48,7 @@ public class ConversationsController(IConversationService conversationService) :
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ConversationDto>> CreateConversation([FromBody] ConversationRequest request)
     {
-        var result = await _conversationService.CreateConversationAsync(IdentityId, request);
-        return result is null ? NotFound() : Ok(result);
+        Result<ConversationDto?> result = await _conversationService.CreateConversationAsync(IdentityId, request);
+        return result.ToActionResult(this);
     }
 }

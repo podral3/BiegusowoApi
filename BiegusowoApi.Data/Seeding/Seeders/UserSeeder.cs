@@ -14,8 +14,7 @@ internal static class UserSeeder
         var blobs = new List<Blob>();
         var userFaker = new Faker<User>()
             .UseSeed(42)
-            .RuleFor(l => l.Id, f => DataSeeder.SeedGuid(idCounter))
-            .RuleFor(u => u.IdentityId, f => DataSeeder.SeedGuid(idCounter++))
+            .RuleFor(l => l.Id, f => DataSeeder.SeedGuid(idCounter++))
             .RuleFor(u => u.DisplayName, f => f.Internet.UserName())
             .RuleFor(u => u.Bio, f => f.Lorem.Paragraph().OrNull(f, 0.2f))
             .RuleFor(u => u.PhoneNumber, f => f.Phone.PhoneNumber().OrNull(f, 0.2f))

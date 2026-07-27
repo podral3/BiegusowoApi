@@ -406,9 +406,6 @@ namespace BiegusowoApi.Data.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid>("IdentityId")
-                        .HasColumnType("uuid");
-
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("text");
 

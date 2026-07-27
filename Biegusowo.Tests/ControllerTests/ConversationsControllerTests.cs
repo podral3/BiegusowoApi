@@ -55,7 +55,7 @@ public class ConversationsControllerTests(WebApplicationFactoryFixture factory)
     {
         // Arrange
         var client = _factory.CreateAuthenticatedClient(FirstUserId);
-        string conversationId = "00000000-0000-0000-0000-000000000010";
+        string conversationId = "00000000-0000-0000-0000-000000000011";
         // Act
         var response = await client.GetAsync($"/api/conversations/{conversationId}",
             CancellationToken);
@@ -85,7 +85,7 @@ public class ConversationsControllerTests(WebApplicationFactoryFixture factory)
     }
 
     [Fact]
-    public async Task GetMessages_NotParticipant_Returns403Forbid()
+    public async Task GetMessages_NotParticipant_Returns404NotFound()
     {
         // Arrange
         var client = _factory.CreateAuthenticatedClient(FirstUserId);
@@ -94,19 +94,19 @@ public class ConversationsControllerTests(WebApplicationFactoryFixture factory)
         var response = await client.GetAsync($"/api/conversations/{conversationId}",
             CancellationToken);
         // Assert
-        response.Should().Be403Forbidden();
+        response.Should().Be404NotFound();
     }
 
     [Fact]
     public async Task CreateConversationCreatesConversation()
     {
         // Arrange
-        var client = _factory.CreateAuthenticatedClient(FirstUserId);
+        var client = _factory.CreateAuthenticatedClient("00000000-0000-0000-0000-000000000009");
 
         var request = new ConversationRequest(
-            Guid.Parse("00000000-0000-0000-0000-000000000010"),
-            "Hello, I am interested in your listing.",
-            DateTimeOffset.UtcNow
+            ListingId: Guid.Parse("00000000-0000-0000-0000-000000000015"),
+            FirstMessage: "Hello, I am interested in your listing.",
+            SentAt: DateTimeOffset.UtcNow
         );
 
         // Act
@@ -119,7 +119,6 @@ public class ConversationsControllerTests(WebApplicationFactoryFixture factory)
         // Assert
         response.Should().Be200Ok();
         ConversationDto? conversation = await response.Content.ReadFromJsonAsync<ConversationDto>(CancellationToken);
-        conversation.Messages.Items.Count().Should().Be(1);
         await Verify(conversation);
     }
 
@@ -130,9 +129,9 @@ public class ConversationsControllerTests(WebApplicationFactoryFixture factory)
         var client = _factory.CreateAuthenticatedClient(FirstUserId);
 
         var request = new ConversationRequest(
-            Guid.Parse("00000000-0000-0000-0000-000000000035"),
-            "Hello, I am interested in your listing.",
-            DateTimeOffset.UtcNow
+            ListingId: Guid.Parse("00000000-0000-0000-0000-000000000021"),
+            FirstMessage: "Hello, I am interested in your listing.",
+            SentAt: DateTimeOffset.UtcNow
         );
 
         // Act

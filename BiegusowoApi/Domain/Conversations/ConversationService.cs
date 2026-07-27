@@ -13,24 +13,22 @@ public class ConversationService(ApplicationDbContext dbContext) : IConversation
 
     private readonly ApplicationDbContext _dbContext = dbContext;
 
-    public async Task<Guid?> GetLocalUserIdAsync(Guid identityId) //TODO do wywalenia
+    public async Task<User?> GetLocalUserIdAsync(Guid identityId) //TODO do wywalenia
     {
         return await _dbContext.Users
-            .Where(u => u.IdentityId == identityId)
-            .Select(u => (Guid?)u.Id)
-            .FirstOrDefaultAsync();
+            .FirstOrDefaultAsync(u => u.Id == identityId);
     }
 
     public async Task<CursorPaginatedList<MinimalConversationDto>> GetUserConversationsAsync(
         Guid identityId, DateTimeOffset? beforeLastMessageAt, Guid? beforeConversationId, int pageSize)
     {
-        var userId = await GetLocalUserIdAsync(identityId);
-        if (userId is null)
+        User? user = await GetLocalUserIdAsync(identityId);
+        if (user is null)
             return new CursorPaginatedList<MinimalConversationDto>([], false);
 
         var query =
         from c in _dbContext.Conversations
-        where c.BuyerId == userId || c.SellerId == userId
+        where c.BuyerId == user.Id || c.SellerId == user.Id
         let lastMessage = _dbContext.Messages
             .Where(m => m.ConversationId == c.Id)
             .OrderByDescending(m => m.CreatedAt)
@@ -53,9 +51,10 @@ public class ConversationService(ApplicationDbContext dbContext) : IConversation
             {
                 x.Conversation.Id,
                 x.Conversation.ListingId,
-                ListingTitle = x.Conversation.Listing.Title,   // translated to a SQL join, no Include needed
+                ListingTitle = x.Conversation.Listing.Title,
                 x.LastMessage,
-                OtherUser = x.Conversation.BuyerId == userId ? x.Conversation.Seller : x.Conversation.Buyer
+                OtherUser = x.Conversation.BuyerId == user.Id ? x.Conversation.Seller : x.Conversation.Buyer,
+                OtherUserIsSeller = x.Conversation.BuyerId == user.Id// if current user is buyer, the other side is the seller
             })
             .ToListAsync();
 
@@ -64,26 +63,30 @@ public class ConversationService(ApplicationDbContext dbContext) : IConversation
             x.Id,
             x.ListingId,
             x.ListingTitle,
-            new ConversationParticipantDto(x.OtherUser.Id, x.OtherUser.DisplayName, x.OtherUser.AvatarFileName),
+            new ConversationParticipantDto(x.OtherUser.Id, x.OtherUserIsSeller, x.OtherUser.DisplayName, x.OtherUser.AvatarFileName),
             x.LastMessage == null ? null : new MessageDto(
-                x.LastMessage.Id, x.LastMessage.ConversationId, x.LastMessage.SenderId,
+                x.LastMessage.Id, x.LastMessage.SenderId,
                 x.LastMessage.Body, x.LastMessage.MessageStatus, x.LastMessage.CreatedAt)
         )).ToList();
 
         return new CursorPaginatedList<MinimalConversationDto>(items, hasNextPage);
     }
 
-    public async Task<ConversationDto?> GetConversationAsync(
+    public async Task<Result<ConversationDto>> GetConversationAsync(
         Guid identityId, Guid conversationId, DateTimeOffset? beforeCreatedAt, Guid? beforeMessageId, int pageSize)
     {
-        var userId = await GetLocalUserIdAsync(identityId);
-        if (userId is null) return null;
+        User? user = await GetLocalUserIdAsync(identityId);
+        if (user is null) return Result<ConversationDto>.Failure(ServiceError.Forbidden);
 
         var conversation = await _dbContext.Conversations
             .Include(c => c.Buyer).Include(c => c.Seller).Include(c => c.Listing)
-            .FirstOrDefaultAsync(c => c.Id == conversationId && (c.BuyerId == userId || c.SellerId == userId));
+            .FirstOrDefaultAsync(c => c.Id == conversationId);
 
-        if (conversation is null) return null;
+        if (conversation is null)
+            return Result<ConversationDto>.Failure(ServiceError.NotFound);
+
+        if (conversation.BuyerId != user.Id && conversation.SellerId != user.Id)
+            return Result<ConversationDto>.Failure(ServiceError.Forbidden);
 
         var messageQuery = _dbContext.Messages.Where(m => m.ConversationId == conversationId);
 
@@ -101,58 +104,90 @@ public class ConversationService(ApplicationDbContext dbContext) : IConversation
 
         var hasNextPage = page.Count > pageSize;
         var messages = page.Take(pageSize)
-            .Select(m => new MessageDto(m.Id, m.ConversationId, m.SenderId, m.Body, m.MessageStatus, m.CreatedAt))
+            .Select(m => new MessageDto(m.Id, m.SenderId, m.Body, m.MessageStatus, m.CreatedAt))
             .ToList();
 
-        return new ConversationDto(
+        ConversationParticipantDto receipient;
+        if (user.Id == conversation.BuyerId)
+        {
+            receipient = new ConversationParticipantDto(conversation.Seller.Id, true, conversation.Seller.DisplayName, conversation.Seller.AvatarFileName);
+        }
+        else
+        {
+            receipient = new ConversationParticipantDto(conversation.Buyer.Id, false, conversation.Buyer.DisplayName, conversation.Buyer.AvatarFileName);
+        }
+
+        var dto = new ConversationDto(
             conversation.Id, conversation.ListingId, conversation.Listing.Title,
-            new ConversationParticipantDto(conversation.Buyer.Id, conversation.Buyer.DisplayName, conversation.Buyer.AvatarFileName),
-            new ConversationParticipantDto(conversation.Seller.Id, conversation.Seller.DisplayName, conversation.Seller.AvatarFileName),
+            receipient,
             new CursorPaginatedList<MessageDto>(messages, hasNextPage));
+        return Result<ConversationDto>.Success(dto);
     }
 
-    public async Task<ConversationDto?> CreateConversationAsync(Guid identityId, ConversationRequest request)
+    public async Task<Result<ConversationDto>> CreateConversationAsync(Guid buyerId, ConversationRequest request)
     {
-        var buyerId = await GetLocalUserIdAsync(identityId);
-        if (buyerId is null) return null;
-
-        var listing = await _dbContext.Listings.FirstOrDefaultAsync(l => l.Id == request.ListingId);
-        if (listing is null) return null;
-
-        if (listing.UserId == buyerId) return null;
-
         var conversation = await _dbContext.Conversations
-            .FirstOrDefaultAsync(c => c.ListingId == request.ListingId && c.BuyerId == buyerId && c.SellerId == listing.UserId);
-
-        if (conversation is null)
+            .FirstOrDefaultAsync(c => c.ListingId == request.ListingId && c.BuyerId == buyerId);
+        if (conversation is not null)
         {
-            conversation = new Conversation
-            {
-                Id = Guid.NewGuid(),
-                ListingId = request.ListingId,
-                BuyerId = buyerId.Value,
-                SellerId = listing.UserId,
-                CreatedAt = DateTimeOffset.UtcNow
-            };
-            _dbContext.Conversations.Add(conversation);
-            await _dbContext.SaveChangesAsync();
+            return Result<ConversationDto>.Failure(ServiceError.Conflict);
         }
 
+        var listing = await _dbContext.Listings
+            .Include(l => l.User)
+            .FirstOrDefaultAsync(l => l.Id == request.ListingId);
+        if (listing is null) return Result<ConversationDto>.Failure(ServiceError.NotFound);
+
+        if (listing.UserId == buyerId) return Result<ConversationDto>.Failure(ServiceError.Conflict);
+
+        conversation = new Conversation
+        {
+            Id = Guid.NewGuid(),
+            ListingId = request.ListingId,
+            BuyerId = buyerId,
+            SellerId = listing.UserId,
+            CreatedAt = DateTimeOffset.UtcNow
+        };
+
+        _dbContext.Conversations.Add(conversation);
+        await _dbContext.SaveChangesAsync();
+        
+        ConversationParticipantDto receipient;
+        if (buyerId == conversation.BuyerId)
+        {
+            receipient = new ConversationParticipantDto(conversation.Seller.Id, true, conversation.Seller.DisplayName, conversation.Seller.AvatarFileName);
+        }
+        else
+        {
+            receipient = new ConversationParticipantDto(conversation.Buyer.Id, false, conversation.Buyer.DisplayName, conversation.Buyer.AvatarFileName);
+        }
+
+        MessageDto? message = null;
         if (!string.IsNullOrWhiteSpace(request.FirstMessage) && await ValidateMessageAsync(request.FirstMessage))
         {
-            await SaveMessageToDbAsync(conversation.Id, identityId, request.FirstMessage);
+            message = await SaveMessageToDbAsync(conversation.Id, buyerId, request.FirstMessage);
         }
 
-        return await GetConversationAsync(identityId, conversation.Id, null, null, 10);
+        if (message is null)
+        {
+            return Result<ConversationDto>.Failure(ServiceError.ValidationError);
+        }
+
+        var messages = new List<MessageDto>() {message };
+        var dto = new ConversationDto(
+           conversation.Id, conversation.ListingId, conversation.Listing.Title,
+           receipient,
+           new CursorPaginatedList<MessageDto>([.. messages], false));
+        return Result<ConversationDto>.Success(dto);
     }
 
     public async Task<bool> IsUserParticipantInConversationAsync(Guid identityId, Guid conversationId)
     {
-        var userId = await GetLocalUserIdAsync(identityId);
-        if (userId is null) return false;
+        User? user = await GetLocalUserIdAsync(identityId);
+        if (user is null) return false;
 
         return await _dbContext.Conversations
-            .AnyAsync(c => c.Id == conversationId && (c.BuyerId == userId || c.SellerId == userId));
+            .AnyAsync(c => c.Id == conversationId && (c.BuyerId == user.Id || c.SellerId == user.Id));
     }
 
     public Task<bool> ValidateMessageAsync(string message)
@@ -163,14 +198,14 @@ public class ConversationService(ApplicationDbContext dbContext) : IConversation
 
     public async Task<MessageDto?> SaveMessageToDbAsync(Guid conversationId, Guid identityId, string message)
     {
-        var senderId = await GetLocalUserIdAsync(identityId);
-        if (senderId is null) return null;
+        User? sender= await GetLocalUserIdAsync(identityId);
+        if (sender is null) return null;
 
         var savedMessage = new Message
         {
             Id = Guid.NewGuid(),
             ConversationId = conversationId,
-            SenderId = senderId.Value,
+            SenderId = sender.Id,
             Body = message.Trim(),
             MessageStatus = MessageStatus.Unread,
             CreatedAt = DateTimeOffset.UtcNow
@@ -179,6 +214,6 @@ public class ConversationService(ApplicationDbContext dbContext) : IConversation
         _dbContext.Messages.Add(savedMessage);
         await _dbContext.SaveChangesAsync();
 
-        return new MessageDto(savedMessage.Id, savedMessage.ConversationId, savedMessage.SenderId, savedMessage.Body, savedMessage.MessageStatus, savedMessage.CreatedAt);
+        return new MessageDto(savedMessage.Id, savedMessage.SenderId, savedMessage.Body, savedMessage.MessageStatus, savedMessage.CreatedAt);
     }
 }

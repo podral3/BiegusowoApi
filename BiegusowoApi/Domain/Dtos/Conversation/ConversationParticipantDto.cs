@@ -2,5 +2,6 @@
 
 public record ConversationParticipantDto(
     Guid UserId,
+    bool IsSelling,
     string DisplayName,
-    string? AvatarFileName);
+    string? AvatarStorageKey);
