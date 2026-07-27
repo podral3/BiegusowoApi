@@ -1,0 +1,34 @@
+﻿{
+  Id: Guid_1,
+  ListingId: Guid_2,
+  ListingTitle: Eligendi voluptatem.,
+  Receipient: {
+    UserId: Guid_3,
+    IsSelling: true,
+    DisplayName: Ismael_Stark,
+    AvatarStorageKey: avatar/image147.webp
+  },
+  Messages: {
+    Items: [
+      {
+        Id: Guid_4,
+        SenderId: Guid_3,
+        Body: Message 3 in conversation 00000000-0000-0000-0000-000000000019,
+        CreatedAt: DateTimeOffset_1
+      },
+      {
+        Id: Guid_5,
+        SenderId: Guid_3,
+        Body: Message 2 in conversation 00000000-0000-0000-0000-000000000019,
+        CreatedAt: DateTimeOffset_2
+      },
+      {
+        Id: Guid_6,
+        SenderId: Guid_3,
+        Body: Message 1 in conversation 00000000-0000-0000-0000-000000000019,
+        CreatedAt: DateTimeOffset_3
+      }
+    ],
+    HasNextPage: false
+  }
+}
