@@ -84,10 +84,17 @@ public class UserControllerTests(WebApplicationFactoryFixture factory)
     {
         // Arrange
         var client = _factory.CreateAuthenticatedClient("00000000-0000-0000-0000-0000000051");
-        var patchDoc = new JsonPatchDocument<UserPatchRequest>();
-        patchDoc.Replace(u => u.PhoneNumber, "InvalidPhoneNumber");
+        var ops = new[]
+        {
+            new { op = "replace", path = "/PhoneNumber", value = "2137" }
+        };
+
+        var json = System.Text.Json.JsonSerializer.Serialize(ops);
+
+        var content = new StringContent(json, Encoding.UTF8);
+        content.Headers.ContentType = new MediaTypeHeaderValue("application/json-patch+json");
         // Act
-        var response = await client.PatchAsJsonAsync("/api/users/me", patchDoc, CancellationToken);
+        var response = await client.PatchAsync("/api/users/me", content, CancellationToken);
         // Assert
         response.Should().Be400BadRequest();
     }

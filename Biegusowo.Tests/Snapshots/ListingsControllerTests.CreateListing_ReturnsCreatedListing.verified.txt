@@ -1,0 +1,19 @@
+﻿{
+  Id: Guid_1,
+  UserId: Guid_2,
+  UserName: Marcel52,
+  Title: Golden Retriever Puppies,
+  Description: Healthy puppies ready for adoption.,
+  ListingType: Exchange,
+  BreedNote: ,
+  Price: 1500.0,
+  PriceNegotiable: true,
+  SpeciesId: 1,
+  BreedId: 10,
+  ImageOrderedUrls: {
+    0: https://example.com/image1.jpg
+  },
+  CreatedAt: DateTimeOffset_1,
+  VoivodeshipId: 8,
+  CityName: Warsaw
+}

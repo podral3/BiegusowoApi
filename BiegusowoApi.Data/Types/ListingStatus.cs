@@ -2,9 +2,9 @@
 
 public enum ListingStatus
 {
-    active,
-    draft,
-    sold,
-    expired,
-    removed
+    Active,
+    Draft,
+    Sold,
+    Expired,
+    Removed
 }

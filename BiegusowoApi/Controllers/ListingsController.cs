@@ -1,17 +1,20 @@
 ﻿using BiegusowoApi.Domain.Blobs;
 using BiegusowoApi.Domain.Dtos.Listing;
+using BiegusowoApi.Domain.Listings;
 using BiegusowoApi.Helpers;
 using BiegusowoApi.Helpers.Claims;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.JsonPatch;
+using Microsoft.AspNetCore.JsonPatch.SystemTextJson;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BiegusowoApi.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class ListingsController : ControllerBase
+public class ListingsController(IListingService listingService): ControllerBase
 {
+    private readonly IListingService _listingService = listingService;
+
     [HttpGet]
     [EndpointDescription("Get a paginated list of listings with optional filters and sorting.")]
     [ProducesResponseType(typeof(CursorPaginatedList<MinimalListingDto>), StatusCodes.Status200OK)]
@@ -27,17 +30,17 @@ public class ListingsController : ControllerBase
         [FromQuery] Guid? beforeListingId,    
         [FromQuery] int pageSize = 20)
     {
-        throw new NotImplementedException();
+        return await _listingService.GetListingsAsync(search, city, sort, speciesId, breedId, priceMin, priceMax, beforeCursorValue, beforeListingId, pageSize);
     }
 
     [HttpGet("{id:guid}")]
     [EndpointDescription("Get a specific listing by its ID.")]
     [ProducesResponseType(typeof(ListingDto), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
-    public ActionResult<ListingDto> GetListing([FromRoute] Guid id)
+    public async Task<ActionResult<ListingDto>> GetListing([FromRoute] Guid id)
     {
-        Guid userId = User.GetUserId();
-        throw new NotImplementedException();
+        var result = await _listingService.GetListingAsync(id);
+        return result.ToActionResult(this);
     }
 
     [Authorize]
@@ -47,7 +50,9 @@ public class ListingsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<ListingDto>> CreateListing([FromBody] CreateListingRequest request)
     {
-        throw new NotImplementedException();    
+        Guid userId = User.GetUserId();
+        var restult = await _listingService.CreateListingAsync(userId, request);
+        return restult.ToActionResult(this);
     }
 
     [Authorize]
@@ -59,7 +64,9 @@ public class ListingsController : ControllerBase
         [FromRoute] Guid id,
         [FromBody] JsonPatchDocument<UpdateListingRequest> request)
     {
-        throw new NotImplementedException();
+        Guid userId = User.GetUserId();
+        var result = await _listingService.PatchListingAsync(userId, id, request);
+        return result.ToActionResult(this);
     }
 
     [Authorize]
@@ -69,7 +76,8 @@ public class ListingsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]   
     public async Task<ActionResult> DeleteListing([FromRoute] Guid id)
     {
-        throw new NotImplementedException();
+       var result = await _listingService.DeleteListingAsync(User.GetUserId(), id);
+       return result.ToActionResult(this);
     }
 
     [Authorize]

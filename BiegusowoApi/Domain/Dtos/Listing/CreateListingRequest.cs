@@ -14,5 +14,5 @@ public record CreateListingRequest(
     string CityName,
     double Longitude,
     double Latitude,
-    List<string> ImageIds
+    Dictionary<string,string> ImageOrderIdPair
 );

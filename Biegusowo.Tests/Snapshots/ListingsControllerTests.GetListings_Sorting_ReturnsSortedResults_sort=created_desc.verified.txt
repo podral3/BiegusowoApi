@@ -1,0 +1,27 @@
+﻿{
+  Items: [
+    {
+      Id: Guid_1,
+      Title: Ut nesciunt nesciunt.,
+      Price: 127.09,
+      PriceNegotiable: false,
+      BreedId: 45
+    },
+    {
+      Id: Guid_2,
+      Title: Et maxime.,
+      Price: 30.3,
+      PriceNegotiable: false,
+      BreedId: 29
+    },
+    {
+      Id: Guid_3,
+      Title: Eaque nisi ratione.,
+      Price: 153.4,
+      PriceNegotiable: false,
+      BreedId: 37
+    }
+  ],
+  HasPreviousPage: false,
+  HasNextPage: false
+}

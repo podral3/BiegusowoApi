@@ -242,7 +242,7 @@ public class ListingsControllerTests(WebApplicationFactoryFixture factory)
             CityName: "Warsaw",
             Longitude: 21.0122,
             Latitude: 52.2297,
-            ImageIds: []
+            new Dictionary<string, string>() { ["0"] = "https://example.com/image1.jpg" }
         );
 
         // Act
@@ -350,7 +350,7 @@ public class ListingsControllerTests(WebApplicationFactoryFixture factory)
         var response = await client.DeleteAsync($"/api/listings/{listingId}",
             CancellationToken);
 
-        response.Should().Be200Ok();
+        response.Should().Be204NoContent();
     }
 
     [Fact]
