@@ -363,3 +363,4 @@ MigrationBackup/
 FodyWeavers.xsd
 
 *.verified.txt text eol=lf working-tree-encoding=UTF-8
+*.received.*
