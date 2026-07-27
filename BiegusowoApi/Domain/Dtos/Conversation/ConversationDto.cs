@@ -1,5 +1,11 @@
-﻿namespace BiegusowoApi.Domain.Dtos.Conversation;
+﻿using BiegusowoApi.Helpers;
 
-public record ConversationDto
-{
-}
+namespace BiegusowoApi.Domain.Dtos.Conversation;
+
+public record ConversationDto(
+    Guid Id,
+    Guid ListingId,
+    string ListingTitle,
+    ConversationParticipantDto Buyer,
+    ConversationParticipantDto Seller,
+    CursorPaginatedList<MessageDto> Messages);

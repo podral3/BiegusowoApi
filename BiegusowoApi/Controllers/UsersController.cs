@@ -1,14 +1,10 @@
-﻿using BiegusowoApi.Auth.CurrentUser;
-using BiegusowoApi.Data;
-using BiegusowoApi.Data.Models;
+﻿using BiegusowoApi.Data;
 using BiegusowoApi.Domain.Blobs;
 using BiegusowoApi.Domain.Blobs.Service;
 using BiegusowoApi.Domain.Dtos.ProfilePage;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
 
 namespace BiegusowoApi.Controllers;
 
@@ -16,11 +12,9 @@ namespace BiegusowoApi.Controllers;
 [ApiController]
 public class UsersController(
     ApplicationDbContext dbContext,
-    ICurrentUserService currentUserService,
     IBlobService blobService) : ControllerBase
 {
     private readonly ApplicationDbContext _dbContext = dbContext;
-    private readonly ICurrentUserService _currentUserService = currentUserService;
     private readonly IBlobService _blobService = blobService;
 
     [HttpGet("{id:guid}")]
@@ -59,16 +53,6 @@ public class UsersController(
     public async Task<ActionResult<PresignedUploadResponse>> UploadAvatarPresigned(
         [FromBody] PresignedUploadFile request)
     {
-        var identityId = User.FindFirstValue(ClaimTypes.NameIdentifier)
-                      ?? User.FindFirstValue("sub");
-
-        if (identityId is null)
-            return Unauthorized();
-
-        var user = await _dbContext.Users
-            .FirstOrDefaultAsync(u => u.IdentityId == identityId);
-
-        //TODO standardize getting user from claims
         throw new NotImplementedException();
     }
 

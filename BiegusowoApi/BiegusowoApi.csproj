@@ -28,5 +28,9 @@
 	<InternalsVisibleTo Include="Biegusowo.Tests" />
 </ItemGroup>
 
+<ItemGroup>
+  <Folder Include="Auth\" />
+</ItemGroup>
+
 
 </Project>

@@ -34,13 +34,13 @@ public class ConversationsControllerTests(WebApplicationFactoryFixture factory)
     {
         var client = _factory.CreateAuthenticatedClient(FirstUserId);
 
-        var firstResponse = await client.GetAsync("/api/conversations?pageSize=5", CancellationToken);
+        var firstResponse = await client.GetAsync("/api/conversations?pageSize=1", CancellationToken);
         var firstPage = await firstResponse.Content.ReadFromJsonAsync<PaginatedList<MinimalConversationDto>>(CancellationToken);
 
         var last = firstPage!.Items.Last();
 
         var secondResponse = await client.GetAsync(
-            $"/api/conversations?pageSize=5&beforeLastMessageAt={Uri.EscapeDataString(last.LastMessageAt.ToString("O"))}&beforeConversationId={last.Id}",
+            $"/api/conversations?pageSize=5&beforeLastMessageAt={Uri.EscapeDataString(last.LastMessage.CreatedAt.ToString("O"))}&beforeConversationId={last.Id}",
             CancellationToken);
 
         secondResponse.Should().Be200Ok();
@@ -91,7 +91,7 @@ public class ConversationsControllerTests(WebApplicationFactoryFixture factory)
         var client = _factory.CreateAuthenticatedClient(FirstUserId);
         string conversationId = "c";
         // Act
-        var response = await client.GetAsync($"/api/conversations/{conversationId}?skip=5&pageSize=10",
+        var response = await client.GetAsync($"/api/conversations/{conversationId}",
             CancellationToken);
         // Assert
         response.Should().Be403Forbidden();
@@ -119,6 +119,7 @@ public class ConversationsControllerTests(WebApplicationFactoryFixture factory)
         // Assert
         response.Should().Be200Ok();
         ConversationDto? conversation = await response.Content.ReadFromJsonAsync<ConversationDto>(CancellationToken);
+        conversation.Messages.Items.Count().Should().Be(1);
         await Verify(conversation);
     }
 
@@ -129,7 +130,7 @@ public class ConversationsControllerTests(WebApplicationFactoryFixture factory)
         var client = _factory.CreateAuthenticatedClient(FirstUserId);
 
         var request = new ConversationRequest(
-            Guid.Parse("00000000-0000-0000-0000-000000000010"),
+            Guid.Parse("00000000-0000-0000-0000-000000000035"),
             "Hello, I am interested in your listing.",
             DateTimeOffset.UtcNow
         );

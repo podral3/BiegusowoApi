@@ -2,9 +2,8 @@
 using Biegusowo.Tests.Common;
 using Biegusowo.Tests.Common.Fakes;
 using BiegusowoApi.Data.Models;
-using BiegusowoApi.Domain.FileStorage;
-using BiegusowoApi.Domain.Image;
-using BiegusowoApi.Domain.Image.Service;
+using BiegusowoApi.Domain.Blobs;
+using BiegusowoApi.Domain.Blobs.Service;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -19,8 +18,8 @@ public class BlobServiceTests(WebApplicationFactoryFixture factory)
         //Arrange
         var scope = _factory.Services.CreateScope();
         var objectService = scope.ServiceProvider.GetRequiredService<IBlobService>();
-        var singleFile = new BiegusowoApi.Domain.Image.Service.PresignedFileInfo("listingPhoto.webp", "image/webp", 21370000, "/key/that/will/work");
-        List<BiegusowoApi.Domain.Image.Service.PresignedFileInfo> request = [singleFile];
+        var singleFile = new PresignedFileInfo("listingPhoto.webp", "image/webp", 21370000, "/key/that/will/work");
+        List<PresignedFileInfo> request = [singleFile];
 
         //Act
         PresignedUploadResponse result = await objectService.CreatePresignedUploadsAsync(request, CancellationToken);
@@ -38,12 +37,12 @@ public class BlobServiceTests(WebApplicationFactoryFixture factory)
         //Arrange
         var scope = _factory.Services.CreateScope();
         var objectService = scope.ServiceProvider.GetRequiredService<IBlobService>();
-        var singleFile = new BiegusowoApi.Domain.Image.Service.PresignedFileInfo("listingPhoto1.webp", "image/webp", 21370000, "/key/that/will/work1");
+        var singleFile = new PresignedFileInfo("listingPhoto1.webp", "image/webp", 21370000, "/key/that/will/work1");
 
         var fakeStorage = scope.ServiceProvider.GetRequiredService<FakeStorageProvider>();
         fakeStorage.SimulateUpload(singleFile.Key, singleFile.FileSizeBytes, singleFile.ContentType);
 
-        List<BiegusowoApi.Domain.Image.Service.PresignedFileInfo> presignedRequest = [singleFile];
+        List<PresignedFileInfo> presignedRequest = [singleFile];
         PresignedUploadResponse presignedResponse = await objectService.CreatePresignedUploadsAsync(presignedRequest, CancellationToken);
         var kvp = presignedResponse.Files
             .Select((f, index) => new { Key = index, Value = f.BlobId })
@@ -56,7 +55,7 @@ public class BlobServiceTests(WebApplicationFactoryFixture factory)
         confirmResults.Result[0].Key.Should().Be(singleFile.Key);
         confirmResults.Result[0].Order.Should().Be(0);
         Blob? blob = await GetQueryable<Blob>()
-            .FirstOrDefaultAsync(b => b.FileName == confirmResults.Result[0].Key, CancellationToken);
+            .FirstOrDefaultAsync(b => b.StorageKey == confirmResults.Result[0].Key, CancellationToken);
         blob.Should().NotBeNull();
         blob!.Uploaded.Should().BeTrue();
     }

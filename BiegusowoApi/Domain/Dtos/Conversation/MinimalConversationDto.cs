@@ -2,10 +2,7 @@
 
 public record MinimalConversationDto(
     Guid Id,
-    Guid OtherPersonId,
-    string OtherPersonName,
     Guid ListingId,
     string ListingTitle,
-    bool AreYouSeller,
-    string LastMessagePreview,
-    DateTimeOffset LastMessageAt);
+    ConversationParticipantDto OtherParticipant,
+    MessageDto? LastMessage);

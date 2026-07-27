@@ -2,6 +2,7 @@
 using BiegusowoApi.Domain.Conversations;
 using BiegusowoApi.Domain.Dtos.Conversation;
 using BiegusowoApi.Helpers;
+using BiegusowoApi.Helpers.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
@@ -10,18 +11,21 @@ namespace BiegusowoApi.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class ConversationsController(ApplicationDbContext dbContext) : ControllerBase
+public class ConversationsController(IConversationService conversationService) : ControllerBase
 {
-    private readonly ApplicationDbContext _dbContext = dbContext;
+    private readonly IConversationService _conversationService = conversationService;
+    private Guid IdentityId => User.GetUserId();
 
     [HttpGet]
     [Authorize]
-    public async Task<ActionResult<PaginatedList<MinimalConversationDto>>> GetConversations(
+    public async Task<ActionResult<CursorPaginatedList<MinimalConversationDto>>> GetConversations(
         [FromQuery] DateTimeOffset? beforeLastMessageAt,
         [FromQuery] Guid? beforeConversationId,
         [FromQuery] int pageSize = 10)
     {
-        throw new NotImplementedException();    
+        var result = await _conversationService.GetUserConversationsAsync(IdentityId, beforeLastMessageAt, beforeConversationId, pageSize);
+        return Ok(result);
+
     }
 
     [HttpGet("{conversationId:guid}")]
@@ -29,10 +33,11 @@ public class ConversationsController(ApplicationDbContext dbContext) : Controlle
     public async Task<ActionResult<ConversationDto>> GetMessages(
         [FromRoute] Guid conversationId,
         [FromQuery] DateTimeOffset? beforeCreatedAt,
-        [FromQuery] Guid? beforeMessageId, 
+        [FromQuery] Guid? beforeMessageId,
         [FromQuery] int pageSize = 10)
     {
-        throw new NotImplementedException();
+        var result = await _conversationService.GetConversationAsync(IdentityId, conversationId, beforeCreatedAt, beforeMessageId, pageSize);
+        return result is null ? NotFound() : Ok(result);
     }
 
     [HttpPost]
@@ -42,6 +47,7 @@ public class ConversationsController(ApplicationDbContext dbContext) : Controlle
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ConversationDto>> CreateConversation([FromBody] ConversationRequest request)
     {
-        throw new NotImplementedException();
+        var result = await _conversationService.CreateConversationAsync(IdentityId, request);
+        return result is null ? NotFound() : Ok(result);
     }
 }

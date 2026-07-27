@@ -1,6 +1,4 @@
-﻿using BiegusowoApi.Auth.CurrentUser;
-
-namespace BiegusowoApi.Helpers.Composition;
+﻿namespace BiegusowoApi.Helpers.Composition;
 
 public static class ConfigureAuthentication
 {
@@ -19,8 +17,6 @@ public static class ConfigureAuthentication
                     options.RequireHttpsMetadata = false;
                 }
             });
-
-        services.AddScoped<ICurrentUserService, CurrentUserService>();
         return services;
     }
 }

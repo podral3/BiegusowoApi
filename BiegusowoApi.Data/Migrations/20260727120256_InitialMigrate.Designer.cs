@@ -14,7 +14,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BiegusowoApi.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260726173739_InitialMigrate")]
+    [Migration("20260727120256_InitialMigrate")]
     partial class InitialMigrate
     {
         /// <inheritdoc />
@@ -409,9 +409,8 @@ namespace BiegusowoApi.Data.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("IdentityId")
-                        .IsRequired()
-                        .HasColumnType("text");
+                    b.Property<Guid>("IdentityId")
+                        .HasColumnType("uuid");
 
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("text");

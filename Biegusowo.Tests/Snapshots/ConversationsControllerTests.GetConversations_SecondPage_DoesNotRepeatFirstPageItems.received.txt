@@ -1,0 +1,40 @@
+﻿{
+  Items: [
+    {
+      Id: Guid_1,
+      ListingId: Guid_2,
+      ListingTitle: Aut recusandae.,
+      OtherParticipant: {
+        UserId: Guid_3,
+        DisplayName: Dagmar_Marquardt3,
+        AvatarFileName: avatar/image55.webp
+      },
+      LastMessage: {
+        Id: Guid_4,
+        ConversationId: Guid_1,
+        SenderId: Guid_3,
+        Body: Message 14 in conversation 00000000-0000-0000-0000-000000000093,
+        CreatedAt: DateTimeOffset_1
+      }
+    },
+    {
+      Id: Guid_5,
+      ListingId: Guid_6,
+      ListingTitle: Eligendi voluptatem.,
+      OtherParticipant: {
+        UserId: Guid_7,
+        DisplayName: Ismael_Stark,
+        AvatarFileName: avatar/image147.webp
+      },
+      LastMessage: {
+        Id: Guid_8,
+        ConversationId: Guid_5,
+        SenderId: Guid_7,
+        Body: Message 3 in conversation 00000000-0000-0000-0000-000000000019,
+        CreatedAt: DateTimeOffset_2
+      }
+    }
+  ],
+  HasPreviousPage: false,
+  HasNextPage: false
+}
