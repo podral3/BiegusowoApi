@@ -1,0 +1,23 @@
+﻿{
+  Id: Guid_1,
+  ListingId: Guid_2,
+  ListingTitle: Error voluptatibus.,
+  Receipient: {
+    UserId: Guid_3,
+    IsSelling: true,
+    DisplayName: Brady.Abernathy,
+    AvatarStorageKey: avatar/image177.webp
+  },
+  Messages: {
+    Items: [
+      {
+        Id: Guid_4,
+        SenderId: Guid_5,
+        Body: Hello, I am interested in your listing.,
+        MessageStatus: Unread,
+        CreatedAt: DateTimeOffset_1
+      }
+    ],
+    HasNextPage: false
+  }
+}

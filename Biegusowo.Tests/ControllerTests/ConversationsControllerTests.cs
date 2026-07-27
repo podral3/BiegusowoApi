@@ -130,7 +130,7 @@ public class ConversationsControllerTests(WebApplicationFactoryFixture factory)
 
         var request = new ConversationRequest(
             ListingId: Guid.Parse("00000000-0000-0000-0000-000000000021"),
-            FirstMessage: "Hello, I am interested in your listing.",
+            FirstMessage: "This is already existing conversation.",
             SentAt: DateTimeOffset.UtcNow
         );
 
