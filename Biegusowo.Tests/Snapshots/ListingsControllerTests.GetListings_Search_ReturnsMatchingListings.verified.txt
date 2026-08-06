@@ -1,1 +1,46 @@
-﻿
+﻿{
+  Items: [
+    {
+      Id: Guid_1,
+      Title: Listing number 15,
+      Price: 85.8,
+      PriceNegotiable: false,
+      BreedId: 2,
+      CreatedAt: DateTimeOffset_1
+    },
+    {
+      Id: Guid_2,
+      Title: Listing number 12,
+      Price: 30.62,
+      PriceNegotiable: false,
+      BreedId: 34,
+      CreatedAt: DateTimeOffset_2
+    },
+    {
+      Id: Guid_3,
+      Title: Listing number 10,
+      Price: 122.68,
+      PriceNegotiable: false,
+      BreedId: 20,
+      CreatedAt: DateTimeOffset_3
+    },
+    {
+      Id: Guid_4,
+      Title: Listing number 13,
+      Price: 141.82,
+      PriceNegotiable: false,
+      BreedId: 42,
+      CreatedAt: DateTimeOffset_4
+    },
+    {
+      Id: Guid_5,
+      Title: Listing number 11,
+      Price: 134.88,
+      PriceNegotiable: false,
+      BreedId: 17,
+      CreatedAt: DateTimeOffset_5
+    }
+  ],
+  HasPreviousPage: false,
+  HasNextPage: false
+}

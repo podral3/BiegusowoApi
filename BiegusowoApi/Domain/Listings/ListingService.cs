@@ -142,6 +142,13 @@ public class ListingsService(ApplicationDbContext db) : IListingService
 
     public async Task<Result<ListingDto>> CreateListingAsync(Guid userId, CreateListingRequest request)
     {
+        CreateListingRequestValidator validator = new();
+        var result = await validator.ValidateAsync(request);
+        if (!result.IsValid)
+        {
+            return Result<ListingDto>.Failure(ServiceError.ValidationError);
+        }
+
         var location = _geometryFactory.CreatePoint(new Coordinate(request.Longitude, request.Latitude));
 
         var orderedImageIds = request.ImageOrderIdPair
@@ -265,8 +272,8 @@ public class ListingsService(ApplicationDbContext db) : IListingService
         l.BreedNote ?? string.Empty,
         l.Price,
         l.PriceNegotiable,
-        l.Species.Id,
-        l.Breed.Id,
+        l.SpeciesId,
+        l.BreedId,
         ParseImages(l.Images),
         l.CreatedAt,
         l.UpdatedAt,
@@ -283,6 +290,7 @@ public class ListingsService(ApplicationDbContext db) : IListingService
         (int)l.ListingType,
         GetFirstImageUrl(l.Images), // ImageUrl comes later
         Slugify(l.Title, l.Id),
+        l.CreatedAt,
         l.Location.Y,
         l.Location.X);
 

@@ -2,6 +2,7 @@
 using BiegusowoApi.Data.Models;
 using BiegusowoApi.Domain.Dtos.ProfilePage;
 using BiegusowoApi.Domain.Dtos.User;
+using BiegusowoApi.Helpers;
 using Microsoft.AspNetCore.JsonPatch.SystemTextJson;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
@@ -29,7 +30,7 @@ public class ProfileService(ApplicationDbContext db) : IProfileService
     public Task<ProfilePageResponse?> GetMyProfileAsync(Guid currentUserId, CancellationToken ct = default)
         => GetProfileAsync(currentUserId, ct);
 
-    public async Task<ProfilePageResponse?> UpdateMyProfileAsync(
+    public async Task<Result<ProfilePageResponse?>> UpdateMyProfileAsync(
         Guid currentUserId,
         JsonPatchDocument<UserPatchRequest> patch,
         CancellationToken ct = default)
@@ -38,7 +39,7 @@ public class ProfileService(ApplicationDbContext db) : IProfileService
             .FirstOrDefaultAsync(u => u.Id == currentUserId && u.DeletedAt == null, ct);
 
         if (user is null)
-            return null;
+            return Result<ProfilePageResponse?>.Failure(ServiceError.NotFound);
 
         var dto = new UserPatchRequest
         {
@@ -56,12 +57,15 @@ public class ProfileService(ApplicationDbContext db) : IProfileService
             errors.Add($"{err.AffectedObject.GetType().Name}: {err.ErrorMessage}");
         });
 
-        if (errors.Count > 0)
-        {
-            throw new InvalidOperationException(string.Join(" | ", errors));
-        }
 
         patch.ApplyTo(dto);
+        UserPatchRequestValidator validator = new();
+        var result = await validator.ValidateAsync(dto, ct);
+
+        if (!result.IsValid)
+        {
+            return Result<ProfilePageResponse?>.Failure(ServiceError.ValidationError);
+        }
 
         user.DisplayName = dto.DisplayName;
         user.Bio = dto.Bio;
@@ -71,7 +75,7 @@ public class ProfileService(ApplicationDbContext db) : IProfileService
         user.UpdatedAt = DateTimeOffset.UtcNow;
 
         await _dbContext.SaveChangesAsync(ct);
-        return await BuildProfileResponseAsync(user, ct);
+        return Result<ProfilePageResponse?>.Success(await BuildProfileResponseAsync(user, ct));
     }
 
     private async Task<ProfilePageResponse> BuildProfileResponseAsync(User user, CancellationToken ct)
@@ -100,14 +104,16 @@ public class ProfileService(ApplicationDbContext db) : IProfileService
 
     private ProfilePageListingSummary MapListingSummary(Listing listing)
     {
-        var images = JsonSerializer.Deserialize<Dictionary<string, string>>(listing.Images.RootElement.GetRawText());
+        var images = JsonSerializer.Deserialize<string[]>(listing.Images.RootElement.GetRawText());
+        var firstImage = images is { Length: > 0 } ? images[0] : string.Empty;
+
         return new ProfilePageListingSummary(
             listing.Id,
             Slugify(listing.Title), // Replace with your real slug if you already store one.
             listing.Title,
             Convert.ToDecimal(listing.Price),
             listing.CityName,
-            images["0"]);
+            firstImage);
     }
     private static string Slugify(string value)
     {

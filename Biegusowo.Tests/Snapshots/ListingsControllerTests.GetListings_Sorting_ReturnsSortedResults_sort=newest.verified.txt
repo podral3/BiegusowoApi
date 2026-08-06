@@ -9,7 +9,7 @@
       BreedId: 48,
       ImageUrl: listings/image6.webp,
       Slug: listing-number-3-00000000,
-      CreatedAt: DateTimeOffset_1,
+      CreatedAt: 2026-06-30 21:48 +0,
       Latitude: 51.67492381691696,
       Longitude: 17.890862713610222
     },
@@ -23,7 +23,7 @@
       TransactionTypeId: 1,
       ImageUrl: listings/image254.webp,
       Slug: listing-number-71-00000000,
-      CreatedAt: DateTimeOffset_2,
+      CreatedAt: 2026-06-30 08:56 +0,
       Latitude: 52.09303199643876,
       Longitude: 23.444236101044453
     },
@@ -36,7 +36,7 @@
       BreedId: 43,
       ImageUrl: listings/image321.webp,
       Slug: listing-number-90-00000000,
-      CreatedAt: DateTimeOffset_3,
+      CreatedAt: 2026-06-30 07:49 +0,
       Latitude: 49.43496956826885,
       Longitude: 17.862032785994014
     },
@@ -49,7 +49,7 @@
       BreedId: 5,
       ImageUrl: listings/image213.webp,
       Slug: listing-number-61-00000000,
-      CreatedAt: DateTimeOffset_4,
+      CreatedAt: 2026-06-29 21:29 +0,
       Latitude: 52.64842556847652,
       Longitude: 22.889212738065613
     },
@@ -63,10 +63,11 @@
       TransactionTypeId: 1,
       ImageUrl: listings/image313.webp,
       Slug: listing-number-88-00000000,
-      CreatedAt: DateTimeOffset_5,
+      CreatedAt: 2026-06-28 21:09 +0,
       Latitude: 50.6095972569704,
       Longitude: 22.83029746796484
     }
   ],
-  HasNextPage: true
+  HasPreviousPage: false,
+  HasNextPage: false
 }

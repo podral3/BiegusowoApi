@@ -2,7 +2,7 @@
 
 public record UserDto(
     string Username,
-    string? Description,
+    string? Bio,
     string Slug,
     string? PhoneNumber,
     string DisplayName,

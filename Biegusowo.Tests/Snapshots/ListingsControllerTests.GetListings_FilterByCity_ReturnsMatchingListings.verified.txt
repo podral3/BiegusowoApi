@@ -1,1 +1,20 @@
-﻿
+﻿{
+  Items: [
+    {
+      Id: Guid_1,
+      Title: Listing number 12,
+      Price: 30.62,
+      City: Mackhaven,
+      SpeciedId: 3,
+      BreedId: 34,
+      TransactionTypeId: 1,
+      ImageUrl: listings/image40.webp,
+      Slug: listing-number-12-00000000,
+      CreatedAt: DateTimeOffset_1,
+      Latitude: 52.56886423303227,
+      Longitude: 18.354997052976394
+    }
+  ],
+  HasPreviousPage: false,
+  HasNextPage: false
+}

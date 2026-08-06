@@ -1,1 +1,47 @@
-﻿
+﻿{
+  Items: [
+    {
+      Id: Guid_1,
+      Title: Listing number 3,
+      Price: 167.48,
+      City: Alexzanderside,
+      SpeciedId: 7,
+      BreedId: 48,
+      ImageUrl: listings/image6.webp,
+      Slug: listing-number-3-00000000,
+      CreatedAt: DateTimeOffset_1,
+      Latitude: 51.67492381691696,
+      Longitude: 17.890862713610222
+    },
+    {
+      Id: Guid_2,
+      Title: Listing number 72,
+      Price: 31.44,
+      City: Ziemeport,
+      SpeciedId: 7,
+      BreedId: 48,
+      TransactionTypeId: 1,
+      ImageUrl: listings/image257.webp,
+      Slug: listing-number-72-00000000,
+      CreatedAt: DateTimeOffset_2,
+      Latitude: 52.01872455301635,
+      Longitude: 14.877981594287782
+    },
+    {
+      Id: Guid_3,
+      Title: Listing number 66,
+      Price: 190.86,
+      City: Delmerberg,
+      SpeciedId: 7,
+      BreedId: 48,
+      TransactionTypeId: 1,
+      ImageUrl: listings/image234.webp,
+      Slug: listing-number-66-00000000,
+      CreatedAt: DateTimeOffset_3,
+      Latitude: 52.05316602552922,
+      Longitude: 21.716371315399357
+    }
+  ],
+  HasPreviousPage: false,
+  HasNextPage: false
+}

@@ -1,14 +1,1 @@
-﻿{
-  User: {
-    Username: Updated Display Name,
-    Description: Updated Bio,
-    Slug: Updated Display Name,
-    PhoneNumber: 123456789,
-    DisplayName: Updated Display Name,
-    City: New Reginald,
-    JoinDate: DateTimeOffset_1
-  },
-  AvatarUrl: avatar/image1.webp,
-  BackgroundImageUrl: background/image2.webp,
-  HasMoreListings: false
-}
+﻿

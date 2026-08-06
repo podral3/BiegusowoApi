@@ -11,6 +11,7 @@ internal static class UserSeeder
     public static (List<User> Users, List<Blob> Blobs) Generate(int count, List<Voivodeship> voivodeships)
     {
         int idCounter = 1;
+        int blobIdCounter = 1;
         var blobs = new List<Blob>();
         var userFaker = new Faker<User>()
             .UseSeed(42)
@@ -22,13 +23,13 @@ internal static class UserSeeder
             .RuleFor(u => u.VoivodeshipId, f => f.PickRandom(voivodeships).Id)
             .RuleFor(u => u.AvatarFileName, f =>
             {
-                var blob = BlobSeeder.Generate(1, "avatar")[0];
+                var blob = BlobSeeder.Generate(1, "avatar", ref blobIdCounter)[0];
                 blobs.Add(blob);
                 return blob.StorageKey;
             })
             .RuleFor(u => u.BackgroundFileName, f =>
             {
-                var blob = BlobSeeder.Generate(1, "background")[0];
+                var blob = BlobSeeder.Generate(1, "background", ref blobIdCounter)[0];
                 blobs.Add(blob);
                 return blob.StorageKey;
             });

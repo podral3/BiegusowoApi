@@ -2,6 +2,7 @@
 using BiegusowoApi.Domain.Blobs.Service;
 using BiegusowoApi.Domain.Dtos.ProfilePage;
 using BiegusowoApi.Domain.Profile;
+using BiegusowoApi.Helpers;
 using BiegusowoApi.Helpers.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch.SystemTextJson;
@@ -52,7 +53,7 @@ public class UsersController(
         try
         {
             var result = await _profileService.UpdateMyProfileAsync(userId, request);
-            return result is null ? NotFound() : Ok(result);
+            return result.ToActionResult(this);
         }
         catch (Microsoft.AspNetCore.JsonPatch.Exceptions.JsonPatchException ex)
         {

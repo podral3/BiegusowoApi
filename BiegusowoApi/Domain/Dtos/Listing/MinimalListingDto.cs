@@ -10,6 +10,7 @@ public record MinimalListingDto(
     int TransactionTypeId,
     string ImageUrl,
     string Slug,
+    DateTimeOffset CreatedAt,
     double Latitude,
     double Longitude);
 

@@ -1,1 +1,33 @@
-﻿
+﻿{
+  Items: [
+    {
+      Id: Guid_1,
+      Title: Listing number 61,
+      Price: 104.57,
+      City: Cummeratafort,
+      SpeciedId: 1,
+      BreedId: 5,
+      ImageUrl: listings/image213.webp,
+      Slug: listing-number-61-00000000,
+      CreatedAt: DateTimeOffset_1,
+      Latitude: 52.64842556847652,
+      Longitude: 22.889212738065613
+    },
+    {
+      Id: Guid_2,
+      Title: Listing number 56,
+      Price: 50.56,
+      City: South Hallie,
+      SpeciedId: 1,
+      BreedId: 5,
+      TransactionTypeId: 1,
+      ImageUrl: listings/image197.webp,
+      Slug: listing-number-56-00000000,
+      CreatedAt: DateTimeOffset_2,
+      Latitude: 50.79080558316354,
+      Longitude: 22.044468868777372
+    }
+  ],
+  HasPreviousPage: false,
+  HasNextPage: false
+}

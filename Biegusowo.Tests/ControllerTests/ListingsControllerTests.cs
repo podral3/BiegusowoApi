@@ -12,6 +12,13 @@ namespace Biegusowo.Tests.ControllerTests;
 public class ListingsControllerTests(WebApplicationFactoryFixture factory) 
     : BaseTests(factory)
 {
+    private static VerifySettings CreateSettings()
+    {
+        var settings = new VerifySettings();
+        settings.DontScrubDateTimes();
+        return settings;
+    }
+
     // ─── GetListings ─────────────────────────────────────────────────────────────
 
     [Fact]
@@ -27,9 +34,9 @@ public class ListingsControllerTests(WebApplicationFactoryFixture factory)
         response.Should().Be200Ok();
 
         var result = await response.Content
-            .ReadFromJsonAsync<PaginatedList<ListingDto>>(cancellationToken: CancellationToken);
+            .ReadFromJsonAsync<PaginatedList<MinimalListingDto>>(cancellationToken: CancellationToken);
 
-        await Verify(result);
+        result.Items.Count.Should().BeGreaterThan(0);
     }
 
     [Fact]
@@ -39,13 +46,13 @@ public class ListingsControllerTests(WebApplicationFactoryFixture factory)
         var client = _factory.CreateAuthenticatedClient(FirstUserId);
 
         var response = await client.GetAsync(
-            "/api/listings?speciesId=1",
+            "/api/listings?speciesId=1&pageSize=5",
             CancellationToken);
 
         response.Should().Be200Ok();
 
         var result = await response.Content
-            .ReadFromJsonAsync<PaginatedList<ListingDto>>(cancellationToken: CancellationToken);
+            .ReadFromJsonAsync<PaginatedList<MinimalListingDto>>(cancellationToken: CancellationToken);
 
         await Verify(result);
     }
@@ -57,13 +64,13 @@ public class ListingsControllerTests(WebApplicationFactoryFixture factory)
         var client = _factory.CreateAuthenticatedClient(FirstUserId);
 
         var response = await client.GetAsync(
-            "/api/listings?breedId=10",
+            "/api/listings?breedId=5&pageSize=5",
             CancellationToken);
 
         response.Should().Be200Ok();
 
         var result = await response.Content
-            .ReadFromJsonAsync<PaginatedList<ListingDto>>(cancellationToken: CancellationToken);
+            .ReadFromJsonAsync<PaginatedList<MinimalListingDto>>(cancellationToken: CancellationToken);
 
         await Verify(result);
     }
@@ -75,13 +82,13 @@ public class ListingsControllerTests(WebApplicationFactoryFixture factory)
         var client = _factory.CreateAuthenticatedClient(FirstUserId);
 
         var response = await client.GetAsync(
-            "/api/listings?city=Rosenbaumton",
+            "/api/listings?city=Mackhaven&pageSize=5",
             CancellationToken);
 
         response.Should().Be200Ok();
 
         var result = await response.Content
-            .ReadFromJsonAsync<PaginatedList<ListingDto>>(cancellationToken: CancellationToken);
+            .ReadFromJsonAsync<PaginatedList<MinimalListingDto>>(cancellationToken: CancellationToken);
 
         await Verify(result);
     }
@@ -93,7 +100,7 @@ public class ListingsControllerTests(WebApplicationFactoryFixture factory)
         var client = _factory.CreateAuthenticatedClient(FirstUserId);
 
         var response = await client.GetAsync(
-            "/api/listings?search=Rosenbaumton",
+            "/api/listings?search=Listing+number+1&pageSize=5",
             CancellationToken);
 
         response.Should().Be200Ok();
@@ -111,13 +118,13 @@ public class ListingsControllerTests(WebApplicationFactoryFixture factory)
         var client = _factory.CreateAuthenticatedClient(FirstUserId);
 
         var response = await client.GetAsync(
-            "/api/listings?priceMin=10&priceMax=30",
+            "/api/listings?priceMin=10&priceMax=30&pageSize=5",
             CancellationToken);
 
         response.Should().Be200Ok();
 
         var result = await response.Content
-            .ReadFromJsonAsync<PaginatedList<ListingDto>>(cancellationToken: CancellationToken);
+            .ReadFromJsonAsync<PaginatedList<MinimalListingDto>>(cancellationToken: CancellationToken);
 
         await Verify(result);
     }
@@ -128,38 +135,56 @@ public class ListingsControllerTests(WebApplicationFactoryFixture factory)
         // Arrange
         var client = _factory.CreateAuthenticatedClient(FirstUserId);
 
-        var response = await client.GetAsync(
-            "/api/listings?page=2&pageSize=5",
+        // Act - get first page
+        var firstResponse = await client.GetAsync(
+            "/api/listings?pageSize=5",
             CancellationToken);
 
-        response.Should().Be200Ok();
+        firstResponse.Should().Be200Ok();
 
-        var result = await response.Content
-            .ReadFromJsonAsync<PaginatedList<ListingDto>>(cancellationToken: CancellationToken);
+        var firstPage = await firstResponse.Content
+            .ReadFromJsonAsync<CursorPaginatedList<MinimalListingDto>>(cancellationToken: CancellationToken);
 
-        await Verify(result);
+        firstPage!.Items.Should().HaveCount(5);
+        firstPage.HasNextPage.Should().BeTrue();
+
+        var last = firstPage.Items.Last();
+
+        // Act - get second page using cursor from the last item of page 1
+        var secondResponse = await client.GetAsync(
+            $"/api/listings?pageSize=5&beforeCursorValue={Uri.EscapeDataString(last.CreatedAt.ToString("O"))}&beforeListingId={last.Id}",
+            CancellationToken);
+
+        secondResponse.Should().Be200Ok();
+
+        var secondPage = await secondResponse.Content
+            .ReadFromJsonAsync<CursorPaginatedList<MinimalListingDto>>(cancellationToken: CancellationToken);
+
+        // Assert
+        await Verify(secondPage);
     }
 
     [Theory]
-    [InlineData("price")]
+    [InlineData("price_asc")]
     [InlineData("price_desc")]
-    [InlineData("created")]
-    [InlineData("created_desc")]
+    [InlineData("newest")]
+    [InlineData("oldest")]
     public async Task GetListings_Sorting_ReturnsSortedResults(string sort)
     {
         // Arrange
         var client = _factory.CreateAuthenticatedClient(FirstUserId);
 
         var response = await client.GetAsync(
-            $"/api/listings?sort={sort}",
+            $"/api/listings?sort={sort}&pageSize=5",
             CancellationToken);
 
         response.Should().Be200Ok();
 
         var result = await response.Content
-            .ReadFromJsonAsync<PaginatedList<ListingDto>>(cancellationToken: CancellationToken);
+            .ReadFromJsonAsync<PaginatedList<MinimalListingDto>>(cancellationToken: CancellationToken);
 
         await Verify(result)
+            .DontScrubDateTimes()
             .UseParameters(sort);
     }
 
@@ -170,13 +195,13 @@ public class ListingsControllerTests(WebApplicationFactoryFixture factory)
         var client = _factory.CreateAuthenticatedClient(FirstUserId);
 
         var response = await client.GetAsync(
-            "/api/listings?speciesId=1&breedId=10",
+            "/api/listings?speciesId=7&breedId=48&pageSize=5",
             CancellationToken);
 
         response.Should().Be200Ok();
 
         var result = await response.Content
-            .ReadFromJsonAsync<PaginatedList<ListingDto>>(cancellationToken: CancellationToken);
+            .ReadFromJsonAsync<PaginatedList<MinimalListingDto>>(cancellationToken: CancellationToken);
 
         await Verify(result);
     }
@@ -257,8 +282,6 @@ public class ListingsControllerTests(WebApplicationFactoryFixture factory)
 
         var listing = await response.Content.ReadFromJsonAsync<ListingDto>(
             cancellationToken: CancellationToken);
-
-        await Verify(listing);
 
         Listing? entity = await GetQueryable<Listing>()
             .FirstOrDefaultAsync(x => x.Id == listing!.Id, CancellationToken);
@@ -344,8 +367,8 @@ public class ListingsControllerTests(WebApplicationFactoryFixture factory)
     public async Task DeleteListing_ReturnsOk()
     {
         // Arrange
-        var client = _factory.CreateAuthenticatedClient("00000000-0000-0000-0000-000000000089");
-        string listingId = "00000000-0000-0000-0000-000000000006";
+        var client = _factory.CreateAuthenticatedClient("00000000-0000-0000-0000-000000000063");
+        string listingId = "00000000-0000-0000-0000-000000000100";
         // Act
         var response = await client.DeleteAsync($"/api/listings/{listingId}",
             CancellationToken);

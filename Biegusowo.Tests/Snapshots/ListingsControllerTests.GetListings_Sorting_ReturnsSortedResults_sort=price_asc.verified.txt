@@ -1,0 +1,75 @@
+﻿{
+  Items: [
+    {
+      Id: Guid_1,
+      Title: Listing number 46,
+      Price: 11.41,
+      City: Leannonview,
+      SpeciedId: 1,
+      BreedId: 7,
+      ImageUrl: listings/image165.webp,
+      Slug: listing-number-46-00000000,
+      CreatedAt: 2026-06-19 23:36 +0,
+      Latitude: 49.35150032106391,
+      Longitude: 20.953734867905144
+    },
+    {
+      Id: Guid_2,
+      Title: Listing number 36,
+      Price: 15.17,
+      City: Judyport,
+      SpeciedId: 7,
+      BreedId: 50,
+      TransactionTypeId: 1,
+      ImageUrl: listings/image125.webp,
+      Slug: listing-number-36-00000000,
+      CreatedAt: 2026-06-19 11:32 +0,
+      Latitude: 51.82506572912683,
+      Longitude: 14.705926664176362
+    },
+    {
+      Id: Guid_3,
+      Title: Listing number 5,
+      Price: 17.31,
+      City: Cartwrightland,
+      SpeciedId: 2,
+      BreedId: 20,
+      TransactionTypeId: 1,
+      ImageUrl: listings/image14.webp,
+      Slug: listing-number-5-00000000,
+      CreatedAt: 2026-06-13 05:31 +0,
+      Latitude: 50.87826653825039,
+      Longitude: 21.686629055713595
+    },
+    {
+      Id: Guid_4,
+      Title: Listing number 73,
+      Price: 18.15,
+      City: Walkertown,
+      SpeciedId: 2,
+      BreedId: 19,
+      TransactionTypeId: 1,
+      ImageUrl: listings/image260.webp,
+      Slug: listing-number-73-00000000,
+      CreatedAt: 2026-06-04 08:55 +0,
+      Latitude: 50.00663116630476,
+      Longitude: 20.272679420082213
+    },
+    {
+      Id: Guid_5,
+      Title: Listing number 63,
+      Price: 18.69,
+      City: Benedictton,
+      SpeciedId: 8,
+      BreedId: 53,
+      TransactionTypeId: 1,
+      ImageUrl: listings/image222.webp,
+      Slug: listing-number-63-00000000,
+      CreatedAt: 2026-06-21 17:55 +0,
+      Latitude: 50.42712025923055,
+      Longitude: 21.474115620820836
+    }
+  ],
+  HasPreviousPage: false,
+  HasNextPage: false
+}

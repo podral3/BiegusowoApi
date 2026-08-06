@@ -57,7 +57,7 @@ public class UserControllerTests(WebApplicationFactoryFixture factory)
     public async Task UpdateUserInfo_ReturnsOk()
     {
         //Arrange
-        var client = _factory.CreateAuthenticatedClient(FirstUserId);
+        var client = _factory.CreateAuthenticatedClient("00000000-0000-0000-0000-000000000040");
         var ops = new[]
         {
             new { op = "replace", path = "/DisplayName", value = "Updated Display Name" },
@@ -76,14 +76,17 @@ public class UserControllerTests(WebApplicationFactoryFixture factory)
         response.Should().Be200Ok();
 
         var result = await response.Content.ReadFromJsonAsync<ProfilePageResponse>(CancellationToken);
-        await Verify(result);
+        result.Should().NotBeNull();
+        result.User.Bio.Should().Be("Updated Bio");
+        result.User.DisplayName.Should().Be("Updated Display Name");
+        result.User.PhoneNumber.Should().Be("123456789");
     }
 
     [Fact]
     public async Task UpdateUserInfo_InvalidPhoneNumber_ReturnsBadRequest()
     {
         // Arrange
-        var client = _factory.CreateAuthenticatedClient("00000000-0000-0000-0000-0000000051");
+        var client = _factory.CreateAuthenticatedClient("00000000-0000-0000-0000-000000000051");
         var ops = new[]
         {
             new { op = "replace", path = "/PhoneNumber", value = "2137" }

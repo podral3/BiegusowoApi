@@ -30,7 +30,7 @@ internal static class ConversationSeeder
                     Listing = listing,
                     Buyer = buyer,
                     Seller = seller,
-                    CreatedAt = DateTimeOffset.UtcNow.AddDays(-random.Next(10))
+                    CreatedAt = listing.CreatedAt.AddDays(random.Next(10))
                 };
                 conversations.Add(conversation);
             }

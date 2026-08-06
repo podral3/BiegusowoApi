@@ -7,7 +7,25 @@
     City: Ankundingtown,
     JoinDate: DateTimeOffset_1
   },
-  AvatarUrl: avatar/image3.webp,
-  BackgroundImageUrl: background/image4.webp,
+  AvatarUrl: avatars/image3.webp,
+  BackgroundImageUrl: backgrounds/image4.webp,
+  Listings: [
+    {
+      Id: Guid_1,
+      Slug: listing-number-3,
+      Title: Listing number 3,
+      Price: 167.48,
+      City: Alexzanderside,
+      CoverPhotoUrl: listings/image6.webp
+    },
+    {
+      Id: Guid_2,
+      Slug: listing-number-65,
+      Title: Listing number 65,
+      Price: 103.9,
+      City: Klingberg,
+      CoverPhotoUrl: listings/image229.webp
+    }
+  ],
   HasMoreListings: false
 }

@@ -1,1 +1,21 @@
-﻿
+﻿{
+  Id: Guid_1,
+  UserId: Guid_2,
+  UserName: Kylie0,
+  Title: Listing number 1,
+  Description: Qui consequuntur cupiditate dolorem voluptatem est excepturi.,
+  ListingStatus: Sold,
+  BreedNote: ,
+  Price: 108.32,
+  PriceNegotiable: true,
+  SpeciesId: 1,
+  BreedId: 41,
+  ImageOrderedUrls: {
+    0: listings/image1.webp,
+    1: listings/image2.webp
+  },
+  CreatedAt: DateTimeOffset_1,
+  UpdatedAt: DateTimeOffset_2,
+  VoivodeshipId: 18,
+  CityName: North Meaghanfort
+}

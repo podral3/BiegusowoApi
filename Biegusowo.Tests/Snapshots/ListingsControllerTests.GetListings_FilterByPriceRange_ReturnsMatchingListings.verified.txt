@@ -1,1 +1,74 @@
-﻿
+﻿{
+  Items: [
+    {
+      Id: Guid_1,
+      Title: Listing number 55,
+      Price: 22.73,
+      City: Minniehaven,
+      SpeciedId: 2,
+      BreedId: 19,
+      TransactionTypeId: 1,
+      ImageUrl: listings/image195.webp,
+      Slug: listing-number-55-00000000,
+      CreatedAt: DateTimeOffset_1,
+      Latitude: 49.23852006832069,
+      Longitude: 21.67415202975932
+    },
+    {
+      Id: Guid_2,
+      Title: Listing number 77,
+      Price: 20.95,
+      City: East Vincenza,
+      SpeciedId: 1,
+      BreedId: 41,
+      ImageUrl: listings/image276.webp,
+      Slug: listing-number-77-00000000,
+      CreatedAt: DateTimeOffset_2,
+      Latitude: 54.506751271293844,
+      Longitude: 22.419165966529008
+    },
+    {
+      Id: Guid_3,
+      Title: Listing number 63,
+      Price: 18.69,
+      City: Benedictton,
+      SpeciedId: 8,
+      BreedId: 53,
+      TransactionTypeId: 1,
+      ImageUrl: listings/image222.webp,
+      Slug: listing-number-63-00000000,
+      CreatedAt: DateTimeOffset_3,
+      Latitude: 50.42712025923055,
+      Longitude: 21.474115620820836
+    },
+    {
+      Id: Guid_4,
+      Title: Listing number 46,
+      Price: 11.41,
+      City: Leannonview,
+      SpeciedId: 1,
+      BreedId: 7,
+      ImageUrl: listings/image165.webp,
+      Slug: listing-number-46-00000000,
+      CreatedAt: DateTimeOffset_4,
+      Latitude: 49.35150032106391,
+      Longitude: 20.953734867905144
+    },
+    {
+      Id: Guid_5,
+      Title: Listing number 36,
+      Price: 15.17,
+      City: Judyport,
+      SpeciedId: 7,
+      BreedId: 50,
+      TransactionTypeId: 1,
+      ImageUrl: listings/image125.webp,
+      Slug: listing-number-36-00000000,
+      CreatedAt: DateTimeOffset_5,
+      Latitude: 51.82506572912683,
+      Longitude: 14.705926664176362
+    }
+  ],
+  HasPreviousPage: false,
+  HasNextPage: false
+}

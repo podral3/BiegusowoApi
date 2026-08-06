@@ -55,7 +55,7 @@ public class ConversationsControllerTests(WebApplicationFactoryFixture factory)
     {
         // Arrange
         var client = _factory.CreateAuthenticatedClient(FirstUserId);
-        string conversationId = "00000000-0000-0000-0000-000000000019";
+        string conversationId = "00000000-0000-0000-0000-000000000011";
         // Act
         var response = await client.GetAsync($"/api/conversations/{conversationId}",
             CancellationToken);
@@ -129,7 +129,7 @@ public class ConversationsControllerTests(WebApplicationFactoryFixture factory)
         var client = _factory.CreateAuthenticatedClient(FirstUserId);
 
         var request = new ConversationRequest(
-            ListingId: Guid.Parse("00000000-0000-0000-0000-000000000021"),
+            ListingId: Guid.Parse("00000000-0000-0000-0000-000000000011"),
             FirstMessage: "This is already existing conversation.",
             SentAt: DateTimeOffset.UtcNow
         );
@@ -143,6 +143,29 @@ public class ConversationsControllerTests(WebApplicationFactoryFixture factory)
 
         // Assert
         response.Should().Be409Conflict();
+    }
+
+    [Fact]
+    public async Task CreateConversation_OwnedListing_ReturnsBadRequest()
+    {
+        // Arrange
+        var client = _factory.CreateAuthenticatedClient(FirstUserId);
+
+        var request = new ConversationRequest(
+            ListingId: Guid.Parse("00000000-0000-0000-0000-000000000012"),
+            FirstMessage: "This is already existing conversation.",
+            SentAt: DateTimeOffset.UtcNow
+        );
+
+        // Act
+        var response = await PostAsJsonAsync(
+            client,
+            "/api/conversations",
+            request,
+            CancellationToken);
+
+        // Assert
+        response.Should().Be400BadRequest();
     }
 }
 

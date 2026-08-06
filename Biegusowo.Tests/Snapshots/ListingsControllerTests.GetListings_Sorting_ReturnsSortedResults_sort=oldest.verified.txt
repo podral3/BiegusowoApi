@@ -1,0 +1,74 @@
+﻿{
+  Items: [
+    {
+      Id: Guid_1,
+      Title: Listing number 28,
+      Price: 149.91,
+      City: Walterville,
+      SpeciedId: 4,
+      BreedId: 38,
+      ImageUrl: listings/image95.webp,
+      Slug: listing-number-28-00000000,
+      CreatedAt: 2026-06-01 02:39 +0,
+      Latitude: 51.085802027902474,
+      Longitude: 16.29733941545586
+    },
+    {
+      Id: Guid_2,
+      Title: Listing number 92,
+      Price: 42.05,
+      City: New Lionelmouth,
+      SpeciedId: 3,
+      BreedId: 31,
+      TransactionTypeId: 1,
+      ImageUrl: listings/image325.webp,
+      Slug: listing-number-92-00000000,
+      CreatedAt: 2026-06-01 07:11 +0,
+      Latitude: 54.381206923714466,
+      Longitude: 16.95645329628906
+    },
+    {
+      Id: Guid_3,
+      Title: Listing number 98,
+      Price: 130.98,
+      City: Angiefort,
+      SpeciedId: 1,
+      BreedId: 4,
+      TransactionTypeId: 1,
+      ImageUrl: listings/image345.webp,
+      Slug: listing-number-98-00000000,
+      CreatedAt: 2026-06-01 16:08 +0,
+      Latitude: 53.998700409195706,
+      Longitude: 16.223947699239453
+    },
+    {
+      Id: Guid_4,
+      Title: Listing number 19,
+      Price: 77.11,
+      City: East Haleigh,
+      SpeciedId: 3,
+      BreedId: 27,
+      ImageUrl: listings/image67.webp,
+      Slug: listing-number-19-00000000,
+      CreatedAt: 2026-06-02 04:45 +0,
+      Latitude: 49.63877575240972,
+      Longitude: 15.539214158495522
+    },
+    {
+      Id: Guid_5,
+      Title: Listing number 14,
+      Price: 105.14,
+      City: Roryport,
+      SpeciedId: 1,
+      BreedId: 12,
+      TransactionTypeId: 1,
+      ImageUrl: listings/image45.webp,
+      Slug: listing-number-14-00000000,
+      CreatedAt: 2026-06-02 13:59 +0,
+      Latitude: 49.36660981018404,
+      Longitude: 15.201463222038681
+    }
+  ],
+  HasPreviousPage: false,
+  HasNextPage: false
+}

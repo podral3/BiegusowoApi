@@ -1,1 +1,73 @@
-﻿
+﻿{
+  Items: [
+    {
+      Id: Guid_1,
+      Title: Listing number 61,
+      Price: 104.57,
+      City: Cummeratafort,
+      SpeciedId: 1,
+      BreedId: 5,
+      ImageUrl: listings/image213.webp,
+      Slug: listing-number-61-00000000,
+      CreatedAt: DateTimeOffset_1,
+      Latitude: 52.64842556847652,
+      Longitude: 22.889212738065613
+    },
+    {
+      Id: Guid_2,
+      Title: Listing number 15,
+      Price: 85.8,
+      City: Amayatown,
+      SpeciedId: 1,
+      BreedId: 2,
+      ImageUrl: listings/image50.webp,
+      Slug: listing-number-15-00000000,
+      CreatedAt: DateTimeOffset_2,
+      Latitude: 49.545897034809876,
+      Longitude: 19.456949457366463
+    },
+    {
+      Id: Guid_3,
+      Title: Listing number 74,
+      Price: 54.14,
+      City: Damarishaven,
+      SpeciedId: 1,
+      BreedId: 14,
+      TransactionTypeId: 1,
+      ImageUrl: listings/image264.webp,
+      Slug: listing-number-74-00000000,
+      CreatedAt: DateTimeOffset_3,
+      Latitude: 50.13012946086476,
+      Longitude: 14.154324116117472
+    },
+    {
+      Id: Guid_4,
+      Title: Listing number 57,
+      Price: 126.09,
+      City: Port Easterhaven,
+      SpeciedId: 1,
+      BreedId: 14,
+      ImageUrl: listings/image200.webp,
+      Slug: listing-number-57-00000000,
+      CreatedAt: DateTimeOffset_4,
+      Latitude: 54.21708970042741,
+      Longitude: 20.895671545758688
+    },
+    {
+      Id: Guid_5,
+      Title: Listing number 96,
+      Price: 111.3,
+      City: West Arvid,
+      SpeciedId: 1,
+      BreedId: 10,
+      TransactionTypeId: 1,
+      ImageUrl: listings/image341.webp,
+      Slug: listing-number-96-00000000,
+      CreatedAt: DateTimeOffset_5,
+      Latitude: 50.531981419740234,
+      Longitude: 22.632464978113987
+    }
+  ],
+  HasPreviousPage: false,
+  HasNextPage: false
+}
