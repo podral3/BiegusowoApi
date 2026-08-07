@@ -3,88 +3,87 @@
     {
       Id: Guid_1,
       ListingId: Guid_2,
-      ListingTitle: Listing number 21,
-      OtherParticipant: {
-        UserId: Guid_3,
-        IsSelling: true,
-        DisplayName: Elvie_Roberts,
-        AvatarStorageKey: avatars/image145.webp
-      },
-      LastMessage: {
-        Id: Guid_4,
-        SenderId: Guid_5,
-        Body: This is already existing conversation.,
-        MessageStatus: Unread,
-        CreatedAt: DateTimeOffset_1
-      }
-    },
-    {
-      Id: Guid_6,
-      ListingId: Guid_7,
       ListingTitle: Listing number 12,
       OtherParticipant: {
-        UserId: Guid_7,
+        UserId: Guid_2,
         IsSelling: false,
         DisplayName: Viviane67,
         AvatarStorageKey: avatars/image23.webp
       },
       LastMessage: {
-        Id: Guid_8,
-        SenderId: Guid_7,
+        Id: Guid_3,
+        SenderId: Guid_2,
         Body: Message 18 in conversation 00000000-0000-0000-0000-000000000014,
+        MessageStatus: Unread,
+        CreatedAt: DateTimeOffset_1
+      }
+    },
+    {
+      Id: Guid_4,
+      ListingId: Guid_5,
+      ListingTitle: Listing number 59,
+      OtherParticipant: {
+        UserId: Guid_6,
+        IsSelling: false,
+        DisplayName: Chanel_Lowe,
+        AvatarStorageKey: avatars/image37.webp
+      },
+      LastMessage: {
+        Id: Guid_7,
+        SenderId: Guid_6,
+        Body: Message 11 in conversation 00000000-0000-0000-0000-000000000079,
         MessageStatus: Unread,
         CreatedAt: DateTimeOffset_2
       }
     },
     {
-      Id: Guid_9,
-      ListingId: Guid_7,
+      Id: Guid_8,
+      ListingId: Guid_2,
       ListingTitle: Listing number 12,
       OtherParticipant: {
-        UserId: Guid_10,
+        UserId: Guid_9,
         IsSelling: false,
         DisplayName: Guiseppe.Swaniawski,
         AvatarStorageKey: avatars/image77.webp
       },
       LastMessage: {
-        Id: Guid_11,
-        SenderId: Guid_5,
+        Id: Guid_10,
+        SenderId: Guid_11,
         Body: Message 1 in conversation 00000000-0000-0000-0000-000000000011,
         CreatedAt: DateTimeOffset_3
       }
     },
     {
-      Id: Guid_12,
-      ListingId: Guid_13,
+      Id: Guid_2,
+      ListingId: Guid_2,
+      ListingTitle: Listing number 12,
+      OtherParticipant: {
+        UserId: Guid_12,
+        IsSelling: false,
+        DisplayName: Madeline_Barton46,
+        AvatarStorageKey: avatars/image5.webp
+      },
+      LastMessage: {
+        Id: Guid_13,
+        SenderId: Guid_11,
+        Body: Message 7 in conversation 00000000-0000-0000-0000-000000000012,
+        CreatedAt: DateTimeOffset_4
+      }
+    },
+    {
+      Id: Guid_14,
+      ListingId: Guid_5,
       ListingTitle: Listing number 59,
       OtherParticipant: {
-        UserId: Guid_14,
+        UserId: Guid_15,
         IsSelling: false,
         DisplayName: Xzavier76,
         AvatarStorageKey: avatars/image171.webp
       },
       LastMessage: {
-        Id: Guid_15,
-        SenderId: Guid_5,
+        Id: Guid_16,
+        SenderId: Guid_11,
         Body: Message 3 in conversation 00000000-0000-0000-0000-000000000078,
-        CreatedAt: DateTimeOffset_4
-      }
-    },
-    {
-      Id: Guid_16,
-      ListingId: Guid_9,
-      ListingTitle: Listing number 11,
-      OtherParticipant: {
-        UserId: Guid_17,
-        IsSelling: true,
-        DisplayName: Elwyn.Spinka43,
-        AvatarStorageKey: avatars/image197.webp
-      },
-      LastMessage: {
-        Id: Guid_18,
-        SenderId: Guid_5,
-        Body: Message 12 in conversation 00000000-0000-0000-0000-000000000010,
-        MessageStatus: Unread,
         CreatedAt: DateTimeOffset_5
       }
     }

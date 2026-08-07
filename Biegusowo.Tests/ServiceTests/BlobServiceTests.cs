@@ -18,8 +18,8 @@ public class BlobServiceTests(WebApplicationFactoryFixture factory)
         //Arrange
         var scope = _factory.Services.CreateScope();
         var objectService = scope.ServiceProvider.GetRequiredService<IBlobService>();
-        var singleFile = new PresignedFileInfo("listingPhoto.webp", "image/webp", 21370000, "/key/that/will/work");
-        List<PresignedFileInfo> request = [singleFile];
+        var singleFile = new PresignedUploadFile("listingPhoto.webp", "image/webp", 21370000, 1920, 1080);
+        PresignedUploadRequest request = new([singleFile]);
 
         //Act
         PresignedUploadResponse result = await objectService.CreatePresignedUploadsAsync(request, CancellationToken);
@@ -30,34 +30,63 @@ public class BlobServiceTests(WebApplicationFactoryFixture factory)
             .FirstOrDefaultAsync(b => b.Id == result.Files[0].BlobId, CancellationToken);
         blob.Should().NotBeNull();
     }
-
     [Fact]
     public async Task ConfirmUploadsAsync_ShouldReturnConfirmUploadResponseAndUpdateDbRecord()
     {
-        //Arrange
-        var scope = _factory.Services.CreateScope();
-        var objectService = scope.ServiceProvider.GetRequiredService<IBlobService>();
-        var singleFile = new PresignedFileInfo("listingPhoto1.webp", "image/webp", 21370000, "/key/that/will/work1");
+        // Arrange
+        using var scope = _factory.Services.CreateScope();
 
+        var blobService = scope.ServiceProvider.GetRequiredService<IBlobService>();
         var fakeStorage = scope.ServiceProvider.GetRequiredService<FakeStorageProvider>();
-        fakeStorage.SimulateUpload(singleFile.Key, singleFile.FileSizeBytes, singleFile.ContentType);
 
-        List<PresignedFileInfo> presignedRequest = [singleFile];
-        PresignedUploadResponse presignedResponse = await objectService.CreatePresignedUploadsAsync(presignedRequest, CancellationToken);
-        var kvp = presignedResponse.Files
-            .Select((f, index) => new { Key = index, Value = f.BlobId })
-            .ToDictionary(pair => pair.Key, pair => pair.Value);
-        ConfirmUploadRequest confirmRequest = new(kvp);
-        //Act
-        ConfirmUploadResult confirmResults = await objectService.ConfirmUploadsAsync(confirmRequest, CancellationToken);
-        //Assert   
-        confirmResults.Result.Count.Should().Be(1);
-        confirmResults.Result[0].Key.Should().Be(singleFile.Key);
-        confirmResults.Result[0].Order.Should().Be(0);
-        Blob? blob = await GetQueryable<Blob>()
-            .FirstOrDefaultAsync(b => b.StorageKey == confirmResults.Result[0].Key, CancellationToken);
-        blob.Should().NotBeNull();
-        blob!.Uploaded.Should().BeTrue();
+        var file = new PresignedUploadFile(
+            "listingPhoto1.webp",
+            "image/webp",
+            21_370_000,
+            1920,
+            1080);
+
+        var presignedRequest = new PresignedUploadRequest([file]);
+
+        var presignedResponse = await blobService.CreatePresignedUploadsAsync(
+            presignedRequest,
+            CancellationToken);
+
+        var blobId = presignedResponse.Files.Single().BlobId;
+
+        var blob = await GetQueryable<Blob>()
+            .AsNoTracking()
+            .SingleAsync(b => b.Id == blobId, CancellationToken);
+
+        // Simulate the client actually uploading the object
+        fakeStorage.SimulateUpload(
+            blob.StorageKey,
+            file.FileSizeBytes,
+            file.ContentType);
+
+        var confirmRequest = new ConfirmUploadRequest(
+            new Dictionary<int, Guid>
+            {
+                [0] = blobId
+            });
+
+        // Act
+        var result = await blobService.ConfirmUploadsAsync(
+            confirmRequest,
+            CancellationToken);
+
+        // Assert
+        result.Result.Should().HaveCount(1);
+
+        result.Result[0].Key.Should().Be(blob.StorageKey);
+        result.Result[0].Order.Should().Be(0);
+        result.Result[0].Error.Should().BeNull();
+
+        var savedBlob = await GetQueryable<Blob>()
+            .AsNoTracking()
+            .SingleAsync(b => b.Id == blobId, CancellationToken);
+
+        savedBlob.Uploaded.Should().BeTrue();
     }
 
     [Fact]

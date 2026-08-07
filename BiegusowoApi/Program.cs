@@ -7,6 +7,7 @@ using BiegusowoApi.Domain.FileStorage;
 using BiegusowoApi.Domain.Listings;
 using BiegusowoApi.Domain.Profile;
 using BiegusowoApi.Helpers.Composition;
+using BiegusowoApi.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +22,8 @@ builder.Services.AddScoped<IFileStorageProvider, S3StorageProvider>();
 builder.Services.AddScoped<IBlobService, BlobService>();
 builder.Services.Configure<FileStorageOptions>(
     builder.Configuration.GetSection("FileStorage"));
+builder.Services.Configure<S3Options>(
+    builder.Configuration.GetSection("S3"));
 
 builder.Services.AddScoped<IConversationService, ConversationService>();
 builder.Services.AddScoped<IProfileService, ProfileService>();

@@ -138,7 +138,7 @@ public class ConversationService(ApplicationDbContext dbContext) : IConversation
             .FirstOrDefaultAsync(l => l.Id == request.ListingId);
         if (listing is null) return Result<ConversationDto>.Failure(ServiceError.NotFound);
 
-        if (listing.UserId == buyerId) return Result<ConversationDto>.Failure(ServiceError.Conflict);
+        if (listing.UserId == buyerId) return Result<ConversationDto>.Failure(ServiceError.ValidationError);
 
         conversation = new Conversation
         {

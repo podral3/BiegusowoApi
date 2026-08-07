@@ -3,7 +3,6 @@ using BiegusowoApi.Data.Models;
 using BiegusowoApi.Domain.FileStorage;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using static BiegusowoApi.Domain.FileStorage.IFileStorageProvider;
 
 namespace BiegusowoApi.Domain.Blobs.Service;
 
@@ -16,51 +15,92 @@ public class BlobService(
     private readonly FileStorageOptions _options = options.Value;
     private readonly IFileStorageProvider _fileStorageProvider = fileStorageProvider;
 
-    public async Task<PresignedUploadResponse> CreatePresignedUploadsAsync(List<PresignedFileInfo> request, CancellationToken ct = default)
+    public async Task<PresignedUploadResponse> CreatePresignedUploadsAsync(
+        PresignedUploadRequest request,
+        CancellationToken ct = default)
     {
-        List<Blob> blobs = [.. request.Select(file => new Blob
-        {
-            StorageKey = file.Key,
-            ContentType = file.ContentType,
-            Bucket = _options.Bucket,
-        })];
+        var uploads = await Task.WhenAll(
+            request.Files.Select(async file =>
+            {
+                var id = Guid.NewGuid();
+                var extension = Path.GetExtension(file.FileName);
+                var key = $"{id}{extension}";
 
-        await _dbContext.Blobs.AddRangeAsync(blobs, ct);
+                var put = await _fileStorageProvider.CreatePresignedUploadUrlAsync(
+                    key,
+                    file.ContentType);
+
+                var blob = new Blob
+                {
+                    Id = id,
+                    StorageKey = key,
+                    ContentType = file.ContentType,
+                    Bucket = _options.Bucket,
+                };
+
+                return (Url: put.Url, Blob: blob);
+            }));
+
+        await _dbContext.Blobs.AddRangeAsync(
+            uploads.Select(x => x.Blob),
+            ct);
+
         await _dbContext.SaveChangesAsync(ct);
 
-        List<FileUploadResponse> presignedUploadResponse = [];
-        for (int i = 0; i < request.Count; i++)
-        {
-            PresignedPutUrl put = await _fileStorageProvider.CreatePresignedUploadUrlAsync(request[i].Key, blobs[i].ContentType);
-            presignedUploadResponse.Add(new FileUploadResponse(put.Url, blobs[i].Id));
-        }
-
-        return new PresignedUploadResponse(presignedUploadResponse);
+        return new PresignedUploadResponse(
+            uploads
+                .Select(x => new FileUploadResponse(x.Url, x.Blob.Id))
+                .ToList());
     }
 
-    public async Task<ConfirmUploadResult> ConfirmUploadsAsync(ConfirmUploadRequest request, CancellationToken ct = default)
+    public async Task<ConfirmUploadResult> ConfirmUploadsAsync(
+        ConfirmUploadRequest request,
+        CancellationToken ct = default)
     {
-        List<FileUploadResult> results = [];
-        foreach (var kvp in request.OrderIdPairs)
+        var blobIds = request.OrderIdPairs.Values.ToList();
+
+        var blobs = await _dbContext.Blobs
+            .Where(b => blobIds.Contains(b.Id))
+            .ToDictionaryAsync(b => b.Id, ct);
+
+        var results = new List<FileUploadResult>();
+
+        foreach (var (order, blobId) in request.OrderIdPairs)
         {
-            Blob? blob = await _dbContext.Blobs.FirstOrDefaultAsync(b => b.Id == kvp.Value, ct);
-            if(blob == null)
+            if (!blobs.TryGetValue(blobId, out var blob))
             {
-                results.Add(new FileUploadResult(null, null, Error: "Blob not found"));
-                continue;   
-            }
-            StorageObjectInfo? info =await _fileStorageProvider.GetObjectInfoAsync(blob.StorageKey, ct);
-            if (info == null)
-            {
-                results.Add(new FileUploadResult(blob.StorageKey, null, Error: "File not found in storage"));
+                results.Add(new FileUploadResult(
+                    null,
+                    null,
+                    "Blob not found"));
+
                 continue;
             }
+
+            var info = await _fileStorageProvider.GetObjectInfoAsync(
+                blob.StorageKey,
+                ct);
+
+            if (info is null)
+            {
+                results.Add(new FileUploadResult(
+                    blob.StorageKey,
+                    null,
+                    "File not found in storage"));
+
+                continue;
+            }
+
             blob.Uploaded = true;
-            results.Add(new FileUploadResult(blob.StorageKey, kvp.Key, null));
+
+            results.Add(new FileUploadResult(
+                blob.StorageKey,
+                order,
+                null));
         }
+
         await _dbContext.SaveChangesAsync(ct);
+
         return new ConfirmUploadResult(results);
     }
-
-    
 }

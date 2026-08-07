@@ -9,19 +9,25 @@ namespace BiegusowoApi.Domain.FileStorage;
 
 public class S3StorageProvider : IFileStorageProvider
 {
-    private readonly IAmazonS3 _s3;
+    private readonly AmazonS3Client _s3;
     private readonly S3Options _options;
 
     public S3StorageProvider(IOptions<S3Options> options)
     {
+        bool forcePathStyle = false;
         _options = options.Value;
-        _s3 = new AmazonS3Client(
+        if (_options.Provider == "Garage")
+        {
+            forcePathStyle = true;
+        }
+            _s3 = new AmazonS3Client(
             _options.AccessKey,
             _options.SecretKey,
             new AmazonS3Config
             {
                 ServiceURL = _options.PublicBaseUrl,
-                AuthenticationRegion = _options.Region
+                AuthenticationRegion = _options.Region,
+                ForcePathStyle = forcePathStyle
             });
     }
 
@@ -61,7 +67,7 @@ public class S3StorageProvider : IFileStorageProvider
             : null;
             return new StorageObjectInfo(response.ContentLength, response.Headers.ContentType, lastModifiedOffset);
         }
-        catch (AmazonS3Exception ex) when (ex.StatusCode == HttpStatusCode.NotFound)
+        catch (AmazonS3Exception ex)
         {
             return null;
         }

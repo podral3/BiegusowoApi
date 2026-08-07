@@ -1,4 +1,5 @@
 ﻿using BiegusowoApi.Domain.Blobs;
+using BiegusowoApi.Domain.Blobs.Service;
 using BiegusowoApi.Domain.Dtos.Listing;
 using BiegusowoApi.Domain.Listings;
 using BiegusowoApi.Helpers;
@@ -11,9 +12,11 @@ namespace BiegusowoApi.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class ListingsController(IListingService listingService): ControllerBase
+public class ListingsController(IListingService listingService,
+    IBlobService blobService): ControllerBase
 {
     private readonly IListingService _listingService = listingService;
+    private readonly IBlobService _blobService = blobService;
 
     [HttpGet]
     [EndpointDescription("Get a paginated list of listings with optional filters and sorting.")]
@@ -80,28 +83,28 @@ public class ListingsController(IListingService listingService): ControllerBase
        return result.ToActionResult(this);
     }
 
-    [Authorize]
-    [HttpPost("{id:guid}/images/presigned")]
+    //[Authorize]
+    [HttpPost("images/presigned")]
     [EndpointDescription("Generate presigned URLs for uploading images associated with a specific listing.")]
     [ProducesResponseType(typeof(PresignedUploadResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<PresignedUploadResponse>> UploadPresigned(
-        [FromRoute] Guid id,
         [FromBody] PresignedUploadRequest request)
     {
-        throw new NotImplementedException();
+        var result = await _blobService.CreatePresignedUploadsAsync(request);
+        return Ok(result);
     }
 
-    [Authorize]
-    [HttpPost("{id:guid}/images")]
+    //[Authorize]
+    [HttpPost("images")]
     [EndpointDescription("Confirm the upload of images associated with a specific listing.")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> ConfirmUpload(
-        [FromRoute] Guid id,
-        [FromBody] List<string> keys)
+        [FromBody] ConfirmUploadRequest request)
     {
-        throw new NotImplementedException();
+        var result = await _blobService.ConfirmUploadsAsync(request);
+        return Ok(result);
     }
     
     [Authorize]
