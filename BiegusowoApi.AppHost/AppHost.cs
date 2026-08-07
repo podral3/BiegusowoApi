@@ -23,6 +23,7 @@ builder.AddProject<Projects.BiegusowoApi>("biegusowoapi")
     .WithReference(keycloak)
     .WaitFor(appDb)
     .WaitFor(keycloak)
+    .WithEnvironment("Keycloak__auth-server-url", keycloak.GetEndpoint("http"))
     .WithEnvironment("DOTNET_WATCH", "1");
 
 builder.Build().Run();

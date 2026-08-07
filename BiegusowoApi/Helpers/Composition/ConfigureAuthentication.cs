@@ -2,21 +2,12 @@
 
 public static class ConfigureAuthentication
 {
-    public static IServiceCollection AddKeycloakAuthentication(this IServiceCollection services, IConfiguration configuration, IHostEnvironment environment)
+    public static IServiceCollection AddKeycloakAuthentication(
+        this IServiceCollection services,
+        IConfiguration configuration)
     {
 
-        services.AddAuthentication()
-         .AddKeycloakJwtBearer(
-            serviceName: "keycloak", //configuration["Keycloak:ServiceName"]!,
-            realm: "biegusowo", //configuration["Keycloak:Realm"]!,
-            options =>
-            {
-                options.Audience = "biegusowoapi"; //configuration["Keycloak:Audience"];
-                if (environment.IsDevelopment())
-                {
-                    options.RequireHttpsMetadata = false;
-                }
-            });
+        services.AddKeycloakWebApiAuthentication(configuration);
         return services;
     }
 }
