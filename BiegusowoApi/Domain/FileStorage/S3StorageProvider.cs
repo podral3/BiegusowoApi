@@ -9,7 +9,7 @@ namespace BiegusowoApi.Domain.FileStorage;
 
 public class S3StorageProvider : IFileStorageProvider
 {
-    private readonly AmazonS3Client _s3;
+    private readonly IAmazonS3 _s3;
     private readonly S3Options _options;
 
     public S3StorageProvider(IOptions<S3Options> options)

@@ -1,16 +1,19 @@
-﻿using BiegusowoApi.Data.Types;
-
-namespace BiegusowoApi.Domain.Blobs.Service;
+﻿namespace BiegusowoApi.Domain.Blobs.Service;
 
 public interface IBlobService
 {
     Task<PresignedUploadResponse> CreatePresignedUploadsAsync(
-        Guid assetId,
-        AssetType assetType,
-        PresignedUploadRequest request,
+        List<PresignedFileInfo> request,
         CancellationToken ct = default);
 
     Task<ConfirmUploadResult> ConfirmUploadsAsync(
         ConfirmUploadRequest request,
         CancellationToken ct = default);
 }
+
+public record PresignedFileInfo(
+    string FileName,
+    string ContentType,
+    int FileSizeBytes,
+    string Key
+    );

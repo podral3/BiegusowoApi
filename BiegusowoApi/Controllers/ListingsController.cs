@@ -1,6 +1,4 @@
-﻿using BiegusowoApi.Data.Types;
-using BiegusowoApi.Domain.Blobs;
-using BiegusowoApi.Domain.Blobs.Service;
+﻿using BiegusowoApi.Domain.Blobs;
 using BiegusowoApi.Domain.Dtos.Listing;
 using BiegusowoApi.Domain.Listings;
 using BiegusowoApi.Helpers;
@@ -13,12 +11,9 @@ namespace BiegusowoApi.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class ListingsController(
-    IListingService listingService,
-    IBlobService blobService) : ControllerBase
+public class ListingsController(IListingService listingService): ControllerBase
 {
     private readonly IListingService _listingService = listingService;
-    private readonly IBlobService _blobService = blobService;
 
     [HttpGet]
     [EndpointDescription("Get a paginated list of listings with optional filters and sorting.")]
@@ -94,7 +89,7 @@ public class ListingsController(
         [FromRoute] Guid id,
         [FromBody] PresignedUploadRequest request)
     {
-        return await _blobService.CreatePresignedUploadsAsync(id, AssetType.Listing, request);
+        throw new NotImplementedException();
     }
 
     [Authorize]

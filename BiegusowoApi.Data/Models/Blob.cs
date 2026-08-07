@@ -1,4 +1,7 @@
-﻿using BiegusowoApi.Data.Types;
+﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Text;
 
 namespace BiegusowoApi.Data.Models;
 
@@ -9,8 +12,6 @@ public class Blob
     public string ContentType { get; set; }
     public string Bucket { get; set; }
     public bool Uploaded { get; set; } = false;
-    public Guid AssetId { get; set; }
-    public AssetType AssetType { get; set; }
     public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset? DeletedAt { get; set; }
 }

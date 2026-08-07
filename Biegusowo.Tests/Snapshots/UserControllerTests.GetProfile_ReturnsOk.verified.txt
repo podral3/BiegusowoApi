@@ -1,7 +1,7 @@
 ﻿{
   User: {
     Username: Kaia.Schneider14,
-    Bio: Dolor fuga fugit. Est nostrum est qui. Id sint ab.,
+    Description: Dolor fuga fugit. Est nostrum est qui. Id sint ab.,
     Slug: Kaia.Schneider14,
     DisplayName: Kaia.Schneider14,
     City: Ankundingtown,

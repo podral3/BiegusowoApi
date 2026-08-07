@@ -103,12 +103,6 @@ namespace BiegusowoApi.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("AssetId")
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("AssetType")
-                        .HasColumnType("integer");
-
                     b.Property<string>("Bucket")
                         .IsRequired()
                         .HasColumnType("text");

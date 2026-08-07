@@ -1,5 +1,4 @@
-﻿using BiegusowoApi.Data.Types;
-namespace BiegusowoApi.Domain.Blobs;
+﻿namespace BiegusowoApi.Domain.Blobs;
 
 public record PresignedUploadRequest(
     List<PresignedUploadFile> Files
