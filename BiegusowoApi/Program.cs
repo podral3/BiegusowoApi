@@ -6,6 +6,7 @@ using BiegusowoApi.Domain.Conversations;
 using BiegusowoApi.Domain.FileStorage;
 using BiegusowoApi.Domain.Listings;
 using BiegusowoApi.Domain.Profile;
+using BiegusowoApi.Domain.Register;
 using BiegusowoApi.Helpers.Composition;
 using BiegusowoApi.Options;
 
@@ -28,6 +29,7 @@ builder.Services.Configure<S3Options>(
 builder.Services.AddScoped<IConversationService, ConversationService>();
 builder.Services.AddScoped<IProfileService, ProfileService>();
 builder.Services.AddScoped<IListingService, ListingsService>();
+builder.Services.AddScoped<IRegisterService, RegisterService>();
 var app = builder.Build();
 
 app.MapDefaultEndpoints();
