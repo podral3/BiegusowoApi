@@ -12,13 +12,13 @@ http:
     type: json
     data: |-
       {
-        "email": "",
-        "password": "",
-        "displayName": "",
-        "bio": "",
-        "city": "",
-        "voivodeshipId": 0,
-        "phoneNumber": ""
+        "email": "podral3@gmail.com",
+        "password": "Gg123!",
+        "displayName": "Kot kotowski",
+        "bio": "Sra w majtasy",
+        "city": "Warszawa",
+        "voivodeshipId": 2,
+        "phoneNumber": "999999999"
       }
   auth: inherit
 

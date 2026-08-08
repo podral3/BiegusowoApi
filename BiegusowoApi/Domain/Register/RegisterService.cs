@@ -51,6 +51,18 @@ public class RegisterService(
             throw new RegistrationFailedException("Could not create account.");
         }
 
+        try
+        {
+            var response = 
+                await keycloakUserClient.SendVerifyEmailWithResponseAsync(Realm, keycloakUserId.ToString(), "biegusowo-test", "biegusowo.gekonlab.org/me");
+            response.EnsureSuccessStatusCode();
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to send verification email for Keycloak user {UserId}", keycloakUserId);
+            throw new RegistrationFailedException("Could not send verification email.");
+        }
+
         var user = new Data.Models.User
         {
             Id = keycloakUserId,
