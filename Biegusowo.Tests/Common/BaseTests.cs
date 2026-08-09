@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Org.BouncyCastle.Tls;
 using System;
 using System.Collections.Generic;
+using System.Net.Http.Json;
 using System.Text;
 
 namespace Biegusowo.Tests.Common;

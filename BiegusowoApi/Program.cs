@@ -1,5 +1,5 @@
 using BiegusowoApi.Data;
-using BiegusowoApi.Data.Seeding;
+using BiegusowoApi.Domain.Account;
 using BiegusowoApi.Domain.Blobs;
 using BiegusowoApi.Domain.Blobs.Service;
 using BiegusowoApi.Domain.Conversations;
@@ -29,7 +29,7 @@ builder.Services.Configure<S3Options>(
 builder.Services.AddScoped<IConversationService, ConversationService>();
 builder.Services.AddScoped<IProfileService, ProfileService>();
 builder.Services.AddScoped<IListingService, ListingsService>();
-builder.Services.AddScoped<IRegisterService, RegisterService>();
+builder.Services.AddScoped<IAccountService, AccountService>();
 var app = builder.Build();
 
 app.MapDefaultEndpoints();

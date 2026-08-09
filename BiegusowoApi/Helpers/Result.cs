@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BiegusowoApi.Helpers;
 
-public enum ServiceError { NotFound, Forbidden, Conflict, ValidationError }
+public enum ServiceError { NotFound, Forbidden, Conflict, ValidationError, ExternalServiceError }
 
 public readonly struct Result
 {
@@ -55,6 +55,7 @@ public static class ResultExtensions
             ServiceError.Forbidden => controller.StatusCode(StatusCodes.Status403Forbidden),
             ServiceError.Conflict => controller.StatusCode(StatusCodes.Status409Conflict),
             ServiceError.ValidationError => controller.BadRequest(),
+            ServiceError.ExternalServiceError => controller.StatusCode(StatusCodes.Status502BadGateway),
             _ => controller.StatusCode(StatusCodes.Status500InternalServerError)
         };
     }

@@ -1,7 +1,10 @@
-﻿using Biegusowo.Tests.Common.Fakes;
+﻿using Biegusowo.Tests.Common.Containers;
+using Biegusowo.Tests.Common.Fakes;
 using BiegusowoApi.Data;
 using BiegusowoApi.Data.Seeding;
 using BiegusowoApi.Domain.FileStorage;
+using DotNet.Testcontainers.Builders;
+using DotNet.Testcontainers.Networks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
@@ -17,16 +20,19 @@ namespace Biegusowo.Tests.Common;
 
 public class WebApplicationFactoryFixture : WebApplicationFactory<Program>, IAsyncLifetime
 {
-    private readonly PostgreSqlContainer _postgreSqlContainer;
+    public MailpitTestContainer Mailpit => _mailpit;
+
+    private readonly INetwork _network = new NetworkBuilder().Build();
+    private readonly PostgresTestContainer _postgres;
+    private readonly KeycloakTestContainer _keycloak;
+    private readonly MailpitTestContainer _mailpit;
     private IServiceScopeFactory _scopeFactory;
 
     public WebApplicationFactoryFixture()
     {
-        _postgreSqlContainer = new PostgreSqlBuilder("biegusowo-postgres")
-            .WithDatabase("biegusowo")
-            .WithUsername("postgres")
-            .WithPassword("postgres")
-            .Build();
+        _postgres = new PostgresTestContainer();
+        _keycloak = new KeycloakTestContainer(_network);
+        _mailpit = new MailpitTestContainer(_network);
     }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -39,7 +45,7 @@ public class WebApplicationFactoryFixture : WebApplicationFactory<Program>, IAsy
                 services.Remove(dbContextDescriptor);
 
             services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseNpgsql(_postgreSqlContainer.GetConnectionString(), x =>
+                options.UseNpgsql(_postgres.ConnectionString, x =>
                 {
                     x.UseNetTopologySuite();
                 }));
@@ -82,7 +88,11 @@ public class WebApplicationFactoryFixture : WebApplicationFactory<Program>, IAsy
 
     public async ValueTask InitializeAsync()
     {
-        await _postgreSqlContainer.StartAsync();        
+        await _network.CreateAsync();
+        await Task.WhenAll(
+            _postgres.StartAsync());
+            //_keycloak.StartAsync(),
+            //_mailpit.StartAsync());
 
         // Migrate
         using var scope = Services.CreateScope();
@@ -98,7 +108,7 @@ public class WebApplicationFactoryFixture : WebApplicationFactory<Program>, IAsy
 
     public override async ValueTask DisposeAsync()
     {
-        await _postgreSqlContainer.StopAsync();
-        GC.SuppressFinalize(this);
+        await Task.WhenAll(_postgres.StopAsync(), _keycloak.StopAsync(), _mailpit.StopAsync());
+        await _network.DeleteAsync();
     }
 }

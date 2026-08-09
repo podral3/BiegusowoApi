@@ -12,10 +12,10 @@ http:
     type: json
     data: |-
       {
-        "email": "podral3@gmail.com",
+        "email": "gekon.uwm@gmail.com",
         "password": "Gg123!",
-        "displayName": "Kot kotowski",
-        "bio": "Sra w majtasy",
+        "displayName": "Gekon Gekonowski",
+        "bio": "Piwo",
         "city": "Warszawa",
         "voivodeshipId": 2,
         "phoneNumber": "999999999"
