@@ -12,13 +12,13 @@ http:
     type: json
     data: |-
       {
-        "email": "gekon.uwm@gmail.com",
-        "password": "Gg123!",
-        "displayName": "Gekon Gekonowski",
-        "bio": "Piwo",
-        "city": "Warszawa",
-        "voivodeshipId": 2,
-        "phoneNumber": "999999999"
+        "email": "",
+        "password": "",
+        "displayName": "",
+        "bio": "",
+        "city": "",
+        "voivodeshipId": 0,
+        "phoneNumber": ""
       }
   auth: inherit
 
