@@ -109,7 +109,15 @@ public class AccountService(
         {
             var response = await keycloakUserClient.SendVerifyEmailWithResponseAsync(
                 Realm, userId.Value.ToString(), FrontendClientId, AppRedirectUri, ct);
-            response.EnsureSuccessStatusCode();
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var body = await response.Content.ReadAsStringAsync(ct);
+                logger.LogError(
+                    "Keycloak send-verify-email failed for {Email}: {Status} {Body}",
+                    email, (int)response.StatusCode, body);
+                return Result.Failure(ServiceError.ExternalServiceError);
+            }
         }
         catch (Exception ex)
         {
@@ -143,7 +151,14 @@ public class AccountService(
                 userId.Value.ToString(),
                 request,
                 ct);
-            response.EnsureSuccessStatusCode();
+            if (!response.IsSuccessStatusCode)
+            {
+                var body = await response.Content.ReadAsStringAsync(ct);
+                logger.LogError(
+                    "Keycloak request-password-reset failed for {Email}: {Status} {Body}",
+                    email, (int)response.StatusCode, body);
+                return Result.Failure(ServiceError.ExternalServiceError);
+            }
         }
         catch (Exception ex)
         {
