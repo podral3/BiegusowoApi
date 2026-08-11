@@ -1,13 +1,8 @@
 ﻿using AwesomeAssertions;
 using Biegusowo.Tests.Common;
-using BiegusowoApi.Domain.Conversations;
-using BiegusowoApi.Domain.Dtos.Conversation;
-using BiegusowoApi.Helpers;
-using Microsoft.Extensions.Validation;
-using System;
-using System.Collections.Generic;
+using BiegusowoApi.Features.Conversations.Dtos;
+using BiegusowoApi.Shared.Helpers;
 using System.Net.Http.Json;
-using System.Text;
 
 namespace Biegusowo.Tests.ControllerTests;
 

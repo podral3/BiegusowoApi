@@ -1,8 +1,8 @@
 ﻿using AwesomeAssertions;
 using Biegusowo.Tests.Common;
 using BiegusowoApi.Data.Models;
-using BiegusowoApi.Domain.Dtos.Listing;
-using BiegusowoApi.Helpers;
+using BiegusowoApi.Features.Listings.Dtos;
+using BiegusowoApi.Shared.Helpers;
 using Microsoft.EntityFrameworkCore;
 using System.Net;
 using System.Net.Http.Json;

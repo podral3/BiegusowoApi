@@ -1,6 +1,6 @@
 ﻿using AwesomeAssertions;
 using Biegusowo.Tests.Common;
-using BiegusowoApi.Domain.Dtos.ProfilePage;
+using BiegusowoApi.Features.Users.Dtos;
 using Microsoft.AspNetCore.JsonPatch;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;

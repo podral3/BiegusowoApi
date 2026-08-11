@@ -2,8 +2,8 @@
 using Biegusowo.Tests.Common;
 using Biegusowo.Tests.Common.Fakes;
 using BiegusowoApi.Data.Models;
-using BiegusowoApi.Domain.Blobs;
-using BiegusowoApi.Domain.Blobs.Service;
+using BiegusowoApi.Features.Blobs;
+using BiegusowoApi.Features.Blobs.Dtos;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 

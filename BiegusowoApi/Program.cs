@@ -1,15 +1,12 @@
 using BiegusowoApi.Data;
-using BiegusowoApi.Domain.Account;
-using BiegusowoApi.Domain.Blobs;
-using BiegusowoApi.Domain.Blobs.Service;
-using BiegusowoApi.Domain.Conversations;
-using BiegusowoApi.Domain.FileStorage;
-using BiegusowoApi.Domain.Listings;
-using BiegusowoApi.Domain.Profile;
-using BiegusowoApi.Domain.Register;
-using BiegusowoApi.ExceptionHandling;
-using BiegusowoApi.Helpers.Composition;
-using BiegusowoApi.Options;
+using BiegusowoApi.Features.Auth;
+using BiegusowoApi.Features.Blobs;
+using BiegusowoApi.Features.Conversations;
+using BiegusowoApi.Features.Listings;
+using BiegusowoApi.Features.Users;
+using BiegusowoApi.Shared.ExceptionHandling;
+using BiegusowoApi.Shared.Helpers.Composition;
+using BiegusowoApi.Shared.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 

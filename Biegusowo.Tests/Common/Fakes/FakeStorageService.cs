@@ -1,6 +1,6 @@
-﻿using BiegusowoApi.Domain.FileStorage;
+﻿using BiegusowoApi.Features.Blobs;
 using System.Collections.Concurrent;
-using static BiegusowoApi.Domain.FileStorage.IFileStorageProvider;
+using static BiegusowoApi.Features.Blobs.IFileStorageProvider;
 
 namespace Biegusowo.Tests.Common.Fakes;
 

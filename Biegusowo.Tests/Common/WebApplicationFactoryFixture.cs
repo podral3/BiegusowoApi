@@ -2,7 +2,7 @@
 using Biegusowo.Tests.Common.Fakes;
 using BiegusowoApi.Data;
 using BiegusowoApi.Data.Seeding;
-using BiegusowoApi.Domain.FileStorage;
+using BiegusowoApi.Features.Blobs;
 using DotNet.Testcontainers.Builders;
 using DotNet.Testcontainers.Networks;
 using Microsoft.AspNetCore.Authentication;
@@ -11,10 +11,6 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using NetTopologySuite.Operation.Overlay.Validate;
-using System.Collections.Generic;
-using System.Text;
-using Testcontainers.PostgreSql;
 
 namespace Biegusowo.Tests.Common;
 
