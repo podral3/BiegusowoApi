@@ -1,4 +1,6 @@
-﻿using BiegusowoApi.Data;
+﻿using Ardalis.Result;
+using Ardalis.Result.FluentValidation;
+using BiegusowoApi.Data;
 using BiegusowoApi.Data.Models;
 using BiegusowoApi.Domain.Dtos.ProfilePage;
 using BiegusowoApi.Domain.Dtos.User;
@@ -30,7 +32,7 @@ public class ProfileService(ApplicationDbContext db) : IProfileService
     public Task<ProfilePageResponse?> GetMyProfileAsync(Guid currentUserId, CancellationToken ct = default)
         => GetProfileAsync(currentUserId, ct);
 
-    public async Task<Result<ProfilePageResponse?>> UpdateMyProfileAsync(
+    public async Task<Result<ProfilePageResponse>> UpdateMyProfileAsync(
         Guid currentUserId,
         JsonPatchDocument<UserPatchRequest> patch,
         CancellationToken ct = default)
@@ -39,7 +41,7 @@ public class ProfileService(ApplicationDbContext db) : IProfileService
             .FirstOrDefaultAsync(u => u.Id == currentUserId && u.DeletedAt == null, ct);
 
         if (user is null)
-            return Result<ProfilePageResponse?>.Failure(ServiceError.NotFound);
+            return Result<ProfilePageResponse>.NotFound();
 
         var dto = new UserPatchRequest
         {
@@ -60,11 +62,11 @@ public class ProfileService(ApplicationDbContext db) : IProfileService
 
         patch.ApplyTo(dto);
         UserPatchRequestValidator validator = new();
-        var result = await validator.ValidateAsync(dto, ct);
+        var validation = await validator.ValidateAsync(dto, ct);
 
-        if (!result.IsValid)
+        if (!validation.IsValid)
         {
-            return Result<ProfilePageResponse?>.Failure(ServiceError.ValidationError);
+            return Result<ProfilePageResponse>.Invalid(validation.AsErrors());
         }
 
         user.DisplayName = dto.DisplayName;
@@ -75,7 +77,7 @@ public class ProfileService(ApplicationDbContext db) : IProfileService
         user.UpdatedAt = DateTimeOffset.UtcNow;
 
         await _dbContext.SaveChangesAsync(ct);
-        return Result<ProfilePageResponse?>.Success(await BuildProfileResponseAsync(user, ct));
+        return Result<ProfilePageResponse>.Success(await BuildProfileResponseAsync(user, ct));
     }
 
     private async Task<ProfilePageResponse> BuildProfileResponseAsync(User user, CancellationToken ct)

@@ -7,6 +7,7 @@ using BiegusowoApi.Domain.FileStorage;
 using BiegusowoApi.Domain.Listings;
 using BiegusowoApi.Domain.Profile;
 using BiegusowoApi.Domain.Register;
+using BiegusowoApi.ExceptionHandling;
 using BiegusowoApi.Helpers.Composition;
 using BiegusowoApi.Options;
 
@@ -30,6 +31,10 @@ builder.Services.AddScoped<IConversationService, ConversationService>();
 builder.Services.AddScoped<IProfileService, ProfileService>();
 builder.Services.AddScoped<IListingService, ListingsService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
+
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
+
 var app = builder.Build();
 
 app.MapDefaultEndpoints();
