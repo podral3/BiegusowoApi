@@ -1,9 +1,10 @@
 ﻿using Ardalis.Result.AspNetCore;
+using BiegusowoApi.Data;
+using BiegusowoApi.Data.Models;
 using BiegusowoApi.Domain.Blobs;
 using BiegusowoApi.Domain.Blobs.Service;
 using BiegusowoApi.Domain.Dtos.ProfilePage;
 using BiegusowoApi.Domain.Profile;
-using BiegusowoApi.Helpers;
 using BiegusowoApi.Helpers.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch.SystemTextJson;

@@ -23,18 +23,10 @@ public class ListingsController(IListingService listingService,
     [EndpointDescription("Get a paginated list of listings with optional filters and sorting.")]
     [ProducesResponseType(typeof(CursorPaginatedList<MinimalListingDto>), StatusCodes.Status200OK)]
     public async Task<ActionResult<CursorPaginatedList<MinimalListingDto>>> GetListings(
-        [FromQuery] string? search,
-        [FromQuery] string? city,
-        [FromQuery] string? sort,
-        [FromQuery] int? speciesId,
-        [FromQuery] int? breedId,
-        [FromQuery] int? priceMin,
-        [FromQuery] int? priceMax,
-        [FromQuery] string? beforeCursorValue, 
-        [FromQuery] Guid? beforeListingId,    
-        [FromQuery] int pageSize = 20)
+    [FromQuery] GetListingsRequest request)
     {
-        return await _listingService.GetListingsAsync(search, city, sort, speciesId, breedId, priceMin, priceMax, beforeCursorValue, beforeListingId, pageSize);
+        var result = await _listingService.GetListingsAsync(request);
+        return result.ToActionResult(this);
     }
 
     [HttpGet("{id:guid}")]

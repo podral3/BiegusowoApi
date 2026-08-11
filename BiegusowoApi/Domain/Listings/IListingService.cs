@@ -7,17 +7,7 @@ namespace BiegusowoApi.Domain.Listings;
 
 public interface IListingService
 {
-    Task<CursorPaginatedList<MinimalListingDto>> GetListingsAsync(
-        string? search,
-        string? city,
-        string? sort,
-        int? speciesId,
-        int? breedId,
-        int? priceMin,
-        int? priceMax,
-        string? beforeCursorValue,
-        Guid? beforeListingId,
-        int pageSize);
+    Task<Result<CursorPaginatedList<MinimalListingDto>>> GetListingsAsync(GetListingsRequest request);
 
     Task<Result<ListingDto>> GetListingAsync(Guid id);
 
