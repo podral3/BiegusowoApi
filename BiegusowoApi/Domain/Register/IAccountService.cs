@@ -1,4 +1,5 @@
-﻿using BiegusowoApi.Domain.Dtos.User;
+﻿using Ardalis.Result;
+using BiegusowoApi.Domain.Dtos.User;
 using BiegusowoApi.Helpers;
 
 namespace BiegusowoApi.Domain.Register;

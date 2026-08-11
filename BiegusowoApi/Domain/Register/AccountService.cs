@@ -1,4 +1,5 @@
-﻿using BiegusowoApi.Data;
+﻿using Ardalis.Result;
+using BiegusowoApi.Data;
 using BiegusowoApi.Domain.Dtos.User;
 using BiegusowoApi.Domain.Register;
 using BiegusowoApi.Helpers;
@@ -43,7 +44,7 @@ public class AccountService(
             var response = await keycloakUserClient.CreateUserWithResponseAsync(Realm, keycloakUser, ct);
 
             if (response.StatusCode == HttpStatusCode.Conflict)
-                return Result<RegisterResult>.Failure(ServiceError.Conflict);
+                return Result<RegisterResult>.Conflict();
 
             response.EnsureSuccessStatusCode();
 
@@ -54,19 +55,13 @@ public class AccountService(
         catch (Exception ex)
         {
             logger.LogError(ex, "Failed to create Keycloak user for {Email}", request.Email);
-            return Result<RegisterResult>.Failure(ServiceError.ExternalServiceError);
+            return Result<RegisterResult>.CriticalError();
         }
 
-        try
-        {
-            var response = await keycloakUserClient.SendVerifyEmailWithResponseAsync(
-                Realm, keycloakUserId.ToString(), FrontendClientId, AppRedirectUri, ct);
-            response.EnsureSuccessStatusCode();
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Failed to send verification email for Keycloak user {UserId}", keycloakUserId);
-        }
+        
+        await keycloakUserClient.SendVerifyEmailAsync(
+            Realm, keycloakUserId.ToString(), FrontendClientId, AppRedirectUri, ct);
+            
 
         var user = new Data.Models.User
         {
@@ -85,14 +80,13 @@ public class AccountService(
             db.Users.Add(user);
             await db.SaveChangesAsync(ct);
         }
-        catch (Exception ex)
+        catch
         {
-            logger.LogError(ex, "DB write failed for Keycloak user {UserId}, rolling back", keycloakUserId);
             await DeleteKeycloakUserAsync(keycloakUserId, ct);
-            return Result<RegisterResult>.Failure(ServiceError.ExternalServiceError);
+            throw;
         }
 
-        return Result<RegisterResult>.Success(new RegisterResult(user.Id), StatusCodes.Status201Created);
+        return Result<RegisterResult>.Created(new RegisterResult(user.Id));
     }
 
     public async Task<Result> ResendVerificationEmailAsync(string email, CancellationToken ct = default)
@@ -102,20 +96,11 @@ public class AccountService(
         if (userId is null)
         {
             logger.LogInformation("Resend-verification requested for unknown email {Email}", email);
-            return Result.Success();
+            return Result.NotFound();
         }
 
-        try
-        {
-            var response = await keycloakUserClient.SendVerifyEmailWithResponseAsync(
-                Realm, userId.Value.ToString(), FrontendClientId, AppRedirectUri, ct);
-            response.EnsureSuccessStatusCode();
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Failed to resend verification email for {Email}", email);
-            return Result.Failure(ServiceError.ExternalServiceError);
-        }
+        await keycloakUserClient.SendVerifyEmailAsync(
+            Realm, userId.Value.ToString(), FrontendClientId, AppRedirectUri, ct);
 
         return Result.Success();
     }
@@ -127,7 +112,7 @@ public class AccountService(
         if (userId is null)
         {
             logger.LogInformation("Password-reset requested for unknown email {Email}", email);
-            return Result.Success();
+            return Result.NotFound();
         }
 
         ExecuteActionsEmailRequest request = new()
@@ -136,20 +121,12 @@ public class AccountService(
             ClientId = FrontendClientId,
             RedirectUri = AppRedirectUri
         };
-        try
-        {
-            var response = await keycloakUserClient.ExecuteActionsEmailWithResponseAsync(
-                Realm,
-                userId.Value.ToString(),
-                request,
-                ct);
-            response.EnsureSuccessStatusCode();
-        }
-        catch (Exception ex)
-        {
-            logger.LogError(ex, "Failed to send password reset email for {Email}", email);
-            return Result.Failure(ServiceError.ExternalServiceError);
-        }
+
+        await keycloakUserClient.ExecuteActionsEmailAsync(
+            Realm,
+            userId.Value.ToString(),
+            request,
+            ct);
 
         return Result.Success();
     }

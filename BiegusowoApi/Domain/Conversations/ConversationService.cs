@@ -1,4 +1,5 @@
-﻿using BiegusowoApi.Data;
+﻿using Ardalis.Result;
+using BiegusowoApi.Data;
 using BiegusowoApi.Data.Models;
 using BiegusowoApi.Data.Types;
 using BiegusowoApi.Domain.Dtos.Conversation;
@@ -13,16 +14,10 @@ public class ConversationService(ApplicationDbContext dbContext) : IConversation
 
     private readonly ApplicationDbContext _dbContext = dbContext;
 
-    public async Task<User?> GetLocalUserIdAsync(Guid identityId) //TODO do wywalenia
-    {
-        return await _dbContext.Users
-            .FirstOrDefaultAsync(u => u.Id == identityId);
-    }
-
     public async Task<CursorPaginatedList<MinimalConversationDto>> GetUserConversationsAsync(
-        Guid identityId, DateTimeOffset? beforeLastMessageAt, Guid? beforeConversationId, int pageSize)
+        Guid userId, DateTimeOffset? beforeLastMessageAt, Guid? beforeConversationId, int pageSize)
     {
-        User? user = await GetLocalUserIdAsync(identityId);
+        User? user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
         if (user is null)
             return new CursorPaginatedList<MinimalConversationDto>([], false);
 
@@ -73,20 +68,20 @@ public class ConversationService(ApplicationDbContext dbContext) : IConversation
     }
 
     public async Task<Result<ConversationDto>> GetConversationAsync(
-        Guid identityId, Guid conversationId, DateTimeOffset? beforeCreatedAt, Guid? beforeMessageId, int pageSize)
+        Guid userId, Guid conversationId, DateTimeOffset? beforeCreatedAt, Guid? beforeMessageId, int pageSize)
     {
-        User? user = await GetLocalUserIdAsync(identityId);
-        if (user is null) return Result<ConversationDto>.Failure(ServiceError.Forbidden);
+        User? user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
+        if (user is null) return Result<ConversationDto>.NotFound();
 
         var conversation = await _dbContext.Conversations
             .Include(c => c.Buyer).Include(c => c.Seller).Include(c => c.Listing)
             .FirstOrDefaultAsync(c => c.Id == conversationId);
 
         if (conversation is null)
-            return Result<ConversationDto>.Failure(ServiceError.NotFound);
+            return Result<ConversationDto>.NotFound();
 
         if (conversation.BuyerId != user.Id && conversation.SellerId != user.Id)
-            return Result<ConversationDto>.Failure(ServiceError.Forbidden);
+            return Result<ConversationDto>.Forbidden();
 
         var messageQuery = _dbContext.Messages.Where(m => m.ConversationId == conversationId);
 
@@ -130,15 +125,15 @@ public class ConversationService(ApplicationDbContext dbContext) : IConversation
             .FirstOrDefaultAsync(c => c.ListingId == request.ListingId && c.BuyerId == buyerId);
         if (conversation is not null)
         {
-            return Result<ConversationDto>.Failure(ServiceError.Conflict);
+            return Result<ConversationDto>.Conflict();
         }
 
         var listing = await _dbContext.Listings
             .Include(l => l.User)
             .FirstOrDefaultAsync(l => l.Id == request.ListingId);
-        if (listing is null) return Result<ConversationDto>.Failure(ServiceError.NotFound);
+        if (listing is null) return Result<ConversationDto>.NotFound();
 
-        if (listing.UserId == buyerId) return Result<ConversationDto>.Failure(ServiceError.ValidationError);
+        if (listing.UserId == buyerId) return Result<ConversationDto>.Forbidden();
 
         conversation = new Conversation
         {
@@ -152,38 +147,26 @@ public class ConversationService(ApplicationDbContext dbContext) : IConversation
         _dbContext.Conversations.Add(conversation);
         await _dbContext.SaveChangesAsync();
         
-        ConversationParticipantDto receipient;
-        if (buyerId == conversation.BuyerId)
-        {
-            receipient = new ConversationParticipantDto(conversation.Seller.Id, true, conversation.Seller.DisplayName, conversation.Seller.AvatarFileName);
-        }
-        else
-        {
-            receipient = new ConversationParticipantDto(conversation.Buyer.Id, false, conversation.Buyer.DisplayName, conversation.Buyer.AvatarFileName);
-        }
+        ConversationParticipantDto recipient = new (
+            listing.User.Id,
+            true,
+            listing.User.DisplayName,
+            listing.User.AvatarFileName);
 
-        MessageDto? message = null;
-        if (!string.IsNullOrWhiteSpace(request.FirstMessage) && await ValidateMessageAsync(request.FirstMessage))
-        {
-            message = await SaveMessageToDbAsync(conversation.Id, buyerId, request.FirstMessage);
-        }
-
-        if (message is null)
-        {
-            return Result<ConversationDto>.Failure(ServiceError.ValidationError);
-        }
+        MessageDto message = 
+            await SaveMessageToDbAsync(conversation.Id, buyerId, request.FirstMessage);
 
         var messages = new List<MessageDto>() {message };
         var dto = new ConversationDto(
            conversation.Id, conversation.ListingId, conversation.Listing.Title,
-           receipient,
+           recipient,
            new CursorPaginatedList<MessageDto>([.. messages], false));
         return Result<ConversationDto>.Success(dto);
     }
 
-    public async Task<bool> IsUserParticipantInConversationAsync(Guid identityId, Guid conversationId)
+    public async Task<bool> IsUserParticipantInConversationAsync(Guid userId, Guid conversationId)
     {
-        User? user = await GetLocalUserIdAsync(identityId);
+        User? user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
         if (user is null) return false;
 
         return await _dbContext.Conversations
@@ -196,16 +179,13 @@ public class ConversationService(ApplicationDbContext dbContext) : IConversation
         return Task.FromResult(valid);
     }
 
-    public async Task<MessageDto?> SaveMessageToDbAsync(Guid conversationId, Guid identityId, string message)
+    public async Task<MessageDto> SaveMessageToDbAsync(Guid conversationId, Guid senderId, string message)
     {
-        User? sender= await GetLocalUserIdAsync(identityId);
-        if (sender is null) return null;
-
         var savedMessage = new Message
         {
             Id = Guid.NewGuid(),
             ConversationId = conversationId,
-            SenderId = sender.Id,
+            SenderId = senderId,
             Body = message.Trim(),
             MessageStatus = MessageStatus.Unread,
             CreatedAt = DateTimeOffset.UtcNow
