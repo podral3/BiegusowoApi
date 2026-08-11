@@ -19,52 +19,50 @@ public class ListingsService(ApplicationDbContext db) : IListingService
 {
 
     private readonly ApplicationDbContext _dbContext = db;
-    GeometryFactory _geometryFactory = NtsGeometryServices.Instance.CreateGeometryFactory();
+    private readonly GeometryFactory _geometryFactory = NtsGeometryServices.Instance.CreateGeometryFactory();
     private const string SortNewest = "newest";
     private const string SortOldest = "oldest";
     private const string SortPriceAsc = "price_asc";
     private const string SortPriceDesc = "price_desc";
 
-    public async Task<CursorPaginatedList<MinimalListingDto>> GetListingsAsync(
-        string? search,
-        string? city,
-        string? sort,
-        int? speciesId,
-        int? breedId,
-        int? priceMin,
-        int? priceMax,
-        string? beforeCursorValue,
-        Guid? beforeListingId,
-        int pageSize)
+    public async Task<Result<CursorPaginatedList<MinimalListingDto>>> GetListingsAsync(GetListingsRequest request)
     {
-        pageSize = Math.Clamp(pageSize, 1, 100);
-        sort = string.IsNullOrWhiteSpace(sort) ? SortNewest : sort.ToLowerInvariant();
+        GetListingsRequestValidator validator = new();
+        var validation = await validator.ValidateAsync(request);
+
+        if (!validation.IsValid)
+        {
+            return Result<CursorPaginatedList<MinimalListingDto>>.Invalid(validation.AsErrors());
+        }
+
+        var pageSize = Math.Clamp(request.PageSize, 1, 30);
+        var sort = string.IsNullOrWhiteSpace(request.Sort) ? SortNewest : request.Sort.ToLowerInvariant();
 
         IQueryable<Listing> query = _dbContext.Listings
             .AsNoTracking()
             .Where(l => l.DeletedAt == null && l.ListingStatus == ListingStatus.Active);
 
-        if (!string.IsNullOrWhiteSpace(search))
+        if (!string.IsNullOrWhiteSpace(request.Search))
         {
-            var term = search.Trim();
+            var term = request.Search.Trim();
             query = query.Where(l => EF.Functions.ILike(l.Title, $"%{term}%")
                                    || EF.Functions.ILike(l.Description, $"%{term}%"));
         }
 
-        if (!string.IsNullOrWhiteSpace(city))
-            query = query.Where(l => EF.Functions.ILike(l.CityName, city));
+        if (!string.IsNullOrWhiteSpace(request.City))
+            query = query.Where(l => EF.Functions.ILike(l.CityName, request.City));
 
-        if (speciesId.HasValue)
-            query = query.Where(l => l.SpeciesId == speciesId.Value);
+        if (request.SpeciesId.HasValue)
+            query = query.Where(l => l.SpeciesId == request.SpeciesId.Value);
 
-        if (breedId.HasValue)
-            query = query.Where(l => l.BreedId == breedId.Value);
+        if (request.BreedId.HasValue)
+            query = query.Where(l => l.BreedId == request.BreedId.Value);
 
-        if (priceMin.HasValue)
-            query = query.Where(l => l.Price >= priceMin.Value);
+        if (request.PriceMin.HasValue)
+            query = query.Where(l => l.Price >= request.PriceMin.Value);
 
-        if (priceMax.HasValue)
-            query = query.Where(l => l.Price <= priceMax.Value);
+        if (request.PriceMax.HasValue)
+            query = query.Where(l => l.Price <= request.PriceMax.Value);
 
         // Ordering
         query = sort switch
@@ -76,14 +74,14 @@ public class ListingsService(ApplicationDbContext db) : IListingService
         };
 
         // Cursor (keyset pagination)
-        if (beforeCursorValue is not null && beforeListingId.HasValue)
+        if (request.BeforeCursorValue is not null && request.BeforeListingId.HasValue)
         {
             query = sort switch
             {
-                SortOldest => ApplyDateCursor(query, beforeCursorValue, beforeListingId.Value, ascending: true),
-                SortPriceAsc => ApplyPriceCursor(query, beforeCursorValue, beforeListingId.Value, ascending: true),
-                SortPriceDesc => ApplyPriceCursor(query, beforeCursorValue, beforeListingId.Value, ascending: false),
-                _ => ApplyDateCursor(query, beforeCursorValue, beforeListingId.Value, ascending: false),
+                SortOldest => ApplyDateCursor(query, request.BeforeCursorValue, request.BeforeListingId.Value, ascending: true),
+                SortPriceAsc => ApplyPriceCursor(query, request.BeforeCursorValue, request.BeforeListingId.Value, ascending: true),
+                SortPriceDesc => ApplyPriceCursor(query, request.BeforeCursorValue, request.BeforeListingId.Value, ascending: false),
+                _ => ApplyDateCursor(query, request.BeforeCursorValue, request.BeforeListingId.Value, ascending: false),
             };
         }
 
@@ -97,7 +95,7 @@ public class ListingsService(ApplicationDbContext db) : IListingService
 
         var dtos = items.Select(MapToMinimalDto).ToList();
 
-        return new CursorPaginatedList<MinimalListingDto>(dtos, hasNextPage);
+        return Result<CursorPaginatedList<MinimalListingDto>>.Success(new CursorPaginatedList<MinimalListingDto>(dtos, hasNextPage));
     }
 
     private static IQueryable<Listing> ApplyDateCursor(
