@@ -133,7 +133,7 @@ public class ConversationService(ApplicationDbContext dbContext) : IConversation
             .FirstOrDefaultAsync(l => l.Id == request.ListingId);
         if (listing is null) return Result<ConversationDto>.NotFound();
 
-        if (listing.UserId == buyerId) return Result<ConversationDto>.Forbidden();
+        if (listing.UserId == buyerId) return Result<ConversationDto>.Invalid();
 
         conversation = new Conversation
         {
@@ -164,9 +164,9 @@ public class ConversationService(ApplicationDbContext dbContext) : IConversation
         return Result<ConversationDto>.Success(dto);
     }
 
-    public async Task<bool> IsUserParticipantInConversationAsync(Guid userId, Guid conversationId)
+    public async Task<bool> IsUserParticipantInConversationAsync(Guid sserId, Guid conversationId)
     {
-        User? user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
+        User? user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == sserId);
         if (user is null) return false;
 
         return await _dbContext.Conversations

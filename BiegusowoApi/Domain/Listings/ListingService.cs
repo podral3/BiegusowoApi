@@ -1,4 +1,6 @@
-﻿using BiegusowoApi.Data;
+﻿using Ardalis.Result;
+using Ardalis.Result.FluentValidation;
+using BiegusowoApi.Data;
 using BiegusowoApi.Data.Models;
 using BiegusowoApi.Data.Types;
 using BiegusowoApi.Domain.Dtos.Listing;
@@ -135,7 +137,7 @@ public class ListingsService(ApplicationDbContext db) : IListingService
             .FirstOrDefaultAsync(l => l.Id == id && l.DeletedAt == null);
 
         if (listing is null)
-            return Result<ListingDto>.Failure(ServiceError.NotFound);
+            return Result<ListingDto>.NotFound();
 
         return Result<ListingDto>.Success(MapToDto(listing));
     }
@@ -143,10 +145,10 @@ public class ListingsService(ApplicationDbContext db) : IListingService
     public async Task<Result<ListingDto>> CreateListingAsync(Guid userId, CreateListingRequest request)
     {
         CreateListingRequestValidator validator = new();
-        var result = await validator.ValidateAsync(request);
-        if (!result.IsValid)
+        var validation = await validator.ValidateAsync(request);
+        if (!validation.IsValid)
         {
-            return Result<ListingDto>.Failure(ServiceError.ValidationError);
+            return Result<ListingDto>.Invalid(validation.AsErrors());
         }
 
         var location = _geometryFactory.CreatePoint(new Coordinate(request.Longitude, request.Latitude));
@@ -186,7 +188,7 @@ public class ListingsService(ApplicationDbContext db) : IListingService
         await _dbContext.Entry(listing).Reference(l => l.Breed).LoadAsync();
         await _dbContext.Entry(listing).Reference(l => l.Voivodeship).LoadAsync();
 
-        return Result<ListingDto>.Success(MapToDto(listing), StatusCodes.Status201Created);
+        return Result<ListingDto>.Created(MapToDto(listing));
     }
 
     public async Task<Result<ListingDto>> PatchListingAsync(
@@ -200,10 +202,10 @@ public class ListingsService(ApplicationDbContext db) : IListingService
             .FirstOrDefaultAsync(l => l.Id == id && l.DeletedAt == null);
 
         if (listing is null)
-            return Result<ListingDto>.Failure(ServiceError.NotFound);
+            return Result<ListingDto>.NotFound();
 
         if (listing.UserId != userId)
-            return Result<ListingDto>.Failure(ServiceError.Forbidden);
+            return Result<ListingDto>.Forbidden();
 
         var updateModel = new UpdateListingRequest
         {
@@ -248,17 +250,17 @@ public class ListingsService(ApplicationDbContext db) : IListingService
         var listing = await _dbContext.Listings.FirstOrDefaultAsync(l => l.Id == id && l.DeletedAt == null);
 
         if (listing is null)
-            return Result.Failure(ServiceError.NotFound);
+            return Result.NotFound();
 
         if (listing.UserId != userId)
-            return Result.Failure(ServiceError.Forbidden);
+            return Result.Forbidden();
 
         listing.DeletedAt = DateTimeOffset.UtcNow;
         listing.ListingStatus = ListingStatus.Removed;
 
         await _dbContext.SaveChangesAsync();
 
-        return Result.Success();
+        return Result.NoContent();
     }
 
     private static ListingDto MapToDto(Listing l) => new(

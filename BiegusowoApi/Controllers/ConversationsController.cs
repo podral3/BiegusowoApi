@@ -1,4 +1,6 @@
-﻿using BiegusowoApi.Data;
+﻿using Ardalis.Result;
+using Ardalis.Result.AspNetCore;
+using BiegusowoApi.Data;
 using BiegusowoApi.Domain.Conversations;
 using BiegusowoApi.Domain.Dtos.Conversation;
 using BiegusowoApi.Helpers;
@@ -36,7 +38,7 @@ public class ConversationsController(IConversationService conversationService) :
         [FromQuery] Guid? beforeMessageId,
         [FromQuery] int pageSize = 10)
     {
-        Result<ConversationDto?> result = await _conversationService
+        Result<ConversationDto> result = await _conversationService
             .GetConversationAsync(IdentityId, conversationId, beforeCreatedAt, beforeMessageId, pageSize);
         return result.ToActionResult(this);
     }
@@ -48,7 +50,7 @@ public class ConversationsController(IConversationService conversationService) :
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ConversationDto>> CreateConversation([FromBody] ConversationRequest request)
     {
-        Result<ConversationDto?> result = await _conversationService.CreateConversationAsync(IdentityId, request);
+        Result<ConversationDto> result = await _conversationService.CreateConversationAsync(IdentityId, request);
         return result.ToActionResult(this);
     }
 }
