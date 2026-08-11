@@ -1,5 +1,6 @@
 ﻿using Ardalis.Result.AspNetCore;
 using BiegusowoApi.Data;
+using BiegusowoApi.Data.Models;
 using BiegusowoApi.Domain.Blobs;
 using BiegusowoApi.Domain.Blobs.Service;
 using BiegusowoApi.Domain.Dtos.ProfilePage;
