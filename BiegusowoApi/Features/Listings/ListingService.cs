@@ -142,6 +142,12 @@ public class ListingsService(ApplicationDbContext db) : IListingService
 
     public async Task<Result<ListingDto>> CreateListingAsync(Guid userId, CreateListingRequest request)
     {
+        User? user = await _dbContext.Users
+           .AsNoTracking()
+           .FirstOrDefaultAsync(u => u.Id == userId);
+        if (user is null)
+            return Result<ListingDto>.Forbidden("Onboarding not completed.");
+
         CreateListingRequestValidator validator = new();
         var validation = await validator.ValidateAsync(request);
         if (!validation.IsValid)

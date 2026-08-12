@@ -19,7 +19,7 @@ public class ConversationsController(IConversationService conversationService) :
     private Guid IdentityId => User.GetUserId();
 
     [HttpGet]
-    [Authorize(AuthorizationPolicies.ApplicationUser)]
+    [Authorize]
     public async Task<ActionResult<CursorPaginatedList<MinimalConversationDto>>> GetConversations(
         [FromQuery] DateTimeOffset? beforeLastMessageAt,
         [FromQuery] Guid? beforeConversationId,
