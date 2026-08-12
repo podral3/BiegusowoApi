@@ -1,8 +1,11 @@
 ﻿using BiegusowoApi.Shared.Authorization;
+using BiegusowoApi.Shared.Options;
 using Duende.AccessTokenManagement;
 using Keycloak.AuthServices.Common;
 using Keycloak.AuthServices.Sdk;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.IdentityModel.Tokens;
 
 namespace BiegusowoApi.Shared.Helpers.Composition;
 
@@ -44,7 +47,7 @@ public static class ConfigureAuthentication
         // Normal user authentication
         // ------------------------------------------------------------
 
-        services.AddKeycloakWebApiAuthentication(configuration);
+        //services.AddKeycloakWebApiAuthentication(configuration);
 
         // ------------------------------------------------------------
         // Application authorization
@@ -63,6 +66,34 @@ public static class ConfigureAuthentication
         });
 
         services.AddScoped<IAuthorizationHandler, ApplicationUserAuthorizationHandler>();
+
+        return services;
+    }
+
+    public static IServiceCollection AddSupabaseAuthentication(
+        this IServiceCollection services,
+        IConfiguration configuration)
+    {
+        services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+        .AddJwtBearer(options =>
+        {
+            var supabaseOptions = configuration
+                .GetSection("Supabase").Get<SupabseJwtOptions>()!;
+
+            options.Authority = $"{supabaseOptions.Url}/auth/v1";
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = supabaseOptions.ValidateIssuerSigningKey,
+                ValidIssuer = supabaseOptions.ValidIssuer,
+                ValidAudience = supabaseOptions.ValidAudience,
+                ValidateIssuer = supabaseOptions.ValidateIssuer,
+                ValidateAudience = supabaseOptions.ValidateAudience,
+                ValidateLifetime = supabaseOptions.ValidateLifetime,
+                ClockSkew = supabaseOptions.ClockSkew
+            };
+            options.MetadataAddress = $"{supabaseOptions.Url}/auth/v1/.well-known/openid-configuration";
+            options.TokenValidationParameters.NameClaimType = "sub";
+        });
 
         return services;
     }

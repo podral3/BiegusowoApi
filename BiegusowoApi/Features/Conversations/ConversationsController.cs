@@ -2,6 +2,7 @@
 using Ardalis.Result.AspNetCore;
 using BiegusowoApi.Data;
 using BiegusowoApi.Features.Conversations.Dtos;
+using BiegusowoApi.Shared.Authorization;
 using BiegusowoApi.Shared.Helpers;
 using BiegusowoApi.Shared.Helpers.Claims;
 using Microsoft.AspNetCore.Authorization;
@@ -18,7 +19,7 @@ public class ConversationsController(IConversationService conversationService) :
     private Guid IdentityId => User.GetUserId();
 
     [HttpGet]
-    [Authorize]
+    [Authorize(AuthorizationPolicies.ApplicationUser)]
     public async Task<ActionResult<CursorPaginatedList<MinimalConversationDto>>> GetConversations(
         [FromQuery] DateTimeOffset? beforeLastMessageAt,
         [FromQuery] Guid? beforeConversationId,

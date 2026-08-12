@@ -14,6 +14,7 @@ builder.AddServiceDefaults();
 
 builder.Services.AddControllers();
 builder.Services.AddDatabaseContext(builder.Configuration);
+builder.Services.AddSupabaseAuthentication(builder.Configuration);
 builder.Services.AddKeycloakAuthentication(builder.Configuration);
 builder.Services.AddOpenApiServices();
 

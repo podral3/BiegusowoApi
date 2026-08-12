@@ -6,12 +6,10 @@ using System.Security.Claims;
 
 namespace BiegusowoApi.Shared.Authorization;
 
-public sealed class ApplicationUserAuthorizationHandler
+public sealed class ApplicationUserAuthorizationHandler(ApplicationDbContext db)
 : AuthorizationHandler<ApplicationUserRequirement>
 {
-    private readonly ApplicationDbContext _db;
-
-    public ApplicationUserAuthorizationHandler(ApplicationDbContext db) => _db = db;
+    private readonly ApplicationDbContext _db = db;
 
     protected override async Task HandleRequirementAsync(
         AuthorizationHandlerContext context,
@@ -33,6 +31,10 @@ public sealed class ApplicationUserAuthorizationHandler
         if (exists)
         {
             context.Succeed(requirement);
+        }
+        else
+        {
+            context.Fail(new AuthorizationFailureReason(this, "AccountNotProvisioned"));
         }
     }
 }
