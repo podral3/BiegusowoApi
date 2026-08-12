@@ -1,5 +1,4 @@
 using BiegusowoApi.Data;
-using BiegusowoApi.Features.Auth;
 using BiegusowoApi.Features.Blobs;
 using BiegusowoApi.Features.Conversations;
 using BiegusowoApi.Features.Listings;
@@ -15,7 +14,6 @@ builder.AddServiceDefaults();
 builder.Services.AddControllers();
 builder.Services.AddDatabaseContext(builder.Configuration);
 builder.Services.AddSupabaseAuthentication(builder.Configuration);
-builder.Services.AddKeycloakAuthentication(builder.Configuration);
 builder.Services.AddOpenApiServices();
 
 builder.Services.AddScoped<IFileStorageProvider, S3StorageProvider>();
@@ -28,7 +26,6 @@ builder.Services.Configure<S3Options>(
 builder.Services.AddScoped<IConversationService, ConversationService>();
 builder.Services.AddScoped<IProfileService, ProfileService>();
 builder.Services.AddScoped<IListingService, ListingsService>();
-builder.Services.AddScoped<IAccountService, AccountService>();
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
