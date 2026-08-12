@@ -1,0 +1,9 @@
+﻿{
+  Username: Setup User,
+  Bio: This is a new user.,
+  Slug: Todo: Generate Slug,
+  PhoneNumber: 987654321,
+  DisplayName: Setup User,
+  City: Warszawa,
+  JoinDate: DateTimeOffset_1
+}

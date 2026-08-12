@@ -2,6 +2,7 @@
 using BiegusowoApi.Data;
 using BiegusowoApi.Data.Models;
 using BiegusowoApi.Features.Accounts.Dtos;
+using BiegusowoApi.Features.Auth;
 using BiegusowoApi.Features.Blobs;
 using BiegusowoApi.Features.Blobs.Dtos;
 using BiegusowoApi.Features.Users.Dtos;
@@ -87,7 +88,8 @@ public class ProfilesController(
 
     [Authorize]
     [HttpPost("setup")]
-    public async Task<IActionResult> Setup(
+    [ProducesResponseType(typeof(UserDto), StatusCodes.Status201Created)]
+    public async Task<ActionResult<UserDto>> SetupAccount(
         [FromBody] SetupAccountRequest request,
         CancellationToken cancellationToken)
     {
@@ -120,13 +122,8 @@ public class ProfilesController(
         _dbContext.Users.Add(user);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        return Created(
-            $"/api/account/me",
-            new
-            {
-                id = user.Id,
-                displayName = user.DisplayName
-            });
+        return Created("api/profiles/me",
+            new UserDto(user.DisplayName, user.Bio, "Todo: Generate Slug", user.PhoneNumber, user.DisplayName, user.City, user.CreatedAt));
     }
 
 
@@ -159,6 +156,7 @@ public class ProfilesController(
         ConfirmUploadRequest confirmRequest = new(keys);
         ConfirmUploadResult result = await _blobService.ConfirmUploadsAsync(confirmRequest);
         user.AvatarFileName = result.Result.FirstOrDefault()?.Key ?? user.AvatarFileName;
+        await _dbContext.SaveChangesAsync();
         return Ok(result);
     }
 
@@ -173,6 +171,7 @@ public class ProfilesController(
         User? user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
         if (user == null) return NotFound("User not found");
         user.AvatarFileName = string.Empty;
+        await _dbContext.SaveChangesAsync();
         return Ok();
     }
     
@@ -205,6 +204,7 @@ public class ProfilesController(
         ConfirmUploadRequest confirmRequest = new(keys);
         ConfirmUploadResult result = await _blobService.ConfirmUploadsAsync(confirmRequest);
         user.BackgroundFileName = result.Result.FirstOrDefault()?.Key ?? user.BackgroundFileName;
+        await _dbContext.SaveChangesAsync();
         return Ok(result);
     }
 
@@ -216,9 +216,11 @@ public class ProfilesController(
     public async Task<IActionResult> DeleteBackgroundImage()
     {
         Guid userId = User.GetUserId();
-        User? user = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
+        User? user = await _dbContext.Users
+            .FirstOrDefaultAsync(u => u.Id == userId);
         if (user == null) return NotFound("User not found");
         user.BackgroundFileName = string.Empty;
+        await _dbContext.SaveChangesAsync();
         return Ok();
     }
 }

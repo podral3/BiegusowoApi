@@ -9,7 +9,7 @@ using BiegusowoApi.Shared.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.AddServiceDefaults();
+//builder.AddServiceDefaults();
 
 builder.Services.AddControllers();
 builder.Services.AddDatabaseContext(builder.Configuration);
@@ -32,7 +32,7 @@ builder.Services.AddProblemDetails();
 
 var app = builder.Build();
 
-app.MapDefaultEndpoints();
+//app.MapDefaultEndpoints();
 
 
 if (app.Environment.IsDevelopment())

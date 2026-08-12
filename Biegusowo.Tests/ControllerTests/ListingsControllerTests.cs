@@ -12,13 +12,6 @@ namespace Biegusowo.Tests.ControllerTests;
 public class ListingsControllerTests(WebApplicationFactoryFixture factory) 
     : BaseTests(factory)
 {
-    private static VerifySettings CreateSettings()
-    {
-        var settings = new VerifySettings();
-        settings.DontScrubDateTimes();
-        return settings;
-    }
-
     // ─── GetListings ─────────────────────────────────────────────────────────────
 
     [Fact]
