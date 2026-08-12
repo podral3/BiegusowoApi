@@ -15,7 +15,7 @@ namespace BiegusowoApi.Features.Users;
 
 [Route("api/[controller]")]
 [ApiController]
-public class AccountController(
+public class ProfilesController(
     ApplicationDbContext dbContext,
     IProfileService profileService,
     IBlobService blobService) : ControllerBase

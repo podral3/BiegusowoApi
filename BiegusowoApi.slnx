@@ -5,6 +5,5 @@
   <Project Path="Biegusowo.Tests/Biegusowo.Tests.csproj" Id="1df266f7-ec78-4469-8b61-a4de455f72ec" />
   <Project Path="BiegusowoApi.AppHost/BiegusowoApi.AppHost.csproj" />
   <Project Path="BiegusowoApi.Data/BiegusowoApi.Data.csproj" Id="3aac1209-fe5f-4473-97e6-49bcfabc015b" />
-  <Project Path="BiegusowoApi.ServiceDefaults/BiegusowoApi.ServiceDefaults.csproj" />
   <Project Path="BiegusowoApi/BiegusowoApi.csproj" />
 </Solution>

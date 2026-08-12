@@ -16,19 +16,13 @@ namespace Biegusowo.Tests.Common;
 
 public class WebApplicationFactoryFixture : WebApplicationFactory<Program>, IAsyncLifetime
 {
-    public MailpitTestContainer Mailpit => _mailpit;
-
-    private readonly INetwork _network = new NetworkBuilder().Build();
+  
     private readonly PostgresTestContainer _postgres;
-    private readonly KeycloakTestContainer _keycloak;
-    private readonly MailpitTestContainer _mailpit;
     private IServiceScopeFactory _scopeFactory;
 
     public WebApplicationFactoryFixture()
     {
         _postgres = new PostgresTestContainer();
-        _keycloak = new KeycloakTestContainer(_network);
-        _mailpit = new MailpitTestContainer(_network);
     }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -84,11 +78,8 @@ public class WebApplicationFactoryFixture : WebApplicationFactory<Program>, IAsy
 
     public async ValueTask InitializeAsync()
     {
-        await _network.CreateAsync();
-        await Task.WhenAll(
-            _postgres.StartAsync());
-            //_keycloak.StartAsync(),
-            //_mailpit.StartAsync());
+        await _postgres.StartAsync();
+            
 
         // Migrate
         using var scope = Services.CreateScope();
@@ -104,7 +95,6 @@ public class WebApplicationFactoryFixture : WebApplicationFactory<Program>, IAsy
 
     public override async ValueTask DisposeAsync()
     {
-        await Task.WhenAll(_postgres.StopAsync(), _keycloak.StopAsync(), _mailpit.StopAsync());
-        await _network.DeleteAsync();
+        await _postgres.StopAsync();
     }
 }

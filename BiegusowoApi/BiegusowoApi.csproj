@@ -27,7 +27,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BiegusowoApi.Data\BiegusowoApi.Data.csproj" />
-    <ProjectReference Include="..\BiegusowoApi.ServiceDefaults\BiegusowoApi.ServiceDefaults.csproj" />
   </ItemGroup>
 
 <ItemGroup>
