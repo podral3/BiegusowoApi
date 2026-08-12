@@ -12,7 +12,7 @@ public class AccountService(
     ApplicationDbContext db,
     ILogger<AccountService> logger) : IAccountService
 {
-    private const string Realm = "biegusowo";
+    private const string Realm = "biegusowo"; //TODO: get from appsettings
     private const string FrontendClientId = "biegusowo-test";
     private const string AppRedirectUri = "https://biegusowo.gekonlab.org/me";
 
@@ -58,32 +58,8 @@ public class AccountService(
         
         await keycloakUserClient.SendVerifyEmailAsync(
             Realm, keycloakUserId.ToString(), FrontendClientId, AppRedirectUri, ct);
-            
 
-        var user = new Data.Models.User
-        {
-            Id = keycloakUserId,
-            DisplayName = request.DisplayName,
-            City = request.City,
-            Bio = request.Bio,
-            VoivodeshipId = request.VoivodeshipId,
-            PhoneNumber = request.PhoneNumber,
-            AvatarFileName = "default-avatar.png",
-            BackgroundFileName = "default-background.png",
-        };
-
-        try
-        {
-            db.Users.Add(user);
-            await db.SaveChangesAsync(ct);
-        }
-        catch
-        {
-            await DeleteKeycloakUserAsync(keycloakUserId, ct);
-            throw;
-        }
-
-        return Result<RegisterResult>.Created(new RegisterResult(user.Id));
+        return Result<RegisterResult>.Created(new RegisterResult(keycloakUserId));
     }
 
     public async Task<Result> ResendVerificationEmailAsync(string email, CancellationToken ct = default)

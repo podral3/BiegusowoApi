@@ -1,6 +1,7 @@
 ﻿using Ardalis.Result.AspNetCore;
 using BiegusowoApi.Data;
 using BiegusowoApi.Data.Models;
+using BiegusowoApi.Features.Accounts.Dtos;
 using BiegusowoApi.Features.Blobs;
 using BiegusowoApi.Features.Blobs.Dtos;
 using BiegusowoApi.Features.Users.Dtos;
@@ -14,7 +15,7 @@ namespace BiegusowoApi.Features.Users;
 
 [Route("api/[controller]")]
 [ApiController]
-public class UsersController(
+public class AccountController(
     ApplicationDbContext dbContext,
     IProfileService profileService,
     IBlobService blobService) : ControllerBase
@@ -40,6 +41,21 @@ public class UsersController(
     public async Task<ActionResult<ProfilePageResponse>> GetMyProfile() 
     {
         var userId = User.GetUserId();
+
+        var user = await _dbContext.Users
+            .AsNoTracking()
+            .SingleOrDefaultAsync(
+                x => x.Id == userId);
+
+        if (user is null)
+        {
+            return Ok(new
+            {
+                authenticated = true,
+                onboardingRequired = true
+            });
+        }
+
         var result = await _profileService.GetMyProfileAsync(userId);
         return result is null ? NotFound() : Ok(result);
     }
@@ -68,6 +84,51 @@ public class UsersController(
             return BadRequest(ex.Message);
         }
     }
+
+    [Authorize]
+    [HttpPost("setup")]
+    public async Task<IActionResult> Setup(
+        [FromBody] SetupAccountRequest request,
+        CancellationToken cancellationToken)
+    {
+        var userId = User.GetUserId();
+
+        var existingUser = await _dbContext.Users
+            .SingleOrDefaultAsync(
+                x => x.Id == userId,
+                cancellationToken);
+
+        if (existingUser is not null)
+        {
+            return Conflict(new
+            {
+                code = "account_already_setup"
+            });
+        }
+
+        var user = new User
+        {
+            Id = userId,
+            DisplayName = request.DisplayName,
+            Bio = request.Bio,
+            PhoneNumber = request.PhoneNumber,
+            City = request.CityName,
+            VoivodeshipId = request.VoivodeshipId,
+            CreatedAt = DateTimeOffset.UtcNow
+        };
+
+        _dbContext.Users.Add(user);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        return Created(
+            $"/api/account/me",
+            new
+            {
+                id = user.Id,
+                displayName = user.DisplayName
+            });
+    }
+
 
     [Authorize]
     [HttpPost("me/avatar/presigned")]
