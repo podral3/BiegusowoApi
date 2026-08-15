@@ -5,7 +5,7 @@
 namespace BiegusowoApi.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class Nullableuserimages : Migration
+    public partial class NullableUserImages : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)

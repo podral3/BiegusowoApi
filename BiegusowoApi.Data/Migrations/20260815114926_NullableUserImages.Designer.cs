@@ -14,8 +14,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BiegusowoApi.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260812141921_Nullable user images")]
-    partial class Nullableuserimages
+    [Migration("20260815114926_NullableUserImages")]
+    partial class NullableUserImages
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
