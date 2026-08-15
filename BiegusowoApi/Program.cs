@@ -14,6 +14,8 @@ builder.Services.AddSerilog((services, lc) => lc
     .ReadFrom.Configuration(builder.Configuration)
     .ReadFrom.Services(services));
 
+builder.Services.ConfigureCorsOrigins();
+
 builder.Services.AddControllers();
 builder.Services.AddDatabaseContext(builder.Configuration);
 builder.Services.AddSupabaseAuthentication(builder.Configuration);
@@ -60,6 +62,7 @@ if (app.Environment.IsDevelopment())
     app.UseScalar();
 }
 
+app.UseCors();
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
