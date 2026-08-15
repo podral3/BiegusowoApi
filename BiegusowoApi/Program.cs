@@ -14,7 +14,7 @@ builder.Services.AddSerilog((services, lc) => lc
     .ReadFrom.Configuration(builder.Configuration)
     .ReadFrom.Services(services));
 
-builder.Services.ConfigureCorsOrigins();
+builder.Services.ConfigureCorsOrigins(builder.Configuration);
 
 builder.Services.AddControllers();
 builder.Services.AddDatabaseContext(builder.Configuration);
