@@ -92,6 +92,7 @@ public class ProfilesController(
 
     [Authorize]
     [HttpPost("setup")]
+    [EndpointDescription("Create user record in database. Use after creating account at external provider.")]
     [ProducesResponseType(typeof(UserDto), StatusCodes.Status201Created)]
     public async Task<ActionResult<UserDto>> SetupAccount(
         [FromBody] SetupAccountRequest request,

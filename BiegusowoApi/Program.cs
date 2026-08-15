@@ -32,6 +32,7 @@ builder.Services.AddScoped<IConversationService, ConversationService>();
 builder.Services.AddScoped<IProfileService, ProfileService>();
 builder.Services.AddScoped<IListingService, ListingsService>();
 
+builder.Services.AddRateLimiting();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 
@@ -61,6 +62,8 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
     app.UseScalar();
 }
+
+app.UseRateLimiter();
 
 app.UseCors();
 app.UseHttpsRedirection();
