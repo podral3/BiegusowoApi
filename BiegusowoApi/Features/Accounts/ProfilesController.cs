@@ -11,6 +11,7 @@ using BiegusowoApi.Shared.Helpers.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch.SystemTextJson;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
 
 namespace BiegusowoApi.Features.Users;
@@ -142,6 +143,7 @@ public class ProfilesController(
     [EndpointDescription("Generate presigned URLs for uploading an avatar associated with the currently authenticated user.")]
     [ProducesResponseType(typeof(PresignedUploadResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [EnableRateLimiting("presigned-uploads")]
     public async Task<ActionResult<PresignedUploadResponse>> UploadAvatarPresigned(
         [FromBody] PresignedUploadFile request)
     {
@@ -155,6 +157,7 @@ public class ProfilesController(
     [EndpointDescription("Confirm the upload of an avatar associated with the currently authenticated user.")]
     [ProducesResponseType(typeof(ProfilePageResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [EnableRateLimiting("presigned-uploads")]
     public async Task<IActionResult> ConfirmAvatarUpload(
         [FromBody] Guid blobId)
     {
@@ -190,6 +193,7 @@ public class ProfilesController(
     [EndpointDescription("Generate presigned URLs for uploading a background image associated with the currently authenticated user.")]
     [ProducesResponseType(typeof(PresignedUploadResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [EnableRateLimiting("presigned-uploads")]
     public async Task<ActionResult<PresignedUploadResponse>> UploadBackgroundImagePresigned(
         [FromBody] PresignedUploadFile request)
     {
@@ -203,6 +207,7 @@ public class ProfilesController(
     [EndpointDescription("Confirm the upload of a background image associated with the currently authenticated user.")]
     [ProducesResponseType(typeof(ProfilePageResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [EnableRateLimiting("presigned-uploads")]
     public async Task<IActionResult> ConfirmBackgroundImageUpload(
         [FromBody] Guid blobId)
     {

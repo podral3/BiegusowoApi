@@ -7,6 +7,7 @@ using BiegusowoApi.Shared.Helpers.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch.SystemTextJson;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace BiegusowoApi.Features.Listings;
 
@@ -80,6 +81,7 @@ public class ListingsController(IListingService listingService,
     [EndpointDescription("Generate presigned URLs for uploading images associated with a specific listing.")]
     [ProducesResponseType(typeof(PresignedUploadResponse), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [EnableRateLimiting("presigned-uploads")]
     public async Task<ActionResult<PresignedUploadResponse>> UploadPresigned(
         [FromBody] PresignedUploadRequest request)
     {
@@ -92,6 +94,7 @@ public class ListingsController(IListingService listingService,
     [EndpointDescription("Confirm the upload of images associated with a specific listing.")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [EnableRateLimiting("presigned-uploads")]
     public async Task<IActionResult> ConfirmUpload(
         [FromBody] ConfirmUploadRequest request)
     {

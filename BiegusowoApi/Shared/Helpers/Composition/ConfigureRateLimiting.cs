@@ -1,17 +1,33 @@
-﻿using Microsoft.AspNetCore.RateLimiting;
+﻿using BiegusowoApi.Shared.Helpers.Claims;
+using Microsoft.AspNetCore.RateLimiting;
+using System.Threading.RateLimiting;
 
 namespace BiegusowoApi.Shared.Helpers.Composition;
-
 public static class ConfigureRateLimiting
 {
     public static IServiceCollection AddRateLimiting(this IServiceCollection services)
     {
         services.AddRateLimiter(options =>
         {
-            options.AddFixedWindowLimiter("email-actions", opt =>
+            services.AddRateLimiter(options =>
             {
-                opt.PermitLimit = 3;
-                opt.Window = TimeSpan.FromMinutes(15);
+                options.AddPolicy("presigned-uploads", context =>
+                {
+                    var userId = context.User.GetUserId().ToString();
+
+                    var partitionKey = !string.IsNullOrEmpty(userId)
+                        ? $"user:{userId}"
+                        : $"ip:{context.Connection.RemoteIpAddress}";
+
+                    return RateLimitPartition.GetFixedWindowLimiter(
+                        partitionKey,
+                        _ => new FixedWindowRateLimiterOptions
+                        {
+                            PermitLimit = 5,
+                            Window = TimeSpan.FromMinutes(15),
+                            QueueLimit = 0
+                        });
+                });
             });
         });
         return services;
