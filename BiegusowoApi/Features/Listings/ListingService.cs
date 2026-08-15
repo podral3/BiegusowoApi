@@ -15,10 +15,13 @@ using System.Text.Json;
 namespace BiegusowoApi.Features.Listings;
 
 
-public class ListingsService(ApplicationDbContext db) : IListingService
+public class ListingsService(
+    ApplicationDbContext db,
+    ILogger<ListingsService> logger) : IListingService
 {
 
     private readonly ApplicationDbContext _dbContext = db;
+    private readonly ILogger<ListingsService> _logger = logger;
     private readonly GeometryFactory _geometryFactory = NtsGeometryServices.Instance.CreateGeometryFactory();
     private const string SortNewest = "newest";
     private const string SortOldest = "oldest";
@@ -146,12 +149,17 @@ public class ListingsService(ApplicationDbContext db) : IListingService
            .AsNoTracking()
            .FirstOrDefaultAsync(u => u.Id == userId);
         if (user is null)
+        {
+            _logger.LogWarning("User {UserId} attempted to create a listing without completing onboarding.", userId);
             return Result<ListingDto>.Forbidden("Onboarding not completed.");
+        }
+            
 
         CreateListingRequestValidator validator = new();
         var validation = await validator.ValidateAsync(request);
         if (!validation.IsValid)
         {
+
             return Result<ListingDto>.Invalid(validation.AsErrors());
         }
 
@@ -186,13 +194,13 @@ public class ListingsService(ApplicationDbContext db) : IListingService
         _dbContext.Listings.Add(listing);
         await _dbContext.SaveChangesAsync();
 
-        // Reload with navigations for the response DTO.
-        await _dbContext.Entry(listing).Reference(l => l.User).LoadAsync();
-        await _dbContext.Entry(listing).Reference(l => l.Species).LoadAsync();
-        await _dbContext.Entry(listing).Reference(l => l.Breed).LoadAsync();
-        await _dbContext.Entry(listing).Reference(l => l.Voivodeship).LoadAsync();
+        var createdListing = await _dbContext.Listings
+            .AsNoTracking()
+            .Include(l => l.User)
+            .FirstAsync(l => l.Id == listing.Id);
 
-        return Result<ListingDto>.Created(MapToDto(listing));
+        _logger.LogInformation("User {UserId} created a new listing {ListingId}.", userId, listing.Id);
+        return Result<ListingDto>.Created(MapToDto(createdListing));
     }
 
     public async Task<Result<ListingDto>> PatchListingAsync(
@@ -257,7 +265,10 @@ public class ListingsService(ApplicationDbContext db) : IListingService
             return Result.NotFound();
 
         if (listing.UserId != userId)
+        {
+            _logger.LogWarning("User {UserId} attempted to delete a listing {ListingId} that does not belong to them.", userId, listing.Id);
             return Result.Forbidden();
+        }
 
         listing.DeletedAt = DateTimeOffset.UtcNow;
         listing.ListingStatus = ListingStatus.Removed;

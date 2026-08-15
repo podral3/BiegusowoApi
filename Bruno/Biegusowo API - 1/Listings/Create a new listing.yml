@@ -1,0 +1,316 @@
+info:
+  name: Create a new listing.
+  type: http
+  seq: 2
+  tags:
+    - Listings
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/Listings"
+  body:
+    type: json
+    data: |-
+      {
+        "title": "",
+        "description": "",
+        "price": 0,
+        "priceNegotiable": false,
+        "speciesId": 0,
+        "breedId": 0,
+        "breedNote": "",
+        "voivodeshipId": 0,
+        "listingTypeId": 0,
+        "listingStatusId": 0,
+        "cityName": "",
+        "longitude": 0,
+        "latitude": 0,
+        "imageOrderIdPair": {}
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+examples:
+  - name: 200 Response
+    description: OK
+    request:
+      url: "{{baseUrl}}/api/Listings"
+      method: POST
+      body:
+        type: json
+        data: |-
+          {
+            "title": "",
+            "description": "",
+            "price": 0,
+            "priceNegotiable": false,
+            "speciesId": 0,
+            "breedId": 0,
+            "breedNote": "",
+            "voivodeshipId": 0,
+            "listingTypeId": 0,
+            "listingStatusId": 0,
+            "cityName": "",
+            "longitude": 0,
+            "latitude": 0,
+            "imageOrderIdPair": {}
+          }
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: Content-Type
+          value: text/plain
+      body:
+        type: text
+        data: |-
+          {
+            "id": "",
+            "userId": "",
+            "userName": "",
+            "title": "",
+            "description": "",
+            "listingType": 0,
+            "listingStatus": 0,
+            "breedNote": "",
+            "price": 0,
+            "priceNegotiable": false,
+            "speciesId": 0,
+            "breedId": 0,
+            "imageOrderedUrls": {},
+            "createdAt": "",
+            "updatedAt": "",
+            "voivodeshipId": 0,
+            "cityName": ""
+          }
+  - name: 200 Response
+    description: OK
+    request:
+      url: "{{baseUrl}}/api/Listings"
+      method: POST
+      body:
+        type: json
+        data: |-
+          {
+            "title": "",
+            "description": "",
+            "price": 0,
+            "priceNegotiable": false,
+            "speciesId": 0,
+            "breedId": 0,
+            "breedNote": "",
+            "voivodeshipId": 0,
+            "listingTypeId": 0,
+            "listingStatusId": 0,
+            "cityName": "",
+            "longitude": 0,
+            "latitude": 0,
+            "imageOrderIdPair": {}
+          }
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "id": "",
+            "userId": "",
+            "userName": "",
+            "title": "",
+            "description": "",
+            "listingType": 0,
+            "listingStatus": 0,
+            "breedNote": "",
+            "price": 0,
+            "priceNegotiable": false,
+            "speciesId": 0,
+            "breedId": 0,
+            "imageOrderedUrls": {},
+            "createdAt": "",
+            "updatedAt": "",
+            "voivodeshipId": 0,
+            "cityName": ""
+          }
+  - name: 200 Response
+    description: OK
+    request:
+      url: "{{baseUrl}}/api/Listings"
+      method: POST
+      body:
+        type: json
+        data: |-
+          {
+            "title": "",
+            "description": "",
+            "price": 0,
+            "priceNegotiable": false,
+            "speciesId": 0,
+            "breedId": 0,
+            "breedNote": "",
+            "voivodeshipId": 0,
+            "listingTypeId": 0,
+            "listingStatusId": 0,
+            "cityName": "",
+            "longitude": 0,
+            "latitude": 0,
+            "imageOrderIdPair": {}
+          }
+    response:
+      status: 200
+      statusText: OK
+      headers:
+        - name: Content-Type
+          value: text/json
+      body:
+        type: json
+        data: |-
+          {
+            "id": "",
+            "userId": "",
+            "userName": "",
+            "title": "",
+            "description": "",
+            "listingType": 0,
+            "listingStatus": 0,
+            "breedNote": "",
+            "price": 0,
+            "priceNegotiable": false,
+            "speciesId": 0,
+            "breedId": 0,
+            "imageOrderedUrls": {},
+            "createdAt": "",
+            "updatedAt": "",
+            "voivodeshipId": 0,
+            "cityName": ""
+          }
+  - name: 400 Response
+    description: Bad Request
+    request:
+      url: "{{baseUrl}}/api/Listings"
+      method: POST
+      body:
+        type: json
+        data: |-
+          {
+            "title": "",
+            "description": "",
+            "price": 0,
+            "priceNegotiable": false,
+            "speciesId": 0,
+            "breedId": 0,
+            "breedNote": "",
+            "voivodeshipId": 0,
+            "listingTypeId": 0,
+            "listingStatusId": 0,
+            "cityName": "",
+            "longitude": 0,
+            "latitude": 0,
+            "imageOrderIdPair": {}
+          }
+    response:
+      status: 400
+      statusText: Bad Request
+      headers:
+        - name: Content-Type
+          value: text/plain
+      body:
+        type: text
+        data: |-
+          {
+            "type": "",
+            "title": "",
+            "status": "",
+            "detail": "",
+            "instance": ""
+          }
+  - name: 400 Response
+    description: Bad Request
+    request:
+      url: "{{baseUrl}}/api/Listings"
+      method: POST
+      body:
+        type: json
+        data: |-
+          {
+            "title": "",
+            "description": "",
+            "price": 0,
+            "priceNegotiable": false,
+            "speciesId": 0,
+            "breedId": 0,
+            "breedNote": "",
+            "voivodeshipId": 0,
+            "listingTypeId": 0,
+            "listingStatusId": 0,
+            "cityName": "",
+            "longitude": 0,
+            "latitude": 0,
+            "imageOrderIdPair": {}
+          }
+    response:
+      status: 400
+      statusText: Bad Request
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "type": "",
+            "title": "",
+            "status": "",
+            "detail": "",
+            "instance": ""
+          }
+  - name: 400 Response
+    description: Bad Request
+    request:
+      url: "{{baseUrl}}/api/Listings"
+      method: POST
+      body:
+        type: json
+        data: |-
+          {
+            "title": "",
+            "description": "",
+            "price": 0,
+            "priceNegotiable": false,
+            "speciesId": 0,
+            "breedId": 0,
+            "breedNote": "",
+            "voivodeshipId": 0,
+            "listingTypeId": 0,
+            "listingStatusId": 0,
+            "cityName": "",
+            "longitude": 0,
+            "latitude": 0,
+            "imageOrderIdPair": {}
+          }
+    response:
+      status: 400
+      statusText: Bad Request
+      headers:
+        - name: Content-Type
+          value: text/json
+      body:
+        type: json
+        data: |-
+          {
+            "type": "",
+            "title": "",
+            "status": "",
+            "detail": "",
+            "instance": ""
+          }
+
+docs: Create a new listing.

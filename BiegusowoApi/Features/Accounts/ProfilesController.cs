@@ -1,4 +1,5 @@
 ﻿using Ardalis.Result.AspNetCore;
+using Ardalis.Result.FluentValidation;
 using BiegusowoApi.Data;
 using BiegusowoApi.Data.Models;
 using BiegusowoApi.Features.Accounts.Dtos;
@@ -19,11 +20,13 @@ namespace BiegusowoApi.Features.Users;
 public class ProfilesController(
     ApplicationDbContext dbContext,
     IProfileService profileService,
-    IBlobService blobService) : ControllerBase
+    IBlobService blobService,
+    ILogger<ProfilesController> logger) : ControllerBase
 {
     private readonly ApplicationDbContext _dbContext = dbContext;
     private readonly IProfileService _profileService = profileService;
     private readonly IBlobService _blobService = blobService;
+    private readonly ILogger<ProfilesController> _logger = logger;
 
     [HttpGet("{id:guid}")]
     [EndpointDescription("Get the profile of a specific user by their ID.")]
@@ -93,6 +96,12 @@ public class ProfilesController(
         [FromBody] SetupAccountRequest request,
         CancellationToken cancellationToken)
     {
+        SetupAccountRequestValidator validator = new ();
+        var validation = await validator.ValidateAsync(request);
+        if (!validation.IsValid)
+        {
+            return BadRequest(validation.AsErrors());
+        }
         var userId = User.GetUserId();
 
         var existingUser = await _dbContext.Users
@@ -102,6 +111,7 @@ public class ProfilesController(
 
         if (existingUser is not null)
         {
+            _logger.LogWarning("User with ID {UserId} attempted to set up an account, but an account already exists.", userId);
             return Conflict(new
             {
                 code = "account_already_setup"

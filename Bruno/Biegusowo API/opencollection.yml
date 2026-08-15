@@ -2,11 +2,22 @@ opencollection: 1.0.0
 
 info:
   name: Biegusowo API
+config:
+  proxy:
+    inherit: true
+    config:
+      protocol: http
+      hostname: ""
+      port: ""
+      auth:
+        username: ""
+        password: ""
+      bypassProxy: ""
 
 request:
   auth:
     type: bearer
-    token: "{{token}}"
+    token: eyJhbGciOiJFUzI1NiIsImtpZCI6Ijc4ZTQ2MWY2LTMxODQtNDM3NS04MjcxLTQ3M2I0ZDYyNjQyMyIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwczovL215cGVlY3ZtcGJoaG13cGpqaW1mLnN1cGFiYXNlLmNvL2F1dGgvdjEiLCJzdWIiOiIzZmVmMWNmMy1jYzExLTRhYjItODIxNC04NTAzYmI1Yzg4NmYiLCJhdWQiOiJhdXRoZW50aWNhdGVkIiwiZXhwIjoxNzg2NzkzNDU2LCJpYXQiOjE3ODY3ODk4NTYsImVtYWlsIjoidGVzdDJAdXNlci5jb20iLCJwaG9uZSI6IiIsImFwcF9tZXRhZGF0YSI6eyJwcm92aWRlciI6ImVtYWlsIiwicHJvdmlkZXJzIjpbImVtYWlsIl19LCJ1c2VyX21ldGFkYXRhIjp7ImVtYWlsX3ZlcmlmaWVkIjp0cnVlfSwicm9sZSI6ImF1dGhlbnRpY2F0ZWQiLCJhYWwiOiJhYWwxIiwiYW1yIjpbeyJtZXRob2QiOiJwYXNzd29yZCIsInRpbWVzdGFtcCI6MTc4Njc4OTg1Nn1dLCJzZXNzaW9uX2lkIjoiNWM3MGQ0OTAtYTE3Ni00Y2NiLWFmZjYtZTYxZTRjZGNkODMxIiwiaXNfYW5vbnltb3VzIjpmYWxzZX0.8anuFWxZPQ9U0qhavutSl00h913pwmxMPu3391hcDZCVnXTu_up5G6nzKmGpMmVJL1kY2kBxDwIUrwKr1D0DHQ
 bundled: false
 extensions:
   bruno:

@@ -10,11 +10,13 @@ namespace BiegusowoApi.Features.Blobs;
 public class BlobService(
     ApplicationDbContext context,
     IFileStorageProvider fileStorageProvider,
-    IOptions<FileStorageOptions> options) : IBlobService
+    IOptions<FileStorageOptions> options,
+    ILogger<BlobService> logger) : IBlobService
 {
     private readonly ApplicationDbContext _dbContext = context;
     private readonly FileStorageOptions _options = options.Value;
     private readonly IFileStorageProvider _fileStorageProvider = fileStorageProvider;
+    private readonly ILogger<BlobService> _logger = logger;
 
     public async Task<PresignedUploadResponse> CreatePresignedUploadsAsync(
         PresignedUploadRequest request,
@@ -84,6 +86,7 @@ public class BlobService(
 
             if (info is null)
             {
+                _logger.LogWarning("Blob with ID {BlobId} and storage key {StorageKey} not found in storage", blob.Id, blob.StorageKey);
                 results.Add(new FileUploadResult(
                     blob.StorageKey,
                     null,

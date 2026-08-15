@@ -1,0 +1,128 @@
+info:
+  name: post /api/Profiles/setup
+  type: http
+  seq: 4
+  tags:
+    - Profiles
+
+http:
+  method: POST
+  url: "{{baseUrl}}/api/Profiles/setup"
+  body:
+    type: json
+    data: |-
+      {
+        "displayName": "",
+        "bio": "",
+        "phoneNumber": "",
+        "cityName": "",
+        "voivodeshipId": 0
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+
+examples:
+  - name: 201 Response
+    description: Created
+    request:
+      url: "{{baseUrl}}/api/Profiles/setup"
+      method: POST
+      body:
+        type: json
+        data: |-
+          {
+            "displayName": "",
+            "bio": "",
+            "phoneNumber": "",
+            "cityName": "",
+            "voivodeshipId": 0
+          }
+    response:
+      status: 201
+      statusText: Created
+      headers:
+        - name: Content-Type
+          value: text/plain
+      body:
+        type: text
+        data: |-
+          {
+            "username": "",
+            "bio": "",
+            "slug": "",
+            "phoneNumber": "",
+            "displayName": "",
+            "city": "",
+            "joinDate": ""
+          }
+  - name: 201 Response
+    description: Created
+    request:
+      url: "{{baseUrl}}/api/Profiles/setup"
+      method: POST
+      body:
+        type: json
+        data: |-
+          {
+            "displayName": "",
+            "bio": "",
+            "phoneNumber": "",
+            "cityName": "",
+            "voivodeshipId": 0
+          }
+    response:
+      status: 201
+      statusText: Created
+      headers:
+        - name: Content-Type
+          value: application/json
+      body:
+        type: json
+        data: |-
+          {
+            "username": "",
+            "bio": "",
+            "slug": "",
+            "phoneNumber": "",
+            "displayName": "",
+            "city": "",
+            "joinDate": ""
+          }
+  - name: 201 Response
+    description: Created
+    request:
+      url: "{{baseUrl}}/api/Profiles/setup"
+      method: POST
+      body:
+        type: json
+        data: |-
+          {
+            "displayName": "",
+            "bio": "",
+            "phoneNumber": "",
+            "cityName": "",
+            "voivodeshipId": 0
+          }
+    response:
+      status: 201
+      statusText: Created
+      headers:
+        - name: Content-Type
+          value: text/json
+      body:
+        type: json
+        data: |-
+          {
+            "username": "",
+            "bio": "",
+            "slug": "",
+            "phoneNumber": "",
+            "displayName": "",
+            "city": "",
+            "joinDate": ""
+          }
