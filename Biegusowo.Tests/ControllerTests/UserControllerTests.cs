@@ -207,7 +207,8 @@ public class UserControllerTests(WebApplicationFactoryFixture factory)
     public async Task ConfirmAvatarUpload_ReturnsOkAndUpdatesUser()
     {
         // Arrange
-        var client = _factory.CreateAuthenticatedClient(FirstUserId);
+        string userId = UserId(5);
+        var client = _factory.CreateAuthenticatedClient(userId);
         var presignedRequest = new PresignedUploadFile("avatarConfirm.webp", "image/webp", 512_000, 512, 512);
         var presignedResponse = await client.PostAsJsonAsync("/api/profiles/me/avatar/presigned", presignedRequest, CancellationToken);
         var presignedResult = await presignedResponse.Content.ReadFromJsonAsync<PresignedUploadResponse>(CancellationToken);
@@ -221,7 +222,7 @@ public class UserControllerTests(WebApplicationFactoryFixture factory)
 
         var user = await GetQueryable<User>()
             .AsNoTracking()
-            .SingleAsync(u => u.Id == Guid.Parse(FirstUserId), CancellationToken);
+            .SingleAsync(u => u.Id == Guid.Parse(userId), CancellationToken);
         user.AvatarFileName.Should().Contain(blobId.ToString());
     }
 
@@ -242,7 +243,8 @@ public class UserControllerTests(WebApplicationFactoryFixture factory)
     public async Task DeleteAvatar_ReturnsOkAndClearsAvatar()
     {
         // Arrange
-        var client = _factory.CreateAuthenticatedClient(FirstUserId);
+        string userId = UserId(6);
+        var client = _factory.CreateAuthenticatedClient(userId);
         var presignedRequest = new PresignedUploadFile("avatarDelete.webp", "image/webp", 512_000, 512, 512);
         var presignedResponse = await client.PostAsJsonAsync("/api/profiles/me/avatar/presigned", presignedRequest, CancellationToken);
         var presignedResult = await presignedResponse.Content.ReadFromJsonAsync<PresignedUploadResponse>(CancellationToken);
@@ -256,7 +258,7 @@ public class UserControllerTests(WebApplicationFactoryFixture factory)
 
         var user = await GetQueryable<User>()
             .AsNoTracking()
-            .SingleAsync(u => u.Id == Guid.Parse(FirstUserId), CancellationToken);
+            .SingleAsync(u => u.Id == Guid.Parse(userId), CancellationToken);
         user.AvatarFileName.Should().BeEmpty();
     }
 
@@ -299,7 +301,8 @@ public class UserControllerTests(WebApplicationFactoryFixture factory)
     public async Task ConfirmBackgroundImageUpload_ReturnsOkAndUpdatesUser()
     {
         // Arrange
-        var client = _factory.CreateAuthenticatedClient(FirstUserId);
+        string userId = UserId(7);
+        var client = _factory.CreateAuthenticatedClient(userId);
         var presignedRequest = new PresignedUploadFile("backgroundConfirm.webp", "image/webp", 512_000, 512, 512);
         var presignedResponse = await client.PostAsJsonAsync("/api/profiles/me/background-image/presigned", presignedRequest, CancellationToken);
         var presignedResult = await presignedResponse.Content.ReadFromJsonAsync<PresignedUploadResponse>(CancellationToken);
@@ -313,7 +316,7 @@ public class UserControllerTests(WebApplicationFactoryFixture factory)
 
         var user = await GetQueryable<User>()
             .AsNoTracking()
-            .SingleAsync(u => u.Id == Guid.Parse(FirstUserId), CancellationToken);
+            .SingleAsync(u => u.Id == Guid.Parse(userId), CancellationToken);
         user.BackgroundFileName.Should().Contain(blobId.ToString());
     }
 
@@ -335,7 +338,8 @@ public class UserControllerTests(WebApplicationFactoryFixture factory)
     public async Task DeleteBackgroundImage_ReturnsOkAndClearsBackgroundImage()
     {
         // Arrange
-        var client = _factory.CreateAuthenticatedClient(FirstUserId);
+        string userId = UserId(8);
+        var client = _factory.CreateAuthenticatedClient(userId);
         var presignedRequest = new PresignedUploadFile("backgroundDelete.webp", "image/webp", 512_000, 512, 512);
         var presignedResponse = await client.PostAsJsonAsync("/api/profiles/me/background-image/presigned", presignedRequest, CancellationToken);
         var presignedResult = await presignedResponse.Content.ReadFromJsonAsync<PresignedUploadResponse>(CancellationToken);
@@ -349,7 +353,7 @@ public class UserControllerTests(WebApplicationFactoryFixture factory)
 
         var user = await GetQueryable<User>()
             .AsNoTracking()
-            .SingleAsync(u => u.Id == Guid.Parse(FirstUserId), CancellationToken);
+            .SingleAsync(u => u.Id == Guid.Parse(userId), CancellationToken);
         user.BackgroundFileName.Should().BeEmpty();
     }
 

@@ -17,6 +17,7 @@ public class BaseTests : IClassFixture<WebApplicationFactoryFixture>
     private readonly ApplicationDbContext _dbContext;
 
     protected readonly string FirstUserId = "00000000-0000-0000-0000-000000000001";
+    protected static string UserId(int n) => $"00000000-0000-0000-0000-{n:D12}";
 
     public BaseTests(WebApplicationFactoryFixture factory)
     {
