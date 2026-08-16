@@ -21,6 +21,10 @@
 **/obj
 **/secrets.dev.yaml
 **/values.dev.yaml
+**/BiegusowoApi.AppHost
+**/BiegusowoApi.Tests
+**Bruno
+**/Database
 LICENSE
 README.md
 !**/.gitignore
