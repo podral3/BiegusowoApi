@@ -17,12 +17,6 @@ public class ConversationService(ApplicationDbContext dbContext) : IConversation
     public async Task<CursorPaginatedList<MinimalConversationDto>> GetUserConversationsAsync(
         Guid userId, DateTimeOffset? beforeLastMessageAt, Guid? beforeConversationId, int pageSize)
     {
-        User? user = await _dbContext.Users
-            .AsNoTracking()
-            .FirstOrDefaultAsync(u => u.Id == userId);
-        if (user is null)
-            return new CursorPaginatedList<MinimalConversationDto>([], false);
-
         var query =
         from c in _dbContext.Conversations
         where c.BuyerId == userId || c.SellerId == userId
@@ -72,19 +66,14 @@ public class ConversationService(ApplicationDbContext dbContext) : IConversation
     public async Task<Result<ConversationDto>> GetConversationAsync(
         Guid userId, Guid conversationId, DateTimeOffset? beforeCreatedAt, Guid? beforeMessageId, int pageSize)
     {
-        User? user = await _dbContext.Users
-            .AsNoTracking()
-            .FirstOrDefaultAsync(u => u.Id == userId);
-        if (user is null) return Result<ConversationDto>.Forbidden("Onboarding required");
-
         var conversation = await _dbContext.Conversations
             .Include(c => c.Buyer).Include(c => c.Seller).Include(c => c.Listing)
-            .FirstOrDefaultAsync(c => c.Id == conversationId);
+            .FirstOrDefaultAsync(c => c.Id == conversationId && c.BuyerId == userId || c.SellerId == userId);
 
         if (conversation is null)
             return Result<ConversationDto>.NotFound();
 
-        if (conversation.BuyerId != user.Id && conversation.SellerId != user.Id)
+        if (conversation.BuyerId != userId && conversation.SellerId != userId)
             return Result<ConversationDto>.Forbidden();
 
         var messageQuery = _dbContext.Messages.Where(m => m.ConversationId == conversationId);
@@ -107,7 +96,7 @@ public class ConversationService(ApplicationDbContext dbContext) : IConversation
             .ToList();
 
         ConversationParticipantDto receipient;
-        if (user.Id == conversation.BuyerId)
+        if (userId == conversation.BuyerId)
         {
             receipient = new ConversationParticipantDto(conversation.Seller.Id, true, conversation.Seller.DisplayName, conversation.Seller.AvatarFileName);
         }
@@ -169,12 +158,7 @@ public class ConversationService(ApplicationDbContext dbContext) : IConversation
     }
 
     public async Task<bool> IsUserParticipantInConversationAsync(Guid userId, Guid conversationId)
-    {
-        User? user = await _dbContext.Users
-            .AsNoTracking()
-            .FirstOrDefaultAsync(u => u.Id == userId);
-        if (user is null) return false;
-
+    { 
         return await _dbContext.Conversations
             .AnyAsync(c => c.Id == conversationId && (c.BuyerId == userId || c.SellerId == userId));
     }

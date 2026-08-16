@@ -16,19 +16,20 @@ public class ProfileService(ApplicationDbContext db) : IProfileService
 
     private readonly ApplicationDbContext _dbContext = db;
 
-    public async Task<ProfilePageResponse?> GetProfileAsync(Guid userId, CancellationToken ct = default)
+    public async Task<Result<ProfilePageResponse>> GetProfileAsync(Guid userId, CancellationToken ct = default)
     {
         var user = await _dbContext.Users
             .AsNoTracking()
             .FirstOrDefaultAsync(u => u.Id == userId && u.DeletedAt == null, ct);
 
         if (user is null)
-            return null;
+            return Result<ProfilePageResponse>.NotFound();
 
-        return await BuildProfileResponseAsync(user, ct);
+        var profileResponse = await BuildProfileResponseAsync(user, ct);
+        return Result<ProfilePageResponse>.Success(profileResponse);
     }
 
-    public Task<ProfilePageResponse?> GetMyProfileAsync(Guid currentUserId, CancellationToken ct = default)
+    public Task<Result<ProfilePageResponse>> GetMyProfileAsync(Guid currentUserId, CancellationToken ct = default)
         => GetProfileAsync(currentUserId, ct);
 
     public async Task<Result<ProfilePageResponse>> UpdateMyProfileAsync(

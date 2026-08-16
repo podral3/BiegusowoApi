@@ -36,7 +36,7 @@ public class ProfilesController(
     public async Task<ActionResult<ProfilePageResponse>> GetProfile(Guid id)
     {
         var result = await _profileService.GetProfileAsync(id);
-        return result is null ? NotFound() : Ok(result);
+        return result.ToActionResult(this);
     }
 
     [Authorize]
@@ -62,7 +62,7 @@ public class ProfilesController(
         }
 
         var result = await _profileService.GetMyProfileAsync(userId);
-        return result is null ? NotFound() : Ok(result);
+        return result.ToActionResult(this);
     }
 
     [Authorize]

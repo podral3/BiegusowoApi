@@ -154,7 +154,6 @@ public class ListingsService(
             return Result<ListingDto>.Forbidden("Onboarding not completed.");
         }
             
-
         CreateListingRequestValidator validator = new();
         var validation = await validator.ValidateAsync(request);
         if (!validation.IsValid)
@@ -211,13 +210,12 @@ public class ListingsService(
             .Include(l => l.Species)
             .Include(l => l.Breed)
             .Include(l => l.Voivodeship)
-            .FirstOrDefaultAsync(l => l.Id == id && l.DeletedAt == null);
+            .FirstOrDefaultAsync(l => l.Id == id 
+            && l.DeletedAt == null
+            && l.UserId == userId);
 
         if (listing is null)
             return Result<ListingDto>.NotFound();
-
-        if (listing.UserId != userId)
-            return Result<ListingDto>.Forbidden();
 
         var updateModel = new UpdateListingRequest
         {
@@ -259,16 +257,13 @@ public class ListingsService(
 
     public async Task<Result> DeleteListingAsync(Guid userId, Guid id)
     { 
-        var listing = await _dbContext.Listings.FirstOrDefaultAsync(l => l.Id == id && l.DeletedAt == null);
+        var listing = await _dbContext.Listings
+            .FirstOrDefaultAsync(l => l.Id == id
+            && l.DeletedAt == null
+            && l.UserId == userId);
 
         if (listing is null)
             return Result.NotFound();
-
-        if (listing.UserId != userId)
-        {
-            _logger.LogWarning("User {UserId} attempted to delete a listing {ListingId} that does not belong to them.", userId, listing.Id);
-            return Result.Forbidden();
-        }
 
         listing.DeletedAt = DateTimeOffset.UtcNow;
         listing.ListingStatus = ListingStatus.Removed;

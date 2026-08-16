@@ -383,7 +383,7 @@ public class ListingsControllerTests(WebApplicationFactoryFixture factory)
     }
 
     [Fact] 
-    public async Task DeleteNotOwnedListing_ReturnsForbid()
+    public async Task DeleteNotOwnedListing_ReturnsNotFound()
     {
         // Arrange
         var client = _factory.CreateAuthenticatedClient(FirstUserId);
@@ -392,7 +392,7 @@ public class ListingsControllerTests(WebApplicationFactoryFixture factory)
         var response = await client.DeleteAsync($"/api/listings/{listingId}",
             CancellationToken);
 
-        response.Should().Be403Forbidden();
+        response.Should().Be404NotFound();
     }
 
 }

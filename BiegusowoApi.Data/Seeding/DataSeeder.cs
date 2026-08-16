@@ -10,34 +10,53 @@ public class DataSeeder(ApplicationDbContext dbContext)
 
     public async Task Seed()
     {
-        await using var transaction = await _dbContext.Database.BeginTransactionAsync();
-        try
+        var strategy = _dbContext.Database.CreateExecutionStrategy();
+
+        await strategy.ExecuteAsync(async () =>
         {
+            await using var transaction =
+                await _dbContext.Database.BeginTransactionAsync();
+
             await InlineDataSeeder.Seed(_dbContext);
 
             var allBlobs = new List<Blob>();
 
-            var (users, userBlobs) = UserSeeder.Generate(100, InlineDataSeeder.Voivodeships);
+            var (users, userBlobs) =
+                UserSeeder.Generate(100, InlineDataSeeder.Voivodeships);
+
             allBlobs.AddRange(userBlobs);
+
             await _dbContext.Users.AddRangeAsync(users);
             await _dbContext.SaveChangesAsync();
 
-            var (listings, listingBlobs) = ListingSeeder.Generate(
-                100, InlineDataSeeder.Breeds, users, InlineDataSeeder.Voivodeships);
+            var (listings, listingBlobs) =
+                ListingSeeder.Generate(
+                    100,
+                    InlineDataSeeder.Breeds,
+                    users,
+                    InlineDataSeeder.Voivodeships);
+
             allBlobs.AddRange(listingBlobs);
+
             await _dbContext.Listings.AddRangeAsync(listings);
             await _dbContext.SaveChangesAsync();
 
-            List<Conversation> conversations = ConversationSeeder.Generate(listings, users, 5);
+            var conversations =
+                ConversationSeeder.Generate(listings, users, 5);
+
             await _dbContext.Conversations.AddRangeAsync(conversations);
             await _dbContext.SaveChangesAsync();
 
-            List<Message> messages = MessageSeeder.Generate(conversations, 20);
+            var messages =
+                MessageSeeder.Generate(conversations, 20);
+
             await _dbContext.Messages.AddRangeAsync(messages);
             await _dbContext.SaveChangesAsync();
 
             var (articles, articleBlobs) = ArticleSeeder.Generate(10);
+
             allBlobs.AddRange(articleBlobs);
+
             await _dbContext.Articles.AddRangeAsync(articles);
             await _dbContext.SaveChangesAsync();
 
@@ -45,12 +64,7 @@ public class DataSeeder(ApplicationDbContext dbContext)
             await _dbContext.SaveChangesAsync();
 
             await transaction.CommitAsync();
-        }
-        catch
-        {
-            await transaction.RollbackAsync();
-            throw;
-        }
+        });
     }
 
     public static Guid SeedGuid(int number) =>
