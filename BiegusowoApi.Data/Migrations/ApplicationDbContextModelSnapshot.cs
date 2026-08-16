@@ -94,7 +94,7 @@ namespace BiegusowoApi.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Articles");
+                    b.ToTable("Articles", (string)null);
                 });
 
             modelBuilder.Entity("BiegusowoApi.Data.Models.Blob", b =>
@@ -128,7 +128,7 @@ namespace BiegusowoApi.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Blobs");
+                    b.ToTable("Blobs", (string)null);
                 });
 
             modelBuilder.Entity("BiegusowoApi.Data.Models.Breed", b =>
@@ -157,7 +157,7 @@ namespace BiegusowoApi.Data.Migrations
 
                     b.HasIndex("SpeciesId");
 
-                    b.ToTable("Breeds");
+                    b.ToTable("Breeds", (string)null);
                 });
 
             modelBuilder.Entity("BiegusowoApi.Data.Models.Conversation", b =>
@@ -188,7 +188,7 @@ namespace BiegusowoApi.Data.Migrations
 
                     b.HasIndex("SellerId");
 
-                    b.ToTable("Conversations");
+                    b.ToTable("Conversations", (string)null);
                 });
 
             modelBuilder.Entity("BiegusowoApi.Data.Models.FileDeletionOutbox", b =>
@@ -230,7 +230,7 @@ namespace BiegusowoApi.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("FileDeletionOutboxes");
+                    b.ToTable("FileDeletionOutboxes", (string)null);
                 });
 
             modelBuilder.Entity("BiegusowoApi.Data.Models.Listing", b =>
@@ -310,7 +310,7 @@ namespace BiegusowoApi.Data.Migrations
 
                     b.HasIndex("VoivodeshipId");
 
-                    b.ToTable("Listings");
+                    b.ToTable("Listings", (string)null);
                 });
 
             modelBuilder.Entity("BiegusowoApi.Data.Models.Message", b =>
@@ -343,7 +343,7 @@ namespace BiegusowoApi.Data.Migrations
 
                     b.HasIndex("SenderId");
 
-                    b.ToTable("Messages");
+                    b.ToTable("Messages", (string)null);
                 });
 
             modelBuilder.Entity("BiegusowoApi.Data.Models.Species", b =>
@@ -370,7 +370,7 @@ namespace BiegusowoApi.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Species");
+                    b.ToTable("Species", (string)null);
                 });
 
             modelBuilder.Entity("BiegusowoApi.Data.Models.User", b =>
@@ -417,7 +417,7 @@ namespace BiegusowoApi.Data.Migrations
 
                     b.HasIndex("VoivodeshipId");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("BiegusowoApi.Data.Models.Voivodeship", b =>
@@ -434,7 +434,7 @@ namespace BiegusowoApi.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Voivodeships");
+                    b.ToTable("Voivodeships", (string)null);
                 });
 
             modelBuilder.Entity("BiegusowoApi.Data.Models.Breed", b =>

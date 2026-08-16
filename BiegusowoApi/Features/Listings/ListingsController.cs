@@ -86,7 +86,7 @@ public class ListingsController(IListingService listingService,
         [FromBody] PresignedUploadRequest request)
     {
         var result = await _blobService.CreatePresignedUploadsAsync(request);
-        return Ok(result);
+        return result.ToActionResult(this);
     }
 
     //[Authorize]

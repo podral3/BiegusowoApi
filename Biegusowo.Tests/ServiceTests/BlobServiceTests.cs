@@ -1,4 +1,5 @@
-﻿using AwesomeAssertions;
+﻿using Ardalis.Result;
+using AwesomeAssertions;
 using Biegusowo.Tests.Common;
 using Biegusowo.Tests.Common.Fakes;
 using BiegusowoApi.Data.Models;
@@ -48,11 +49,11 @@ public class BlobServiceTests(WebApplicationFactoryFixture factory)
 
         var presignedRequest = new PresignedUploadRequest([file]);
 
-        var presignedResponse = await blobService.CreatePresignedUploadsAsync(
+        PresignedUploadResponse presignedResponse = await blobService.CreatePresignedUploadsAsync(
             presignedRequest,
             CancellationToken);
 
-        var blobId = presignedResponse.Files.Single().BlobId;
+        var blobId = presignedResponse.Files[0].BlobId;
 
         var blob = await GetQueryable<Blob>()
             .AsNoTracking()
@@ -107,5 +108,94 @@ public class BlobServiceTests(WebApplicationFactoryFixture factory)
         confirmResults.Result.Count.Should().Be(1);
         confirmResults.Result[0].Key.Should().BeNull();
         confirmResults.Result[0].Error.Should().NotBeNullOrEmpty();
+    }
+
+    [Fact]
+    public async Task CreatePresignedUploadsAsync_AllFilesInvalid_ReturnsInvalidResult()
+    {
+        // Arrange
+        var scope = _factory.Services.CreateScope();
+        var objectService = scope.ServiceProvider.GetRequiredService<IBlobService>();
+
+        var invalidFile = new PresignedUploadFile(
+            "",                 // empty filename -> NotEmpty fails
+            "image/png",        // wrong content type -> Equal fails
+            0,                  // FileSizeBytes -> GreaterThan(0) fails
+            0,                  // FileWidth -> GreaterThan(0) fails
+            0);                 // FileHeight -> GreaterThan(0) fails
+
+        var request = new PresignedUploadRequest([invalidFile]);
+
+        // Act
+        Result<PresignedUploadResponse> result =
+            await objectService.CreatePresignedUploadsAsync(request, CancellationToken);
+
+        result.IsSuccess.Should().BeFalse();
+        result.Status.Should().Be(ResultStatus.Invalid);
+        result.ValidationErrors.Should().NotBeEmpty();
+    }
+
+    [Fact]
+    public async Task CreatePresignedUploadsAsync_SomeFilesInvalid_ReturnsPartialSuccessWithErrors()
+    {
+        // Arrange
+        var scope = _factory.Services.CreateScope();
+        var objectService = scope.ServiceProvider.GetRequiredService<IBlobService>();
+
+        var validFile = new PresignedUploadFile(
+            "validListingPhoto.webp",
+            "image/webp",
+            21_370_000,
+            1920,
+            1080);
+
+        var invalidFile = new PresignedUploadFile(
+            "invalidListingPhoto.webp",
+            "image/webp",
+            30 * 1024 * 1024,  // exceeds 25 MB max -> LessThanOrEqualTo fails
+            1920,
+            1080);
+
+        var request = new PresignedUploadRequest([validFile, invalidFile]);
+
+        // Act
+        PresignedUploadResponse result =
+            await objectService.CreatePresignedUploadsAsync(request, CancellationToken);
+
+        // Assert
+
+        result.Errors.Should().NotBeEmpty();
+        result.Files.Should().HaveCount(1);
+        var file = result.Files[0];
+
+        Blob? blob = await GetQueryable<Blob>()
+            .FirstOrDefaultAsync(b => b.Id == file.BlobId, CancellationToken);
+        blob.Should().NotBeNull();
+        blob.StorageKey.Should().NotContain(invalidFile.FileName);
+    }
+
+    [Theory]
+    [InlineData("", "image/webp", 1_000_000, 1920, 1080)]      // empty filename
+    [InlineData("photo.png", "image/png", 1_000_000, 1920, 1080)] // wrong content type
+    [InlineData("photo.webp", "image/webp", 0, 1920, 1080)]     // zero size
+    [InlineData("photo.webp", "image/webp", 1_000_000, 0, 1080)] // zero width
+    [InlineData("photo.webp", "image/webp", 1_000_000, 1920, 0)] // zero height
+    [InlineData("photo.webp", "image/webp", 1_000_000, 10001, 1080)] // width over max
+    public async Task CreatePresignedUploadsAsync_SingleInvalidField_ReturnsInvalidResult(
+        string fileName, string contentType, int fileSize, int width, int height)
+    {
+        // Arrange
+        var scope = _factory.Services.CreateScope();
+        var objectService = scope.ServiceProvider.GetRequiredService<IBlobService>();
+
+        var invalidFile = new PresignedUploadFile(fileName, contentType, fileSize, width, height);
+        var request = new PresignedUploadRequest([invalidFile]);
+
+        // Act
+        Result<PresignedUploadResponse> result =
+       await objectService.CreatePresignedUploadsAsync(request, CancellationToken);
+
+        result.IsSuccess.Should().BeFalse();
+        result.ValidationErrors.Should().NotBeEmpty();
     }
 }

@@ -138,8 +138,8 @@ public class ProfilesController(
         [FromBody] PresignedUploadFile request)
     {
         PresignedUploadRequest parsed = new([request]);
-        PresignedUploadResponse result = await _blobService.CreatePresignedUploadsAsync(parsed);
-        return Ok(result);
+        var result = await _blobService.CreatePresignedUploadsAsync(parsed);
+        return result.ToActionResult(this);
     }
 
     [Authorize]
@@ -188,8 +188,8 @@ public class ProfilesController(
         [FromBody] PresignedUploadFile request)
     {
         PresignedUploadRequest parsed = new([request]);
-        PresignedUploadResponse result = await _blobService.CreatePresignedUploadsAsync(parsed);
-        return Ok(result);
+        var result = await _blobService.CreatePresignedUploadsAsync(parsed);
+        return result.ToActionResult(this);
     }
 
     [Authorize]

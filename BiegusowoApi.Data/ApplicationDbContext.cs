@@ -19,6 +19,7 @@ namespace BiegusowoApi.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
             modelBuilder.HasPostgresEnum<ListingStatus>();
             modelBuilder.HasPostgresEnum<ListingType>();
             modelBuilder.HasPostgresEnum<MessageStatus>();
