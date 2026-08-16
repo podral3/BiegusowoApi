@@ -9,24 +9,31 @@ public class GlobalExceptionHandler(
 {
     public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
     {
-        logger.LogError(exception, "Unhandled exception occurred");
+        logger.LogError(
+            exception,
+            "Unhandled exception. TraceId: {TraceId}",
+            httpContext.TraceIdentifier);
 
-        httpContext.Response.StatusCode = exception switch
+        httpContext.Response.StatusCode =
+             StatusCodes.Status500InternalServerError;
+
+        var problemDetails = new ProblemDetails
         {
-            ApplicationException => StatusCodes.Status400BadRequest,
-            _ => StatusCodes.Status500InternalServerError
+            Status = StatusCodes.Status500InternalServerError,
+            Type = "/problems/internal-server-error",
+            Title = "An unexpected error occurred.",
+            Detail = "An unexpected error occurred."
         };
 
-        return await problemDetailsService.TryWriteAsync(new ProblemDetailsContext
-        {
-            HttpContext = httpContext,
-            Exception = exception,
-            ProblemDetails = new ProblemDetails
+        problemDetails.Extensions["traceId"] =
+            httpContext.TraceIdentifier;
+
+        return await problemDetailsService.TryWriteAsync(
+            new ProblemDetailsContext
             {
-                Type = exception.GetType().Name,
-                Title = "An error occured",
-                Detail = exception.Message
-            }
-        });
+                HttpContext = httpContext,
+                Exception = exception,
+                ProblemDetails = problemDetails
+            });
     }
 }

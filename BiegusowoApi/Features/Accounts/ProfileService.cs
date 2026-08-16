@@ -58,8 +58,6 @@ public class ProfileService(ApplicationDbContext db) : IProfileService
             errors.Add($"{err.AffectedObject.GetType().Name}: {err.ErrorMessage}");
         });
 
-
-        patch.ApplyTo(dto);
         UserPatchRequestValidator validator = new();
         var validation = await validator.ValidateAsync(dto, ct);
 

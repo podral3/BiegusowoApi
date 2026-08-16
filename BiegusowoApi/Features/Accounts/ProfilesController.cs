@@ -75,19 +75,8 @@ public class ProfilesController(
     {
         var userId = User.GetUserId();
 
-        try
-        {
-            var result = await _profileService.UpdateMyProfileAsync(userId, request);
-            return result.ToActionResult(this);
-        }
-        catch (Microsoft.AspNetCore.JsonPatch.Exceptions.JsonPatchException ex)
-        {
-            return BadRequest(ex.Message);
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(ex.Message);
-        }
+        var result = await _profileService.UpdateMyProfileAsync(userId, request);
+        return result.ToActionResult(this);        
     }
 
     [Authorize]

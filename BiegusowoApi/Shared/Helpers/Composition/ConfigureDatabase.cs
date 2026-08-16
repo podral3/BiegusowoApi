@@ -12,7 +12,10 @@ public static class ConfigureDatabase
             options.UseNpgsql(
                 connectionString, x =>
                 {
+                    
                     x.UseNetTopologySuite();
+                    x.EnableRetryOnFailure(3);
+                    x.CommandTimeout(30);
                 }));      
 
         return services;
