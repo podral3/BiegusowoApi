@@ -7,6 +7,7 @@ on:
     paths-ignore:
       - './Database/**'
       - '**.md' 
+      - ./.github**
 
 permissions:
   contents: read
