@@ -5,7 +5,7 @@ on:
     branches: [main]
     paths:
       - 'Database/**'
-      - 'database/**'
+         
 
 jobs:
   build:
@@ -26,7 +26,7 @@ jobs:
 
       - uses: docker/build-push-action@v6
         with:
-          context: ./docker/postgis
+          context: ./Database
           push: true
           tags: ghcr.io/${{ github.repository_owner }}/postgis:18-3.6-h3
           cache-from: type=gha
