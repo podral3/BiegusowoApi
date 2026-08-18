@@ -8,7 +8,7 @@ public class PostgresTestContainer
 
     public PostgresTestContainer()
     {
-        _container = new PostgreSqlBuilder("biegusowo-postgres")
+        _container = new PostgreSqlBuilder("ghcr.io/podral3/postgis:18-3.6-h3")
             .WithDatabase("biegusowo")
             .WithUsername("postgres")
             .WithPassword("postgres")
