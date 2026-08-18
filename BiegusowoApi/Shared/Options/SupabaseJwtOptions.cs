@@ -1,6 +1,6 @@
 ﻿namespace BiegusowoApi.Shared.Options;
 
-public class SupabseJwtOptions
+public sealed class SupabaseJwtOptions
 {
     public string Url { get; set; } = string.Empty;
     public bool ValidateIssuerSigningKey { get; set; }

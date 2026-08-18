@@ -18,7 +18,7 @@ public static class ConfigureAuthentication
         .AddJwtBearer(options =>
         {
             var supabaseOptions = configuration
-                .GetSection("Supabase").Get<SupabseJwtOptions>()!;
+                .GetSection("Supabase").Get<SupabaseJwtOptions>()!;
 
             options.Authority = $"{supabaseOptions.Url}/auth/v1";
             options.TokenValidationParameters = new TokenValidationParameters

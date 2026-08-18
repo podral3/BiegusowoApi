@@ -17,6 +17,8 @@ builder.Services.AddSerilog((services, lc) => lc
 builder.Services.ConfigureCorsOrigins(builder.Configuration);
 
 builder.Services.AddControllers();
+builder.Services.AddHealthChecks();
+
 builder.Services.AddDatabaseContext(builder.Configuration);
 builder.Services.AddSupabaseAuthentication(builder.Configuration);
 builder.Services.AddOpenApiServices();
@@ -71,6 +73,7 @@ app.UseHttpsRedirection();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHealthChecks("/health");
 
 app.Run();
 
