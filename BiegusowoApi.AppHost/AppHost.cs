@@ -54,5 +54,3 @@ var s3SecretKey =
 api.WithEnvironment("S3__SecretKey", s3SecretKey);
 
 builder.Build().Run();
-
-//testing runner
