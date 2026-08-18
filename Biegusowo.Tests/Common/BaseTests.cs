@@ -30,6 +30,13 @@ public class BaseTests : IClassFixture<WebApplicationFactoryFixture>
     protected CancellationToken CancellationToken => TestContext.Current.CancellationToken;
 
     protected IQueryable<T> GetQueryable<T>() where T : class => _dbContext.Set<T>().AsNoTracking();
+    protected async Task DeleteByIdAsync<T>(Guid id, CancellationToken cancellationToken = default)
+    where T : class
+    {
+        await _dbContext.Set<T>()
+            .Where(x => EF.Property<Guid>(x, "Id") == id)
+            .ExecuteDeleteAsync(cancellationToken);
+    }
     protected async Task<HttpResponseMessage> PostAsJsonAsync<T>(string url, T data, CancellationToken cancellationToken)
         => await _client.PostAsJsonAsync(url, data, cancellationToken);
 

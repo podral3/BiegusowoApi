@@ -286,6 +286,8 @@ public class ListingsControllerTests(WebApplicationFactoryFixture factory)
         entity.SpeciesId.Should().Be(request.SpeciesId);
         entity.BreedId.Should().Be(request.BreedId);
         entity.CityName.Should().Be(request.CityName);
+        
+        await this.DeleteByIdAsync<Listing>(listing!.Id, CancellationToken);
     }
 
     [Fact]
