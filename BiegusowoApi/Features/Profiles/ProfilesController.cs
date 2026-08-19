@@ -48,6 +48,7 @@ public class ProfilesController(
     [HttpGet("me")]
     [EndpointDescription("Get the profile of the currently authenticated user.")]
     [ProducesResponseType(typeof(ProfilePageResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     public async Task<ActionResult<ProfilePageResponse>> GetMyProfile() 
     {
         var userId = User.GetUserId();
@@ -58,6 +59,12 @@ public class ProfilesController(
                 x => x.Id == userId);
 
         if (user is null)
+        {
+            _logger.LogError("Authenticated user {UserId} not found in database.", userId);
+            return NotFound();
+        }
+        
+        if (!user.IsOnboarded)
         {
             return Ok(new
             {

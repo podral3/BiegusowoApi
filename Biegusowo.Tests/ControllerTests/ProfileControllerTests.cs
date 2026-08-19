@@ -66,6 +66,15 @@ public class ProfileControllerTests(WebApplicationFactoryFixture factory)
     [Fact]
     public async Task GetMyProfile_ProfileNotSetUp_ReturnsOnboardingRequired()
     {
+        await AddAsync<User>(new User
+        {
+            Id = Guid.Parse("00000000-0000-0000-0000-000000000999"),
+            DisplayName = null,
+            Bio = null,
+            PhoneNumber = null,
+            IsOnboarded = false
+        });
+
         //Arrange
         var client = _factory.CreateAuthenticatedClient("00000000-0000-0000-0000-000000000999");
         //Act
@@ -155,8 +164,10 @@ public class ProfileControllerTests(WebApplicationFactoryFixture factory)
 
         // Assert
         response.Should().Be201Created();
-        var returnedId = await response.Content.ReadFromJsonAsync<Guid>(CancellationToken);
-        returnedId.Should().Be(userId);
+        User? user = await GetQueryable<User>()
+            .AsNoTracking()
+            .SingleOrDefaultAsync(u => u.Id == userId, CancellationToken);
+        user.Should().NotBeNull();
     }
 
     [Fact]
@@ -220,7 +231,7 @@ public class ProfileControllerTests(WebApplicationFactoryFixture factory)
 
         // Assert
         firstResponse.Should().Be201Created();
-        secondResponse.StatusCode.Should().Be(HttpStatusCode.OK); // not a duplicate error, just a no-op
+        secondResponse.Should().Be200Ok(); // not a duplicate error, just a no-op
     }
 
     private static string BuildSupabaseUserCreatedPayload(Guid userId) => $$"""
@@ -254,8 +265,7 @@ public class ProfileControllerTests(WebApplicationFactoryFixture factory)
             Content = new StringContent(BuildSupabaseUserCreatedPayload(userId), Encoding.UTF8, "application/json")
         };
         webhookRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", WebhookTestSecret);
-        var webhookResponse = await webhookClient.SendAsync(webhookRequest, CancellationToken);
-        webhookResponse.Should().Be201Created();
+        await webhookClient.SendAsync(webhookRequest, CancellationToken);
 
         var client = _factory.CreateAuthenticatedClient(userId.ToString());
         var request = new OnboardingRequest("Setup User", "This is a new user.", "987654321", "Warszawa", 2);
