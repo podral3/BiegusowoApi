@@ -34,7 +34,10 @@ public static class ConfigureAuthentication
             options.MetadataAddress = $"{supabaseOptions.Url}/auth/v1/.well-known/openid-configuration";
             options.TokenValidationParameters.NameClaimType = "sub";
         });
-
+        services.AddOptions<SupabaseJwtOptions>()
+            .Bind(configuration.GetSection("Supabase"))
+            .ValidateDataAnnotations()
+            .ValidateOnStart();
         return services;
     }
 }

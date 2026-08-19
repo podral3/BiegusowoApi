@@ -1,0 +1,30 @@
+﻿{
+  User: {
+    Username: Marcel52,
+    Slug: Marcel52,
+    DisplayName: Marcel52,
+    City: New Reginald,
+    JoinDate: DateTimeOffset_1
+  },
+  AvatarUrl: avatars/image1.webp,
+  BackgroundImageUrl: backgrounds/image2.webp,
+  Listings: [
+    {
+      Id: Guid_1,
+      Slug: listing-number-12,
+      Title: Listing number 12,
+      Price: 30.62,
+      City: Mackhaven,
+      CoverPhotoUrl: listings/image40.webp
+    },
+    {
+      Id: Guid_2,
+      Slug: listing-number-59,
+      Title: Listing number 59,
+      Price: 69.8,
+      City: Lake Jennieside,
+      CoverPhotoUrl: listings/image205.webp
+    }
+  ],
+  HasMoreListings: false
+}

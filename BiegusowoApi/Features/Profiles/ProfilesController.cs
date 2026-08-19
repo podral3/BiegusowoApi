@@ -8,11 +8,14 @@ using BiegusowoApi.Features.Blobs;
 using BiegusowoApi.Features.Blobs.Dtos;
 using BiegusowoApi.Features.Users.Dtos;
 using BiegusowoApi.Shared.Helpers.Claims;
+using BiegusowoApi.Shared.Options;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.JsonPatch.SystemTextJson;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using System.Text.Json;
 
 namespace BiegusowoApi.Features.Users;
 
@@ -22,11 +25,13 @@ public class ProfilesController(
     ApplicationDbContext dbContext,
     IProfileService profileService,
     IBlobService blobService,
+    IOptions<SupabaseJwtOptions> options,
     ILogger<ProfilesController> logger) : ControllerBase
 {
     private readonly ApplicationDbContext _dbContext = dbContext;
     private readonly IProfileService _profileService = profileService;
     private readonly IBlobService _blobService = blobService;
+    private readonly IOptions<SupabaseJwtOptions> _supabaseOptions = options;
     private readonly ILogger<ProfilesController> _logger = logger;
 
     [HttpGet("{id:guid}")]
@@ -79,54 +84,88 @@ public class ProfilesController(
         return result.ToActionResult(this);        
     }
 
-    [Authorize]
-    [HttpPost("setup")]
-    [EndpointDescription("Create user record in database. Use after creating account at external provider.")]
-    [ProducesResponseType(typeof(UserDto), StatusCodes.Status201Created)]
-    public async Task<ActionResult<UserDto>> SetupAccount(
-        [FromBody] SetupAccountRequest request,
-        CancellationToken cancellationToken)
+    [HttpPost("supabase/user-created")]
+    public async Task<ActionResult<Guid>> HandleUserCreated(CancellationToken cancellationToken)
     {
-        SetupAccountRequestValidator validator = new ();
-        var validation = await validator.ValidateAsync(request);
+        var expectedSecret = _supabaseOptions.Value.WebhookSecret ;
+        var authHeader = Request.Headers.Authorization.ToString();
+        bool isAuthorized = !string.IsNullOrEmpty(expectedSecret) && authHeader == $"Bearer {expectedSecret}";
+
+        if (!isAuthorized)
+        {
+            return Unauthorized();
+        }
+
+        var options = new JsonSerializerOptions
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower
+        };
+
+        SupabaseUserCreatedPayload? payload;
+        using (var reader = new StreamReader(Request.Body))
+        {
+            var body = await reader.ReadToEndAsync(cancellationToken);
+            payload = JsonSerializer.Deserialize<SupabaseUserCreatedPayload>(body, options);
+        }
+
+        if (payload?.Record is null || payload.Record.Id == Guid.Empty)
+        {
+            return BadRequest("Missing user record in payload.");
+        }
+
+        var result = await _profileService.CreatePendingUserAsync(
+            payload.Record.Id,
+            payload.Record.CreatedAt ?? DateTimeOffset.UtcNow,
+            cancellationToken);
+
+        return result.ToActionResult(this);
+    }
+
+    [Authorize]
+    [HttpPost("onboarding")]
+    [EndpointDescription("Complete profile setup for the currently authenticated user, created earlier via Supabase webhook.")]
+    [ProducesResponseType(typeof(UserDto), StatusCodes.Status200OK)]
+    public async Task<ActionResult<UserDto>> CompleteOnboarding(
+    [FromBody] OnboardingRequest request,
+    CancellationToken cancellationToken)
+    {
+        OnboardingRequestValidator validator = new();
+        var validation = await validator.ValidateAsync(request, cancellationToken);
         if (!validation.IsValid)
         {
             return BadRequest(validation.AsErrors());
         }
+
         var userId = User.GetUserId();
 
-        var existingUser = await _dbContext.Users
-            .SingleOrDefaultAsync(
-                x => x.Id == userId,
-                cancellationToken);
+        var user = await _dbContext.Users
+            .SingleOrDefaultAsync(x => x.Id == userId, cancellationToken);
 
-        if (existingUser is not null)
+        if (user is null)
         {
-            _logger.LogWarning("User with ID {UserId} attempted to set up an account, but an account already exists.", userId);
-            return Conflict(new
-            {
-                code = "account_already_setup"
-            });
+            // Webhook hasn't landed yet, or something went wrong upstream.
+            _logger.LogWarning("Onboarding attempted for {UserId} but no user record exists.", userId);
+            return NotFound(new { code = "user_not_found" });
         }
 
-        var user = new User
+        if (user.IsOnboarded)
         {
-            Id = userId,
-            DisplayName = request.DisplayName,
-            Bio = request.Bio,
-            PhoneNumber = request.PhoneNumber,
-            City = request.CityName,
-            VoivodeshipId = request.VoivodeshipId,
-            CreatedAt = DateTimeOffset.UtcNow
-        };
+            _logger.LogWarning("User {UserId} attempted to onboard again.", userId);
+            return Conflict(new { code = "account_already_setup" });
+        }
 
-        _dbContext.Users.Add(user);
+        user.DisplayName = request.DisplayName;
+        user.Bio = request.Bio;
+        user.PhoneNumber = request.PhoneNumber;
+        user.City = request.CityName;
+        user.VoivodeshipId = request.VoivodeshipId;
+        user.IsOnboarded = true;
+        user.UpdatedAt = DateTimeOffset.UtcNow;
+
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        return Created("api/profiles/me",
-            new UserDto(user.DisplayName, user.Bio, "Todo: Generate Slug", user.PhoneNumber, user.DisplayName, user.City, user.CreatedAt));
+        return Ok(new UserDto(user.DisplayName!, user.Bio, "Todo: Generate Slug", user.PhoneNumber, user.DisplayName!, user.City!, user.CreatedAt));
     }
-
 
     [Authorize]
     [HttpPost("me/avatar/presigned")]

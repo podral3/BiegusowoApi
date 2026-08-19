@@ -50,7 +50,10 @@ else
 
 var s3SecretKey =
     builder.AddParameter("s3-secret-key", secret: true);
-
 api.WithEnvironment("S3__SecretKey", s3SecretKey);
+
+var supabaseWebhookSecret =
+    builder.AddParameter("supabase-webhook-secret", secret: true);
+api.WithEnvironment("SupabaseJwt__WebhookSecret", supabaseWebhookSecret);
 
 builder.Build().Run();

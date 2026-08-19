@@ -20,6 +20,7 @@ internal static class UserSeeder
             .RuleFor(u => u.Bio, f => f.Lorem.Paragraph().OrNull(f, 0.2f))
             .RuleFor(u => u.PhoneNumber, f => f.Phone.PhoneNumber().OrNull(f, 0.2f))
             .RuleFor(u => u.City, f => f.Address.City())
+            .RuleFor(u => u.IsOnboarded, f => true)
             .RuleFor(u => u.VoivodeshipId, f => f.PickRandom(voivodeships).Id)
             .RuleFor(u => u.AvatarFileName, f =>
             {

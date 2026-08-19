@@ -13,4 +13,9 @@ public interface IProfileService
         Guid currentUserId,
         JsonPatchDocument<UserPatchRequest> patch,
         CancellationToken ct = default);
+
+    Task<Result<Guid>> CreatePendingUserAsync(
+        Guid userId,
+        DateTimeOffset createdAt,
+        CancellationToken ct = default);
 }

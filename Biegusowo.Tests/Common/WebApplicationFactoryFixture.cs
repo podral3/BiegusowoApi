@@ -3,6 +3,7 @@ using Biegusowo.Tests.Common.Fakes;
 using BiegusowoApi.Data;
 using BiegusowoApi.Data.Seeding;
 using BiegusowoApi.Features.Blobs;
+using BiegusowoApi.Shared.Options;
 using DotNet.Testcontainers.Builders;
 using DotNet.Testcontainers.Networks;
 using Microsoft.AspNetCore.Authentication;
@@ -48,6 +49,11 @@ public class WebApplicationFactoryFixture : WebApplicationFactory<Program>, IAsy
 
             services.AddScoped<IFileStorageProvider>(sp =>
                 sp.GetRequiredService<FakeStorageProvider>());
+
+            services.Configure<SupabaseJwtOptions>(options =>
+            {
+                options.WebhookSecret = "WebhookSecret";
+            });
 
             services.AddScoped<DataSeeder>();
         });

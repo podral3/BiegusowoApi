@@ -10,6 +10,7 @@ public sealed class SupabaseJwtOptions
     public bool ValidateAudience { get; set; }
     public bool ValidateLifetime { get; set; }
     public TimeSpan ClockSkew { get; set; }
+    public string WebhookSecret { get; set; } = string.Empty;
 }
 
 

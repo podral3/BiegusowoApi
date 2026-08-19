@@ -5,11 +5,11 @@ namespace BiegusowoApi.Features.Users.Dtos;
 
 public class UserPatchRequest
 {
-    public string DisplayName { get; set; } = default!;
+    public string? DisplayName { get; set; } = default!;
     public string? Bio { get; set; }
     public string? PhoneNumber { get; set; }
-    public string City { get; set; } = default!;
-    public int VoivodeshipId { get; set; }
+    public string? City { get; set; } = default!;
+    public int? VoivodeshipId { get; set; }
 }
 
 internal class UserPatchRequestValidator : AbstractValidator<UserPatchRequest>

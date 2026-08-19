@@ -9,15 +9,18 @@ using BiegusowoApi.Features.Users.Dtos;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Org.BouncyCastle.Asn1.Ocsp;
+using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text;
 
 namespace Biegusowo.Tests.ControllerTests;
 
-public class UserControllerTests(WebApplicationFactoryFixture factory)
+public class ProfileControllerTests(WebApplicationFactoryFixture factory)
     : BaseTests(factory)
 {
+    private readonly string WebhookTestSecret = "WebhookSecret";
+
     [Fact]
     public async Task GetProfile_ReturnsOk()
     {
@@ -75,6 +78,9 @@ public class UserControllerTests(WebApplicationFactoryFixture factory)
             onboardingRequired = true
         });
     }
+    // ---------------------------------------------------------------------
+    // Update user info
+    // ---------------------------------------------------------------------
 
     [Fact]
     public async Task UpdateUserInfo_ReturnsOk()
@@ -125,61 +131,156 @@ public class UserControllerTests(WebApplicationFactoryFixture factory)
         response.Should().Be400BadRequest();
     }
 
+    // ---------------------------------------------------------------------
+    // Webhook create user entity
+    // ---------------------------------------------------------------------
+
     [Fact]
-    public async Task SetupAccountSetsUpAccount()
+    public async Task WebhookCreatesUserAccount()
     {
         // Arrange
-        var client = _factory.CreateAuthenticatedClient("00000000-0000-0000-0000-000000001111");
-        var request = new SetupAccountRequest("Setup User", "This is a new user.", "987654321", "Warszawa", 2);
+        var userId = Guid.Parse("00000000-0000-0000-0000-000000001112");
+        var client = _factory.CreateClient(); // unauthenticated — webhook uses secret, not JWT
+
+        var webhookPayload = BuildSupabaseUserCreatedPayload(userId);
+
         // Act
-        var response = await client.PostAsJsonAsync("/api/profiles/setup", request, CancellationToken);
+        var request = new HttpRequestMessage(HttpMethod.Post, "/api/profiles/supabase/user-created")
+        {
+            Content = new StringContent(webhookPayload, Encoding.UTF8, "application/json")
+        };
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", WebhookTestSecret);
+
+        var response = await client.SendAsync(request, CancellationToken);
+
         // Assert
         response.Should().Be201Created();
+        var returnedId = await response.Content.ReadFromJsonAsync<Guid>(CancellationToken);
+        returnedId.Should().Be(userId);
+    }
+
+    [Fact]
+    public async Task Webhook_MissingSecret_ReturnsUnauthorized()
+    {
+        // Arrange
+        var client = _factory.CreateClient();
+        var webhookPayload = BuildSupabaseUserCreatedPayload(Guid.NewGuid());
+
+        // Act
+        var request = new HttpRequestMessage(HttpMethod.Post, "/api/profiles/supabase/user-created")
+        {
+            Content = new StringContent(webhookPayload, Encoding.UTF8, "application/json")
+        };
+        var response = await client.SendAsync(request, CancellationToken);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+    }
+
+    [Fact]
+    public async Task Webhook_WrongSecret_ReturnsUnauthorized()
+    {
+        // Arrange
+        var client = _factory.CreateClient();
+        var webhookPayload = BuildSupabaseUserCreatedPayload(Guid.NewGuid());
+
+        // Act
+        var request = new HttpRequestMessage(HttpMethod.Post, "/api/profiles/supabase/user-created")
+        {
+            Content = new StringContent(webhookPayload, Encoding.UTF8, "application/json")
+        };
+        request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", "not-the-real-secret");
+        var response = await client.SendAsync(request, CancellationToken);
+
+        // Assert
+        response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
+    }
+
+    [Fact]
+    public async Task Webhook_DuplicateDelivery_IsIdempotent()
+    {
+        // Arrange
+        var userId = Guid.Parse("00000000-0000-0000-0000-000000002222");
+        var client = _factory.CreateClient();
+        var webhookPayload = BuildSupabaseUserCreatedPayload(userId);
+
+        async Task<HttpResponseMessage> SendWebhook()
+        {
+            var request = new HttpRequestMessage(HttpMethod.Post, "/api/profiles/supabase/user-created")
+            {
+                Content = new StringContent(webhookPayload, Encoding.UTF8, "application/json")
+            };
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", WebhookTestSecret);
+            return await client.SendAsync(request, CancellationToken);
+        }
+
+        // Act
+        var firstResponse = await SendWebhook();
+        var secondResponse = await SendWebhook();
+
+        // Assert
+        firstResponse.Should().Be201Created();
+        secondResponse.StatusCode.Should().Be(HttpStatusCode.OK); // not a duplicate error, just a no-op
+    }
+
+    private static string BuildSupabaseUserCreatedPayload(Guid userId) => $$"""
+    {
+        "type": "INSERT",
+        "table": "users",
+        "schema": "auth",
+        "record": {
+        "id": "{{userId}}",
+        "email": "webhook-test@example.com",
+        "created_at": "2026-08-19T07:20:25.473086+00:00"
+        },
+        "old_record": null
+    }
+    """;
+
+    // ---------------------------------------------------------------------
+    // Complete Onboarding
+    // ---------------------------------------------------------------------
+
+    [Fact]
+    public async Task CompleteOnboardingSetsUpAccount()
+    {
+        // Arrange
+        var userId = Guid.Parse("00000000-0000-0000-0000-000000001113");
+
+        // Simulate Supabase having already called the webhook for this user
+        var webhookClient = _factory.CreateClient();
+        var webhookRequest = new HttpRequestMessage(HttpMethod.Post, "/api/profiles/supabase/user-created")
+        {
+            Content = new StringContent(BuildSupabaseUserCreatedPayload(userId), Encoding.UTF8, "application/json")
+        };
+        webhookRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", WebhookTestSecret);
+        var webhookResponse = await webhookClient.SendAsync(webhookRequest, CancellationToken);
+        webhookResponse.Should().Be201Created();
+
+        var client = _factory.CreateAuthenticatedClient(userId.ToString());
+        var request = new OnboardingRequest("Setup User", "This is a new user.", "987654321", "Warszawa", 2);
+
+        // Act
+        var response = await client.PostAsJsonAsync("/api/profiles/onboarding", request, CancellationToken);
+
+        // Assert
+        response.Should().Be200Ok();
         var result = await response.Content.ReadFromJsonAsync<UserDto>(CancellationToken);
         await Verify(result);
     }
 
     [Fact]
-    public async Task SetupAccount_AlreadySetup_ReturnsConflict()
+    public async Task CompleteOnboarding_AlreadySetup_ReturnsConflict()
     {
         // Arrange
         var client = _factory.CreateAuthenticatedClient(FirstUserId);
-        var request = new SetupAccountRequest("Setup User", "This is a new user.", "987654321", "Warszawa", 2);
+        var request = new OnboardingRequest("Setup User", "This is a new user.", "987654321", "Warszawa", 2);
+
         // Act
-        var response = await client.PostAsJsonAsync("/api/profiles/setup", request, CancellationToken);
+        var response = await client.PostAsJsonAsync("/api/profiles/onboarding", request, CancellationToken);
+
         // Assert
-        response.Should().Be409Conflict();
-    }
-
-    /// <summary>
-    /// Requests a presigned upload via the given endpoint, simulates the client uploading
-    /// the resulting object to the fake storage provider, and returns the created blob id.
-    /// </summary>
-    private async Task<Guid> CreateAndUploadPresignedImageAsync(
-        HttpClient client,
-        string presignedEndpoint,
-        string fileName,
-        string contentType)
-    {
-        var presignedFile = new PresignedUploadFile(fileName, contentType, 512_000, 512, 512);
-
-        var presignedResponse = await client.PostAsJsonAsync(presignedEndpoint, presignedFile, CancellationToken);
-        presignedResponse.Should().Be200Ok();
-
-        var presigned = await presignedResponse.Content
-            .ReadFromJsonAsync<PresignedUploadResponse>(CancellationToken);
-        presigned.Should().NotBeNull();
-        var blobId = presigned!.Files.Single().BlobId;
-
-        var blob = await GetQueryable<Blob>()
-            .AsNoTracking()
-            .SingleAsync(b => b.Id == blobId, CancellationToken);
-
-        using var scope = _factory.Services.CreateScope();
-        var fakeStorage = scope.ServiceProvider.GetRequiredService<FakeStorageProvider>();
-        fakeStorage.SimulateUpload(blob.StorageKey, presignedFile.FileSizeBytes, presignedFile.ContentType);
-
-        return blobId;
+        response.StatusCode.Should().Be(HttpStatusCode.Conflict);
     }
 
     // ---------------------------------------------------------------------

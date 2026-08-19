@@ -4,6 +4,7 @@ using System.Text.Json;
 using BiegusowoApi.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -13,9 +14,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace BiegusowoApi.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260819071232_MakeOnboardingFieldsNullable")]
+    partial class MakeOnboardingFieldsNullable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -411,7 +414,7 @@ namespace BiegusowoApi.Data.Migrations
                     b.Property<DateTimeOffset?>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int?>("VoivodeshipId")
+                    b.Property<int>("VoivodeshipId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
@@ -534,7 +537,9 @@ namespace BiegusowoApi.Data.Migrations
                 {
                     b.HasOne("BiegusowoApi.Data.Models.Voivodeship", "Voivodeship")
                         .WithMany()
-                        .HasForeignKey("VoivodeshipId");
+                        .HasForeignKey("VoivodeshipId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Voivodeship");
                 });

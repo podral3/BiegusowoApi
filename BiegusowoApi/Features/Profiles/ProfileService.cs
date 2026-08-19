@@ -2,19 +2,27 @@
 using Ardalis.Result.FluentValidation;
 using BiegusowoApi.Data;
 using BiegusowoApi.Data.Models;
+using BiegusowoApi.Features.Accounts.Dtos;
 using BiegusowoApi.Features.Auth;
 using BiegusowoApi.Features.Users.Dtos;
+using BiegusowoApi.Shared.Options;
 using Microsoft.AspNetCore.JsonPatch.SystemTextJson;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using System.Text.Json;
 
 namespace BiegusowoApi.Features.Users;
 
-public class ProfileService(ApplicationDbContext db) : IProfileService
+public class ProfileService(
+    ApplicationDbContext db,
+    ILogger<ProfileService> logger,
+    IOptions<SupabaseJwtOptions> options) : IProfileService
 {
     private const int ListingPageSize = 12;
 
     private readonly ApplicationDbContext _dbContext = db;
+    private readonly ILogger<ProfileService> _logger = logger;
+    private readonly IOptions<SupabaseJwtOptions> _options = options;
 
     public async Task<Result<ProfilePageResponse>> GetProfileAsync(Guid userId, CancellationToken ct = default)
     {
@@ -102,6 +110,74 @@ public class ProfileService(ApplicationDbContext db) : IProfileService
             hasMoreListings);
     }
 
+    public async Task<Result<Guid>> CreatePendingUserAsync(
+    Guid userId,
+    DateTimeOffset createdAt,
+    CancellationToken ct = default)
+    {
+        var existingUser = await _dbContext.Users
+            .SingleOrDefaultAsync(x => x.Id == userId, ct);
+
+        if (existingUser is not null)
+        {
+            _logger.LogInformation("User {UserId} already exists, skipping creation.", userId);
+            return Result.Success();
+        }
+
+        var user = new User
+        {
+            Id = userId,
+            IsOnboarded = false,
+            CreatedAt = createdAt,
+        };
+
+        _dbContext.Users.Add(user);
+        await _dbContext.SaveChangesAsync(ct);
+
+        _logger.LogInformation("Created pending user record for {UserId}.", userId);
+
+        return Result.Created(user.Id);
+    }
+
+    public async Task<Result<UserDto>> CompleteOnboarding(Guid userId, OnboardingRequest request, CancellationToken ct = default)
+    {
+        OnboardingRequestValidator validator = new();
+        var validation = await validator.ValidateAsync(request);
+        if (!validation.IsValid)
+        {
+            return Result<UserDto>.Invalid(validation.AsErrors());
+        }
+
+        User? user = await _dbContext.Users
+            .SingleOrDefaultAsync(
+                x => x.Id == userId,
+                ct);
+
+        if (user is null)
+        {
+            // Webhook hasn't landed yet, or something went wrong upstream.
+            _logger.LogWarning("Onboarding attempted for {UserId} but no user record exists.", userId);
+            return Result<UserDto>.NotFound("user_not_found");
+        }
+
+        if (user.IsOnboarded)
+        {
+            _logger.LogWarning("User {UserId} attempted to onboard again.", userId);
+            return Result<UserDto>.Conflict("account_already_setup");
+        }
+
+        user.DisplayName = request.DisplayName;
+        user.Bio = request.Bio;
+        user.PhoneNumber = request.PhoneNumber;
+        user.City = request.CityName;
+        user.VoivodeshipId = request.VoivodeshipId;
+        user.IsOnboarded = true;
+        user.UpdatedAt = DateTimeOffset.UtcNow;
+
+        await _dbContext.SaveChangesAsync(ct);
+
+        return Result<UserDto>.Success(new UserDto(user.DisplayName!, user.Bio, "Todo: Generate Slug", user.PhoneNumber, user.DisplayName!, user.City!, user.CreatedAt));
+    }
     private ProfilePageListingSummary MapListingSummary(Listing listing)
     {
         var images = JsonSerializer.Deserialize<string[]>(listing.Images.RootElement.GetRawText());
