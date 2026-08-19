@@ -14,21 +14,17 @@ public class S3StorageProvider : IFileStorageProvider
 
     public S3StorageProvider(IOptions<S3Options> options)
     {
-        bool forcePathStyle = false;
         _options = options.Value;
-        if (_options.Provider == "Garage")
+
+        _s3 = new AmazonS3Client(
+        _options.AccessKey,
+        _options.SecretKey,
+        new AmazonS3Config
         {
-            forcePathStyle = true;
-        }
-            _s3 = new AmazonS3Client(
-            _options.AccessKey,
-            _options.SecretKey,
-            new AmazonS3Config
-            {
-                ServiceURL = _options.PublicBaseUrl,
-                AuthenticationRegion = _options.Region,
-                ForcePathStyle = forcePathStyle
-            });
+            ServiceURL = _options.PutEndpoint,
+            AuthenticationRegion = _options.Region,
+            ForcePathStyle = true
+        });
     }
 
     public async Task<PresignedPutUrl> CreatePresignedUploadUrlAsync(
