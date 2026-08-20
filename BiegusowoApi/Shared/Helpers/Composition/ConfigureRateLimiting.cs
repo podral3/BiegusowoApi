@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.RateLimiting;
 using System.Threading.RateLimiting;
 
 namespace BiegusowoApi.Shared.Helpers.Composition;
+
 public static class ConfigureRateLimiting
 {
     public static IServiceCollection AddRateLimiting(
@@ -19,6 +20,26 @@ public static class ConfigureRateLimiting
                     "Too many requests. Please try again later.",
                     cancellationToken);
             };
+
+            options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
+            {
+                var clientIp = context.Request.Headers["CF-Connecting-IP"].FirstOrDefault()
+                    ?? context.Connection.RemoteIpAddress?.ToString()
+                    ?? "unknown";
+
+                var partitionKey = context.User.Identity?.IsAuthenticated == true
+                    ? $"user:{context.User.GetUserId()}"
+                    : $"ip:{clientIp}";
+
+                return RateLimitPartition.GetFixedWindowLimiter(
+                    partitionKey,
+                    _ => new FixedWindowRateLimiterOptions
+                    {
+                        PermitLimit = 100,
+                        Window = TimeSpan.FromMinutes(1),
+                        QueueLimit = 0
+                    });
+            });
 
             options.AddPolicy("presigned-uploads", context =>
             {

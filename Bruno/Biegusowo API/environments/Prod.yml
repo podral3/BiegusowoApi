@@ -1,0 +1,6 @@
+name: Prod
+color: "#2E8A54"
+variables:
+  - name: baseUrl
+    value: https://mapa-drobiu.pl
+    description: ""
