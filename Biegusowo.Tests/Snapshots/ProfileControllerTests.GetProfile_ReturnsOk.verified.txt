@@ -7,8 +7,8 @@
     City: Ankundingtown,
     JoinDate: DateTimeOffset_1
   },
-  AvatarUrl: avatars/image3.webp,
-  BackgroundImageUrl: backgrounds/image4.webp,
+  AvatarUrl: https://garage.gekonlab.org/avatars/image3.webp,
+  BackgroundImageUrl: https://garage.gekonlab.org/backgrounds/image4.webp,
   Listings: [
     {
       Id: Guid_1,

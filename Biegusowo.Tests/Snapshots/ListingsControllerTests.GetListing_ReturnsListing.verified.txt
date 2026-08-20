@@ -11,8 +11,8 @@
   SpeciesId: 1,
   BreedId: 41,
   ImageOrderedUrls: {
-    0: listings/image1.webp,
-    1: listings/image2.webp
+    0: https://garage.gekonlab.org/listings/image1.webp,
+    1: https://garage.gekonlab.org/listings/image2.webp
   },
   CreatedAt: DateTimeOffset_1,
   UpdatedAt: DateTimeOffset_2,

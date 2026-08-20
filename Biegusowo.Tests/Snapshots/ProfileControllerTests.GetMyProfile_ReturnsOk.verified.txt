@@ -6,8 +6,8 @@
     City: New Reginald,
     JoinDate: DateTimeOffset_1
   },
-  AvatarUrl: avatars/image1.webp,
-  BackgroundImageUrl: backgrounds/image2.webp,
+  AvatarUrl: https://garage.gekonlab.org/avatars/image1.webp,
+  BackgroundImageUrl: https://garage.gekonlab.org/backgrounds/image2.webp,
   Listings: [
     {
       Id: Guid_1,

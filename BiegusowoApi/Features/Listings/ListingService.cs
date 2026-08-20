@@ -5,8 +5,10 @@ using BiegusowoApi.Data.Models;
 using BiegusowoApi.Data.Types;
 using BiegusowoApi.Features.Listings.Dtos;
 using BiegusowoApi.Shared.Helpers;
+using BiegusowoApi.Shared.Options;
 using Microsoft.AspNetCore.JsonPatch.SystemTextJson;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using NetTopologySuite;
 using NetTopologySuite.Geometries;
 using System.Text;
@@ -17,10 +19,12 @@ namespace BiegusowoApi.Features.Listings;
 
 public class ListingsService(
     ApplicationDbContext db,
+    IOptions<S3Options> fileStorageOptions,
     ILogger<ListingsService> logger) : IListingService
 {
 
     private readonly ApplicationDbContext _dbContext = db;
+    private readonly IOptions<S3Options> _fileStorageOptions = fileStorageOptions;
     private readonly ILogger<ListingsService> _logger = logger;
     private readonly GeometryFactory _geometryFactory = NtsGeometryServices.Instance.CreateGeometryFactory();
     private const string SortNewest = "newest";
@@ -273,7 +277,7 @@ public class ListingsService(
         return Result.NoContent();
     }
 
-    private static ListingDto MapToDto(Listing l) => new(
+    private ListingDto MapToDto(Listing l) => new(
         l.Id,
         l.UserId,
         l.User.DisplayName,
@@ -292,7 +296,7 @@ public class ListingsService(
         l.VoivodeshipId,
         l.CityName);
 
-    private static MinimalListingDto MapToMinimalDto(Listing l) => new(
+    private MinimalListingDto MapToMinimalDto(Listing l) => new(
         l.Id.ToString(),
         l.Title,
         l.Price,
@@ -300,7 +304,7 @@ public class ListingsService(
         l.SpeciesId,
         l.BreedId,
         (int)l.ListingType,
-        GetFirstImageUrl(l.Images), // ImageUrl comes later
+        GetFirstImageUrl(l.Images),
         Slugify(l.Title, l.Id),
         l.CreatedAt,
         l.Location.Y,
@@ -317,8 +321,9 @@ public class ListingsService(
         var slug = sb.ToString().Trim('-');
         return $"{slug}-{id.ToString()[..8]}";
     }
-    private static Dictionary<string, string> ParseImages(JsonDocument images)
+    private Dictionary<string, string> ParseImages(JsonDocument images)
     {
+        string baseUrl = _fileStorageOptions.Value.PublicBaseUrl;
         var root = images.RootElement;
         if (root.ValueKind != JsonValueKind.Array)
             return new Dictionary<string, string>();
@@ -327,15 +332,19 @@ public class ListingsService(
             .EnumerateArray()
             .Select((element, index) => (index, value: element.GetString()))
             .Where(x => x.value is not null)
-            .ToDictionary(x => x.index.ToString(), x => x.value!);
+            .ToDictionary(
+                x => x.index.ToString(),
+                x => $"{baseUrl.TrimEnd('/')}/{x.value!.TrimStart('/')}");
     }
-    private static string GetFirstImageUrl(JsonDocument images)
+    private string GetFirstImageUrl(JsonDocument images)
     {
+        string baseUrl = _fileStorageOptions.Value.PublicBaseUrl;
         var root = images.RootElement;
         if (root.ValueKind != JsonValueKind.Array || root.GetArrayLength() == 0)
             return string.Empty;
 
         var firstImageId = root[0].GetString();
+        firstImageId = $"{baseUrl.TrimEnd('/')}/{firstImageId!.TrimStart('/')}";
         return firstImageId is null
             ? string.Empty
             : firstImageId;

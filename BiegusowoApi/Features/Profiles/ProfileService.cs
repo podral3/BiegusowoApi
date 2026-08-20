@@ -16,13 +16,14 @@ namespace BiegusowoApi.Features.Users;
 public class ProfileService(
     ApplicationDbContext db,
     ILogger<ProfileService> logger,
-    IOptions<SupabaseJwtOptions> options) : IProfileService
+    IOptions<SupabaseJwtOptions> supabaseOptions,
+    IOptions<S3Options> fileStorageOptions) : IProfileService
 {
     private const int ListingPageSize = 12;
 
     private readonly ApplicationDbContext _dbContext = db;
     private readonly ILogger<ProfileService> _logger = logger;
-    private readonly IOptions<SupabaseJwtOptions> _options = options;
+    private readonly IOptions<S3Options> _fileStorageOptions = fileStorageOptions;
 
     public async Task<Result<ProfilePageResponse>> GetProfileAsync(Guid userId, CancellationToken ct = default)
     {
@@ -104,8 +105,8 @@ public class ProfileService(
 
         return new ProfilePageResponse(
             userDto,
-            user.AvatarFileName,
-            user.BackgroundFileName,
+            $"{_fileStorageOptions.Value.PublicBaseUrl.TrimEnd('/')}/{user.AvatarFileName?.TrimStart('/')}",
+            $"{_fileStorageOptions.Value.PublicBaseUrl.TrimEnd('/')}/{user.BackgroundFileName?.TrimStart('/')}",
             [.. page.Select(MapListingSummary)],
             hasMoreListings);
     }
